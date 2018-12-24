@@ -54,7 +54,6 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_ll_tim.h"
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
@@ -64,8 +63,6 @@
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
-
-extern void _Error_Handler(char *, int);
 
 void MX_TIM1_Init(void);
 void MX_TIM8_Init(void);

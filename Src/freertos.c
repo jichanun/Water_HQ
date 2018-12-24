@@ -1,3 +1,4 @@
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * File Name          : freertos.c
@@ -45,12 +46,15 @@
   *
   ******************************************************************************
   */
+/* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 #include "task.h"
+#include "main.h"
 #include "cmsis_os.h"
 
+/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
 #include "sys.h"
 #include "led.h"
@@ -64,9 +68,27 @@
 #include "bsp_watchdog.h"
 #include "driver_gimbal.h"
 #include "task_feedmotor.h"
+#include "delay.h"
 /* USER CODE END Includes */
 
-/* Variables -----------------------------------------------------------------*/
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+/* USER CODE BEGIN Variables */
+/* USER CODE END Variables */
 osThreadId LED_TaskHandle;
 osThreadId Chassis_TaskHandle;
 osThreadId FeedMotor_TaskHandle;
@@ -74,10 +96,12 @@ osThreadId Remote_TaskHandle;
 osThreadId LostCounter_TaskHandle;
 osThreadId Gimbal_TaskHandle;
 
-/* USER CODE BEGIN Variables */
-/* USER CODE END Variables */
+/* Private function prototypes -----------------------------------------------*/
+/* USER CODE BEGIN FunctionPrototypes */
 
-/* Function prototypes -------------------------------------------------------*/
+
+/* USER CODE END FunctionPrototypes */
+
 void LEDTask(void const * argument);
 void ChassisTask(void const * argument);
 void FeedMotorTask(void const * argument);
@@ -87,15 +111,11 @@ void GimbalTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
-/* USER CODE BEGIN FunctionPrototypes */
-
-
-/* USER CODE END FunctionPrototypes */
-
-/* Hook prototypes */
-
-/* Init FreeRTOS */
-
+/**
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
        
@@ -147,7 +167,13 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 }
 
-/* LEDTask function */
+/* USER CODE BEGIN Header_LEDTask */
+/**
+  * @brief  Function implementing the LED_Task thread.
+  * @param  argument: Not used 
+  * @retval None
+  */
+/* USER CODE END Header_LEDTask */
 void LEDTask(void const * argument)
 {
 
@@ -157,12 +183,17 @@ void LEDTask(void const * argument)
   {
 		LED0=!LED0;
     osDelay(500);
-
   }
   /* USER CODE END LEDTask */
 }
 
-/* ChassisTask function */
+/* USER CODE BEGIN Header_ChassisTask */
+/**
+* @brief Function implementing the Chassis_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_ChassisTask */
 void ChassisTask(void const * argument)
 {
   /* USER CODE BEGIN ChassisTask */
@@ -194,7 +225,13 @@ void ChassisTask(void const * argument)
   /* USER CODE END ChassisTask */
 }
 
-/* FeedMotorTask function */
+/* USER CODE BEGIN Header_FeedMotorTask */
+/**
+* @brief Function implementing the FeedMotor_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_FeedMotorTask */
 void FeedMotorTask(void const * argument)
 {
   /* USER CODE BEGIN FeedMotorTask */
@@ -207,7 +244,13 @@ void FeedMotorTask(void const * argument)
   /* USER CODE END FeedMotorTask */
 }
 
-/* RemoteTask function */
+/* USER CODE BEGIN Header_RemoteTask */
+/**
+* @brief Function implementing the Remote_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_RemoteTask */
 void RemoteTask(void const * argument)
 {
   /* USER CODE BEGIN RemoteTask */
@@ -231,7 +274,13 @@ void RemoteTask(void const * argument)
   /* USER CODE END RemoteTask */
 }
 
-/* LostCounterTask function */
+/* USER CODE BEGIN Header_LostCounterTask */
+/**
+* @brief Function implementing the LostCounter_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_LostCounterTask */
 void LostCounterTask(void const * argument)
 {
   /* USER CODE BEGIN LostCounterTask */
@@ -245,7 +294,13 @@ void LostCounterTask(void const * argument)
   /* USER CODE END LostCounterTask */
 }
 
-/* GimbalTask function */
+/* USER CODE BEGIN Header_GimbalTask */
+/**
+* @brief Function implementing the Gimbal_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_GimbalTask */
 void GimbalTask(void const * argument)
 {
   /* USER CODE BEGIN GimbalTask */
@@ -267,6 +322,7 @@ void GimbalTask(void const * argument)
   /* USER CODE END GimbalTask */
 }
 
+/* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 void DMAUsart1DataFinishedHandle(void)
 {

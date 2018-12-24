@@ -5,6 +5,8 @@
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
 
+void LL_CAN_Receive(CAN_HandleTypeDef* hcan);
+
 void CanInit(void);
 unsigned char UserCan1FilterConfig(void);
 unsigned char UserCan2FilterConfig(void);
