@@ -47,6 +47,8 @@ void ChassisFollowCalculate(ChassisSpeedMessegePort *ChassisSpeed);
 void ChassisShakeCalculate(ChassisSpeedMessegePort *ChassisSpeed);
 void ChassisChangeFollow(ChassisSpeedMessegePort *ChassisSpeed);
 
+
+void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed);
 #endif
 
 #endif

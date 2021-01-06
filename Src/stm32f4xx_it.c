@@ -58,7 +58,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+char  TIM5CH1_CAPTURE_STA=0; //输入捕获状态 
+int   TIM5CH1_CAPTURE_VAL;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,18 +72,19 @@
 
 #include "freertostask.h"
 #include "bsp_can.h"
-
-
+#include "FreeRTOS.h"
 
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
 extern CAN_HandleTypeDef hcan1;
 extern CAN_HandleTypeDef hcan2;
+extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN EV */
-
+extern SemaphoreHandle_t xSemaphore;//wifi的二值信号
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -182,6 +184,25 @@ void DebugMon_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles DMA1 stream1 global interrupt.
+  */
+void DMA1_Stream1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Stream1_IRQn 0 */
+	if (LL_DMA_IsActiveFlag_TC1(DMA1))
+	{
+		
+	}
+	LL_DMA_ClearFlag_HT1(DMA1);
+	LL_DMA_ClearFlag_TC1(DMA1);
+  /* USER CODE END DMA1_Stream1_IRQn 0 */
+  
+  /* USER CODE BEGIN DMA1_Stream1_IRQn 1 */
+
+  /* USER CODE END DMA1_Stream1_IRQn 1 */
+}
+
+/**
   * @brief This function handles CAN1 RX0 interrupts.
   */
 void CAN1_RX0_IRQHandler(void)
@@ -197,22 +218,59 @@ void CAN1_RX0_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles TIM3 global interrupt.
+  */
+void TIM3_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM3_IRQn 0 */
+
+  /* USER CODE END TIM3_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim3);
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+
+  /* USER CODE END TIM3_IRQn 1 */
+}
+
+/**
   * @brief This function handles USART1 global interrupt.
   */
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
+
+  /* USER CODE END USART1_IRQn 0 */
+  /* USER CODE BEGIN USART1_IRQn 1 */
 	if(((USART1->SR)&(1<<4))!=0)
 	{
 		LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_5);
-  /* USER CODE END USART1_IRQn 0 */
-  /* USER CODE BEGIN USART1_IRQn 1 */
 		(void)USART1->SR;				//清除中断
 		(void)USART1->DR;				//清除数据
 		LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_5);
 		LL_DMA_ClearFlag_TC5(DMA2);
 	}
   /* USER CODE END USART1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USART3 global interrupt.
+  */
+void USART3_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART3_IRQn 0 */
+static BaseType_t xHigherPriorityTaskWoken;
+if(((USART3->SR)&(1<<4))!=0)
+	{
+		LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_1);
+		(void)USART3->SR;				//清除中断
+		(void)USART3->DR;				//清除数据
+		LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_1);
+		LL_DMA_ClearFlag_TC1(DMA1);
+		xSemaphoreGiveFromISR(xSemaphore,&xHigherPriorityTaskWoken);//发送信号
+	}
+  /* USER CODE END USART3_IRQn 0 */
+  /* USER CODE BEGIN USART3_IRQn 1 */
+
+  /* USER CODE END USART3_IRQn 1 */
 }
 
 /**
@@ -227,6 +285,25 @@ void TIM7_IRQHandler(void)
   /* USER CODE BEGIN TIM7_IRQn 1 */
 
   /* USER CODE END TIM7_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA2 stream1 global interrupt.
+  */
+void DMA2_Stream1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream1_IRQn 0 */
+
+  /* USER CODE END DMA2_Stream1_IRQn 0 */
+  
+  /* USER CODE BEGIN DMA2_Stream1_IRQn 1 */
+  if (LL_DMA_IsActiveFlag_TC1(DMA2))
+	{
+		//DMAUsart6DataFinishedHandle();
+	}
+	LL_DMA_ClearFlag_HT1(DMA2);
+	LL_DMA_ClearFlag_TC1(DMA2);
+  /* USER CODE END DMA2_Stream1_IRQn 1 */
 }
 
 /**
@@ -245,22 +322,57 @@ void CAN2_RX0_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles USB On The Go FS global interrupt.
+  */
+void OTG_FS_IRQHandler(void)
+{
+  /* USER CODE BEGIN OTG_FS_IRQn 0 */
+
+  /* USER CODE END OTG_FS_IRQn 0 */
+  HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+  /* USER CODE BEGIN OTG_FS_IRQn 1 */
+
+  /* USER CODE END OTG_FS_IRQn 1 */
+}
+
+/**
   * @brief This function handles DMA2 stream5 global interrupt.
   */
 void DMA2_Stream5_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream5_IRQn 0 */
-	if (LL_DMA_IsActiveFlag_TC5(DMA2))
-	{
-		DMAUsart1DataFinishedHandle();
+
   /* USER CODE END DMA2_Stream5_IRQn 0 */
   
   /* USER CODE BEGIN DMA2_Stream5_IRQn 1 */
-
+	if (LL_DMA_IsActiveFlag_TC5(DMA2))
+	{
+		DMAUsart1DataFinishedHandle();
 	}
 	LL_DMA_ClearFlag_HT5(DMA2);
 	LL_DMA_ClearFlag_TC5(DMA2);
   /* USER CODE END DMA2_Stream5_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USART6 global interrupt.
+  */
+void USART6_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART6_IRQn 0 */
+
+  /* USER CODE END USART6_IRQn 0 */
+  /* USER CODE BEGIN USART6_IRQn 1 */
+   if(((USART6->SR)&(1<<4))!=0)
+	{
+		LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_1);
+		(void)USART6->SR;				//清除中断
+		(void)USART6->DR;				//清除数据
+		LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_1);
+		LL_DMA_ClearFlag_TC1(DMA2);
+	}
+
+  /* USER CODE END USART6_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

@@ -1,9 +1,14 @@
 #include "driver_feedmotor.h"
+#include "driver_gimbal.h"
+#include "driver_remote.h"
 #include "task_feedmotor.h"
 #include "math.h"
 #include "task_remote.h"
 #include "task_gimbal.h"
+#include "bsp_can.h"
+#include "delay.h"
 
+//300初始位置
 //热量控制参数
 #define HEAT_UPPER_LIMIT  (480.0f)
 #define COOLlNG_RATIO   	(160.0f)
@@ -18,16 +23,19 @@
 //堵转回转拨盘格数
 #define MOTOR_RETURN_RATE (0.5f)
 
+//扳机参数
+#define Trigger_initcode 2400
+#define Trigger_firecode 930
+
 float SetLocation;
+extern GimbalMotorStruct	PitchMotor;
+extern  RemoteDataUnion RemoteData;
+extern  SwitchStruct Switch;
+
+TriggerStruct Trigger;
+
 
 //----------------------------------------------拨弹周期任务----------------------------------------------------------
-void FeedMotorControlLogic()
-{	
-
-	
-//PID控制和can信号发送放在云台任务中了
-}
-
 
 int IsDeverseLocked=0;
 void LockedMotorDetectionAndProcessed(void)		//堵转检测算法
@@ -99,4 +107,129 @@ void FeedMotorSingleShootSet(u8 FeedMotorJudge)		//单发函数
 	{
 			SingleShootEnable = 1;
 	}
+}
+//拉线电机发射控制
+void PitchControlCalculateAndSend(void)
+{
+	u8 Can1PitchSendMessege[8];
+	PitchMotor.PIDLocation.Ref	=	PitchMotor.Location.SetLocation;
+	PitchMotor.PIDLocation.Fdb	=	PitchMotor.Location.Location;
+	
+	PitchMotor.PIDLocation.calc(&PitchMotor.PIDLocation);
+	
+	PitchMotor.Speed.SetSpeed	=	PitchMotor.PIDLocation.Out;
+	
+	PitchMotor.PIDSpeed.Ref	=	PitchMotor.Speed.SetSpeed;
+	PitchMotor.PIDSpeed.Fdb	=	PitchMotor.Speed.Speed;
+	
+	PitchMotor.PIDSpeed.calc(&PitchMotor.PIDSpeed);
+	
+	
+	Can1PitchSendMessege[0]	=	((s16)(PitchMotor.PIDSpeed.Out*16384))>>8;
+	Can1PitchSendMessege[1]	=	((s16)(PitchMotor.PIDSpeed.Out*16384))&0x00ff;	
+	
+	
+#if DEBUG_USE_PULLMOTOR_CANSEND
+	if(RemoteData.RemoteDataProcessed.RCValue.s2==2)
+	{
+	  Can1PitchSendMessege[0]	=	0;
+	  Can1PitchSendMessege[1] = 0;
+		CAN1_Send_Msg(Can1PitchSendMessege,8,0x1FF);
+	}
+	else
+	{
+		CAN1_Send_Msg(Can1PitchSendMessege,8,0x1FF);
+	}
+#endif
+}
+
+//拉线电机控制
+int Flag_=1;
+int count_ = 0;
+int location = 0;
+int loction_1 = 0;
+int flag_count=1;
+void FeedMotorControlLogic()
+{	
+/*****************************拉线复位一体化*************************************/
+	Switch.Reload0=PBin(15);
+	if(RemoteData.RemoteDataProcessed.RCValue.s1==2)
+	{
+		location=PitchMotor.Location.Location+10;
+		if(Switch.Reload0==1)//触发限位开关
+		{
+			count_++;
+			if(Flag_==1)
+			{
+				loction_1=PitchMotor.Location.Location;
+			}
+			Flag_=0;
+			location=loction_1;
+		}
+		if(count_>=40)
+			{
+				if(flag_count==1)
+				{
+					flag_count=0;
+					Switch.Reload1=1;
+				}
+					location=0;
+			}
+	}		
+	else
+	{
+		flag_count=1;
+		location=0;
+		Flag_=1;
+		count_=0;
+	}
+		PitchSetLocationValueChange(location);
+	  PitchControlCalculateAndSend();
+}
+
+/**************************遥控器控制拉线、遥控器控制拉线复位*****************************/
+//	Switch.Reload0=PBin(15);
+//	if(RemoteData.RemoteDataProcessed.RCValue.s1==2)
+//	{
+//		location=PitchMotor.Location.Location+10;
+//		if(Switch.Reload0==1)//触发限位开关
+//		{
+//			if(Flag_==1)
+//			{
+//				loction_1=PitchMotor.Location.Location;
+//			}
+//			Flag_=0;
+//			location=loction_1;
+//		}
+//	}		
+//	else
+//	{
+//		location=0;
+//		Flag_=1;
+//	}
+//		PitchSetLocationValueChange(location);
+//	  PitchControlCalculateAndSend();
+//}
+
+	
+//*************************************扳机相关函数*****************************************//
+void TriggerInit(void)
+{
+	LL_TIM_CC_EnableChannel(TIM1,LL_TIM_CHANNEL_CH1);
+	LL_TIM_EnableCounter(TIM1);
+	LL_TIM_EnableAllOutputs(TIM1);
+}
+
+void TriggerControl(void)
+{
+	
+		if(RemoteData.RemoteDataProcessed.RCValue.s1==1)
+		 {
+		  Trigger.firecode=930;
+		  }else
+		 {
+		  Trigger.firecode=2400;
+		 }
+		 
+	LL_TIM_OC_SetCompareCH1(TIM1,Trigger.firecode);
 }

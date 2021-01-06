@@ -53,8 +53,10 @@
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
+#include "usb_device.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -69,11 +71,12 @@
 #include "driver_chassis.h"
 #include "driver_remote.h"
 #include "driver_gimbal.h"
-#include "driver_mpu9250.h"
-#include "inv_mpu.h"
-#include "inv_mpu_dmp_motion_driver.h"
 #include "driver_feedmotor.h"
 #include "task_lostcounter.h"
+#include "task_wifi.h"
+#include "driver_icm20689.h"
+#include "driver_hi229um.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -95,7 +98,34 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+void usb_reset(void)
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
 
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11|GPIO_PIN_12, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PF9 */
+  GPIO_InitStruct.Pin = GPIO_PIN_11;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PF10 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	
+	PAout(11)=0;
+	PAout(12)=0;
+	HAL_Delay(100);
+};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -133,6 +163,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+	usb_reset();
   DelayInit(168);
   /* USER CODE END SysInit */
 
@@ -143,24 +174,35 @@ int main(void)
   MX_CAN2_Init();
   MX_USART3_UART_Init();
   MX_UART5_Init();
-  MX_UART4_Init();
   MX_TIM1_Init();
   MX_TIM8_Init();
   MX_USART2_UART_Init();
   MX_USART1_UART_Init();
+  MX_SPI1_Init();
+  MX_TIM3_Init();
+  MX_TIM5_Init();
+  MX_TIM12_Init();
+  MX_TIM4_Init();
+  MX_TIM2_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-  GPIO_Config();
-  UserTim1Config();
+	MX_USB_DEVICE_Init();
+	HI229_Gyroscope_Init();
+
+  //GPIO_Config();
+  //UserTim1Config();
   
+	//这行以下5个都要删掉注释
   CanInit();
   ChassisInit();
   GimbalInit();
   FeedMotorInit();
+//	icm20689_dmp_setup();
+	WifiInit("192.168.1.113",8888,"RoboMaster2","bufujiugan",USART3);
 	
-	MPU9250Init();
   LostCounterInit();
   WatchDogInit();
-
+	
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -204,6 +246,7 @@ void SystemClock_Config(void)
     
   }
   LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_25, 336, LL_RCC_PLLP_DIV_2);
+  LL_RCC_PLL_ConfigDomain_48M(LL_RCC_PLLSOURCE_HSE, LL_RCC_PLLM_DIV_25, 336, LL_RCC_PLLQ_DIV_7);
   LL_RCC_PLL_Enable();
 
    /* Wait till PLL is ready */
@@ -261,6 +304,7 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
   while(1)
   {
+		
   }
   /* USER CODE END Error_Handler_Debug */
 }

@@ -10,7 +10,15 @@
 #define __TASKFEEDMOTOR_H	 
 #include "sys.h"
 
+typedef struct 
+{
+	int initcode;
+	int firecode;
+}TriggerStruct;
+
 void FeedMotorControlLogic(void);
 void LockedMotorDetectionAndProcessed(void);
+void TriggerInit(void);
+void TriggerControl(void);
 
 #endif

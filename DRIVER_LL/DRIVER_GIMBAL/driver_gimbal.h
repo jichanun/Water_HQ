@@ -9,9 +9,9 @@
 #include "sys.h"
 #include "pid.h"
 #include "BSPconfig.h"
-#define PITCH_INIT_VALUE PITCH_INIT_VALUE_SET		//-0.178
+#define PITCH_INIT_VALUE PITCH_INIT_VALUE_SET		
 #define PITCH_TEMPSET (PITCH_INIT_VALUE>0.5f ? 1.0f:0.0f)
-#define YAW_INIT_VALUE YAW_INIT_VALUE_SET 		//0.720
+#define YAW_INIT_VALUE YAW_INIT_VALUE_SET 		
 #define YAW_TEMPSET	(YAW_INIT_VALUE>0.5f ? 1.0f:0.0f)
 
 #define PITCH_MAX_VALUE (PITCH_INIT_VALUE+0.04f)
@@ -19,6 +19,10 @@
 
 #define YAW_MAX_VALUE (YAW_INIT_VALUE+0.16f)
 #define YAW_MIN_VALUE (YAW_INIT_VALUE-0.16f)
+
+#define YAW_TARGET_MODE0  120  //前哨战
+#define YAW_TARGET_MODE1  125  //基地
+
 
 void GimbalInit(void);
 void GimbalReturnToInitLocation(u8 IfPitch,u8 IfYaw);
@@ -28,6 +32,7 @@ typedef struct					//电机速度相关值
 {
 	float	SetSpeed;
 	float Speed;
+	float SpeedLast;
 }SpeedStruct;						//速度结构体定义
 
 typedef struct					//电机位置相关值
@@ -64,12 +69,23 @@ typedef struct
 	u8 FlagPitchUseEncoder;
 	u8 FlagYawUseEncoder;
 }GimbalSetLocationStruct;
+typedef struct
+{
+	float roll;
+	float pitch;
+	float yaw;
+	float speed_x;
+	float speed_y;
+	float speed_z;
+}GyroscopeStruct;
 
 float GetYawEncoderValue(void);
 float GetYawGyroValue(void);
 void GimbalPIDClear(void);
 void GimbalDataInit(void);
 void PitchDataInit(void);
+
+extern GyroscopeStruct Gyroscope;
 
 void GimbalControlTask(void);
 void GyroAndEncoderDataGet(void);

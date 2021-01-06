@@ -160,10 +160,10 @@ void ChassisControl(ChassisSpeedMessegePort ChassisSpeed)
 	u8 i;
 	u8 CAN1SendMessegeBuffer[8];
 	
-	ChassisMotor[0].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		-	1.8f*ChassisSpeed.Spin;
-	ChassisMotor[1].Speed.SetSpeed=	-0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+	1.8f*ChassisSpeed.Spin;
-	ChassisMotor[2].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+ 1.8f*ChassisSpeed.Spin;
-	ChassisMotor[3].Speed.SetSpeed=	-0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		-	1.8f*ChassisSpeed.Spin;
+	ChassisMotor[0].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+	1.8f*ChassisSpeed.Spin;
+	ChassisMotor[1].Speed.SetSpeed=	-0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		-	1.8f*ChassisSpeed.Spin;
+	ChassisMotor[2].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		- 1.8f*ChassisSpeed.Spin;
+	ChassisMotor[3].Speed.SetSpeed=	-0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+	1.8f*ChassisSpeed.Spin;
 	
 	for(i=0;i<4;i++)
 	{
@@ -186,4 +186,48 @@ void ChassisControl(ChassisSpeedMessegePort ChassisSpeed)
 	CAN1_Send_Msg(CAN1SendMessegeBuffer,8);
 #endif
 }
+extern int RemoteLostCount;
+float YAWK=1000;	
+u16 speed0=0,speed1=0,speed2=0,speed3=0;
 
+void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
+{
+	ChassisMotor[0].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		-	1.8f*ChassisSpeed.Spin;
+	ChassisMotor[1].Speed.SetSpeed=	-0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+	1.8f*ChassisSpeed.Spin;
+	ChassisMotor[2].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+ 1.8f*ChassisSpeed.Spin;
+	ChassisMotor[3].Speed.SetSpeed=	-0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		-	1.8f*ChassisSpeed.Spin;
+	for(int i=0;i<4;i++)
+	{
+		if (ChassisMotor[i].Speed.SetSpeed>1)
+			ChassisMotor[i].Speed.SetSpeed=1;
+		else if (ChassisMotor[i].Speed.SetSpeed<-1)
+			ChassisMotor[i].Speed.SetSpeed=-1;
+	}
+	
+#if 1 //启用关控保护
+	if (!RemoteLostCount)
+	{
+		LL_TIM_OC_SetCompareCH1(TIM2,0);
+		LL_TIM_OC_SetCompareCH2(TIM2,0);
+		LL_TIM_OC_SetCompareCH3(TIM8,0);
+		LL_TIM_OC_SetCompareCH4(TIM8,0);
+	}	
+	else 
+	{		
+		speed0=(u16)((ChassisMotor[0].Speed.SetSpeed*YAWK)+1000);
+		speed1=(u16)((ChassisMotor[1].Speed.SetSpeed*YAWK)+1000);
+		speed2=(u16)((ChassisMotor[2].Speed.SetSpeed*YAWK)+1000);
+		speed3=(u16)((ChassisMotor[3].Speed.SetSpeed*YAWK)+1000);
+		LL_TIM_OC_SetCompareCH1(TIM2,speed2);
+		LL_TIM_OC_SetCompareCH2(TIM2,speed3);
+		LL_TIM_OC_SetCompareCH3(TIM8,speed1);
+		LL_TIM_OC_SetCompareCH4(TIM8,speed0);
+	}
+	#else  //关闭关控保护
+		LL_TIM_OC_SetCompareCH1(TIM2,ChassisMotor[2].Speed.SetSpeed);
+		LL_TIM_OC_SetCompareCH2(TIM2,ChassisMotor[3].Speed.SetSpeed);
+		LL_TIM_OC_SetCompareCH3(TIM8,ChassisMotor[1].Speed.SetSpeed);
+		LL_TIM_OC_SetCompareCH4(TIM8,ChassisMotor[0].Speed.SetSpeed);
+#endif
+	
+}

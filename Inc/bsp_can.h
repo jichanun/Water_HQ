@@ -10,7 +10,7 @@ void LL_CAN_Receive(CAN_HandleTypeDef* hcan);
 void CanInit(void);
 unsigned char UserCan1FilterConfig(void);
 unsigned char UserCan2FilterConfig(void);
-u8 CAN1_Send_Msg(u8* msg,u8 len);
+u8 CAN1_Send_Msg(u8* msg,u8 len,u16 ID);
 u8 CAN2_Send_Msg(u8* msg,u8 len);
 
 

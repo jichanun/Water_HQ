@@ -33,6 +33,8 @@
 #define REMOTE_RECEIVER_BAUDRATE (100000)
 
 RemoteDataUnion RemoteData;
+//限位开关控制
+SwitchStruct Switch;
 
 void RemoteDataClear()
 {

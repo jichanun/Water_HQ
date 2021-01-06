@@ -10,6 +10,7 @@
 #define LOST_COUNTER_TIME_MS (50)
 u32 LostCounterCountNumber[NUMBERS_OF_COUNT];
 
+
 void LostCounterInit()
 {
 	u8 i;
@@ -24,13 +25,21 @@ void LostCounterFeed(u8 i)
 {
 	LostCounterCountNumber[i]=0;
 }
+ int RemoteLostCount=0;
+extern u8 GimbalInitFlag;
 
 void LostCounterControl(u16 SystemErrorStatus)
 {
 	if((SystemErrorStatus>>REMOTE_LOST_COUNT)&1) //Ò£¿ØÆ÷¶ªÊý¾Ý
 	{
-		
+		 RemoteLostCount=0;
+		GimbalInitFlag=1;
 	}
+	else 
+	{
+		 RemoteLostCount=1;
+	}
+	
 	
 }
 

@@ -20,6 +20,8 @@ typedef enum
 }ChassisControlModeEnum;
 
 void ChassisSetSpeed(float SpeedX,float SpeedY,float Spin);
+void Chassis_Init(void);
+void Chassis_Control(void);
 
 
 #endif

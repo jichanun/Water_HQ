@@ -107,6 +107,16 @@ void RemoteInit(void);
 RemoteDataProcessedStruct RemoteDataProcess(RemoteDataUnion RemoteDataRaw);
 void RockerDataConvert(float *x,float *y);
 
+typedef struct
+{
+	int Target0;
+	int Target1;
+	int Reload0;//拉线电机靠近扳机处的限位开关
+	int Reload1;//换弹标志位
+	int Trigger;
+	int Init;
+}SwitchStruct;
+
 
 #endif
 

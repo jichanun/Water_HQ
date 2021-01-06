@@ -53,7 +53,7 @@ unsigned char UserCan2FilterConfig()
   CAN2_FilerConf.FilterActivation=ENABLE; //激活滤波器0
   CAN2_FilerConf.SlaveStartFilterBank=14;
 	
-	if(HAL_CAN_ConfigFilter(&hcan1,&CAN2_FilerConf)!=HAL_OK) return 1;//滤波器初始化
+	if(HAL_CAN_ConfigFilter(&hcan2,&CAN2_FilerConf)!=HAL_OK) return 1;//滤波器初始化
 
 	__HAL_CAN_ENABLE_IT(&hcan2,CAN_IT_RX_FIFO0_MSG_PENDING);//FIFO0消息挂起中断允许.	  
 	return 0;	
@@ -119,12 +119,35 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	if(hcan==&hcan1)
 	{
 		__HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-		LostCounterFeed(RxMessage.FilterMatchIndex);
-  
-		for(i=0;i<8;i++)
+//		LostCounterFeed(RxMessage.FilterMatchIndex);
+//  
+//		for(i=0;i<8;i++)
+//		{
+//			ChassisMotor[RxMessage.FilterMatchIndex].SpeedReceiveMessege[i] = Data[i];
+//		}
+		switch(RxMessage.FilterMatchIndex)
 		{
-			ChassisMotor[RxMessage.FilterMatchIndex].SpeedReceiveMessege[i] = Data[i];
+			case 0: 
+				for(i=0;i<8;i++)
+				{
+					FeedMotor.ReceiveMessege[i] = Data[i];
+				}
+				LostCounterFeed(FEEDMOTOR_LOST_COUNT);
+				break;
+				
+			case 1:
+				for(i=0;i<8;i++)
+				{
+					PitchMotor.CANReceiveMessege[i] = Data[i];
+				}
+				LostCounterFeed(GIMBAL_MOTOR_PITCH);
+				break;
+
+				
+			default:
+				break;
 		}
+		
 		
 	}else if(hcan==&hcan2)
 	{
@@ -147,14 +170,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 				LostCounterFeed(GIMBAL_MOTOR_PITCH);
 				break;
 				
-			case 2:
-				for(i=0;i<8;i++)
-				{
-					FeedMotor.ReceiveMessege[i] = Data[i];
-				}
-				LostCounterFeed(FEEDMOTOR_LOST_COUNT);
-				break;
-				
 			default:
 				break;
 		}
@@ -162,11 +177,11 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 }
 
 
-u8 CAN1_Send_Msg(u8* msg,u8 len)
+u8 CAN1_Send_Msg(u8* msg,u8 len,u16 ID)
 {
     u16 i=0;
 	  uint8_t Data[8];
-    Tx1Message.StdId=0x200;        //标准标识符
+    Tx1Message.StdId=ID;        //标准标识符
     Tx1Message.ExtId=0x12;        //扩展标识符(29位)
     Tx1Message.IDE=CAN_ID_STD;    //使用标准帧
     Tx1Message.RTR=CAN_RTR_DATA;  //数据帧
@@ -188,6 +203,6 @@ u8 CAN2_Send_Msg(u8* msg,u8 len)
     Tx2Message.DLC=len;
     for(i=0;i<len;i++)
 			Data[i]=msg[i];
-		if(HAL_CAN_AddTxMessage(&hcan2,&Tx1Message,Data,(uint32_t *)CAN_TX_MAILBOX0)!=HAL_OK) return 1;     //发送
+		if(HAL_CAN_AddTxMessage(&hcan2,&Tx2Message,Data,(uint32_t *)CAN_TX_MAILBOX0)!=HAL_OK) return 1;     //发送
     return 0;		
 }

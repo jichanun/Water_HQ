@@ -2,9 +2,9 @@
 #include "pid.h"
 #include "math.h"
 #include "bsp_can.h"
-
+#include "driver_remote.h"
 FeedMotorStruct FeedMotor={0};
-
+extern  RemoteDataUnion RemoteData;
 #define FEEDMOTOR_SPEED_KP	(1.6f)
 #define FEEDMOTOR_SPEED_KI	(0)
 #define FEEDMOTOR_SPEED_KD	(0)
@@ -13,10 +13,11 @@ FeedMotorStruct FeedMotor={0};
 #define FEEDMOTOR_LOCATION_KI	(0)
 #define FEEDMOTOR_LOCATION_KD	(0.0f)
 
+
 void FeedMotorInit(void)
 {
-	FeedMotor.PIDSpeed.OutMax=1;
-	FeedMotor.PIDSpeed.OutMin=-1;
+	FeedMotor.PIDSpeed.OutMax=0.8;
+	FeedMotor.PIDSpeed.OutMin=-0.8;
 	FeedMotor.PIDSpeed.calc=&PidCalc;
 	FeedMotor.PIDSpeed.clear=&PidClear;
 	FeedMotor.PIDSpeed.clear(&FeedMotor.PIDSpeed);
@@ -35,6 +36,8 @@ void FeedMotorInit(void)
 	FeedMotor.PIDLocation.Ki=FEEDMOTOR_LOCATION_KI;
 	FeedMotor.PIDLocation.Kd=FEEDMOTOR_LOCATION_KD;
 }
+
+
 
 
 void FeedMotorSpeedDataUpdate(void)							
@@ -82,9 +85,10 @@ void FeedMotorDataUpdate()
 		FeedMotorCurrentDataUpdate();
 }
 
+//拨弹电机发指令
 void MotorLocationControlLogic(void)
 {
-//	u8 Can2FeedMotorSendMessege[8] = {0};
+	u8 Can1FeedMotorSendMessege[8] = {0};
 	
 	FeedMotor.PIDLocation.Ref	=	FeedMotor.Location.SetLocation;
 	FeedMotor.PIDLocation.Fdb	=	FeedMotor.Location.Location;
@@ -98,12 +102,21 @@ void MotorLocationControlLogic(void)
 	
 	FeedMotor.PIDSpeed.calc(&FeedMotor.PIDSpeed);
 	
-//	Can2FeedMotorSendMessege[0]=((int16_t)(FeedMotor.PIDSpeed.Out*32767))>>8;
-//	Can2FeedMotorSendMessege[1]=((int16_t)(FeedMotor.PIDSpeed.Out*32767))&0x00ff;
+	Can1FeedMotorSendMessege[0]=((int16_t)(FeedMotor.PIDSpeed.Out*32767))>>8;
+	Can1FeedMotorSendMessege[1]=((int16_t)(FeedMotor.PIDSpeed.Out*32767))&0x00ff;
 
-//#if DEBUG_USE_GIMBALMOTOR_CANSEND
-//	CAN2_Send_Msg_FeedMotor(Can2FeedMotorSendMessege,8);
-//#endif
+#if DEBUG_USE_GIMBALMOTOR_CANSEND
+	if(RemoteData.RemoteDataProcessed.RCValue.s2==2)
+	{
+	  Can1FeedMotorSendMessege[0]	=	0;
+	  Can1FeedMotorSendMessege[1] = 0;
+		CAN1_Send_Msg(Can1FeedMotorSendMessege,8,0x200);
+	}
+	else
+	{
+		CAN1_Send_Msg(Can1FeedMotorSendMessege,8,0x200);
+	}
+#endif
 }
 
 

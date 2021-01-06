@@ -1,10 +1,15 @@
 #include "task_chassis.h"
+#include "task_gimbal.h"
 #include "task_remote.h"
 #include "driver_remote.h"
 #include "math.h"
 #include "driver_gimbal.h"
 #include "driver_chassis.h"
 extern RemoteDataUnion RemoteData;
+extern GimbalMotorStruct	YawMotor,PitchMotor;
+extern SwitchStruct Switch;
+int Target_mode;  //发射目标，0基地，1前哨战
+
 
 enum
 {
@@ -19,7 +24,7 @@ RemoteDataPortStruct RemoteModeProcessData(RemoteDataProcessedStruct	RemoteDataR
 {
 	RemoteDataPortStruct	RemoteDataPortTemp={0};
 	RemoteDataPortTemp.ChassisSpeedX	=	-	RemoteDataReceive.Channel_2;
-	RemoteDataPortTemp.ChassisSpeedY	=	-	RemoteDataReceive.Channel_3;
+	RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3;
 		
 	RemoteDataPortTemp.PitchIncrement	=		RemoteDataReceive.Channel_1;
 	RemoteDataPortTemp.YawIncrement		=	-	RemoteDataReceive.Channel_0;
@@ -465,13 +470,36 @@ void ChassisRampProcessed(RemoteDataPortStruct	*RemoteDataPortTemp)
 	ChassisSpeedYSave = RemoteDataPortTemp->ChassisSpeedY;
 }
 
-
+//********************************************缺了一部分*************************************//
+extern float YAWError;
+extern float PitchError;
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 {
-	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,0);
-	
-}
+////	if(Target_mode==0)//基地
+////	{
+////		YawSetLocationValueChange(YAW_TARGET_MODE0);
+////	}
+////	if(Target_mode==1)//前哨战
+////	{
+////	  YawSetLocationValueChange(YAW_TARGET_MODE1);
+////	}
+//	if(RemoteData.RemoteDataProcessed.RCValue.Ch0>1024)
+//		RemoteDataPort.YawIncrement=1;
+//	if(RemoteData.RemoteDataProcessed.RCValue.Ch0<1024)
+//		RemoteDataPort.YawIncrement=-1;
+//	if(RemoteData.RemoteDataProcessed.RCValue.Ch0==1024)
+//		RemoteDataPort.YawIncrement=0;
+//	YawSetLocationValueChange(YawMotor.Location.SetLocation+(RemoteDataPort.YawIncrement)/800);
+	//**************下面的是工训代码
+	#if 0 //****如果不使用陀螺仪，右摇杆控制方向
+	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,RemoteDataPort.YawIncrement);	
+	#else  //***如果使用陀螺仪，右摇杆控制位置增量
+	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError);	
+	YawSetLocationValueChange((RemoteDataPort.YawIncrement)/800);
+	PitchSetLocationValueChange(RemoteDataPort.PitchIncrement/1000);
+	#endif
 
+}
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort);
 
 RemoteDataPortStruct	RemoteDataPort;

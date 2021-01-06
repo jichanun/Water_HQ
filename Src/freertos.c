@@ -69,6 +69,10 @@
 #include "driver_gimbal.h"
 #include "task_feedmotor.h"
 #include "delay.h"
+#include "usbd_cdc_if.h"
+
+#include "interface_base.h"
+#include "task_wifi.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -78,6 +82,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+GyroscopeStruct Gyroscope;
 
 /* USER CODE END PD */
 
@@ -90,11 +95,12 @@
 /* USER CODE BEGIN Variables */
 /* USER CODE END Variables */
 osThreadId LED_TaskHandle;
-osThreadId Chassis_TaskHandle;
 osThreadId FeedMotor_TaskHandle;
 osThreadId Remote_TaskHandle;
 osThreadId LostCounter_TaskHandle;
 osThreadId Gimbal_TaskHandle;
+osThreadId WIFI_TaskHandle;
+osThreadId Chassis_TaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -103,11 +109,12 @@ osThreadId Gimbal_TaskHandle;
 /* USER CODE END FunctionPrototypes */
 
 void LEDTask(void const * argument);
-void ChassisTask(void const * argument);
 void FeedMotorTask(void const * argument);
 void RemoteTask(void const * argument);
 void LostCounterTask(void const * argument);
 void GimbalTask(void const * argument);
+void WifiTask(void const * argument);
+void ChassisTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -138,10 +145,6 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(LED_Task, LEDTask, osPriorityLow, 0, 64);
   LED_TaskHandle = osThreadCreate(osThread(LED_Task), NULL);
 
-  /* definition and creation of Chassis_Task */
-  osThreadDef(Chassis_Task, ChassisTask, osPriorityAboveNormal, 0, 512);
-  Chassis_TaskHandle = osThreadCreate(osThread(Chassis_Task), NULL);
-
   /* definition and creation of FeedMotor_Task */
   osThreadDef(FeedMotor_Task, FeedMotorTask, osPriorityNormal, 0, 512);
   FeedMotor_TaskHandle = osThreadCreate(osThread(FeedMotor_Task), NULL);
@@ -158,6 +161,14 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(Gimbal_Task, GimbalTask, osPriorityHigh, 0, 512);
   Gimbal_TaskHandle = osThreadCreate(osThread(Gimbal_Task), NULL);
 
+  /* definition and creation of WIFI_Task */
+  osThreadDef(WIFI_Task, WifiTask, osPriorityIdle, 0, 512);
+  WIFI_TaskHandle = osThreadCreate(osThread(WIFI_Task), NULL);
+
+  /* definition and creation of Chassis_Task */
+  osThreadDef(Chassis_Task, ChassisTask, osPriorityIdle, 0, 512);
+  Chassis_TaskHandle = osThreadCreate(osThread(Chassis_Task), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -173,56 +184,28 @@ void MX_FREERTOS_Init(void) {
   * @param  argument: Not used 
   * @retval None
   */
+
+//unsigned char	send_buffer[]="Hello World!";
+
+
+
+
+extern u8 init_Wifi_flag;
+SemaphoreHandle_t xSemaphore;//wifi的二值信号
+int code;
+extern  RemoteDataUnion RemoteData;
 /* USER CODE END Header_LEDTask */
 void LEDTask(void const * argument)
 {
 
   /* USER CODE BEGIN LEDTask */
   /* Infinite loop */
-  for(;;)
+	 for(;;)
   {
 		LED0=!LED0;
     osDelay(500);
   }
   /* USER CODE END LEDTask */
-}
-
-/* USER CODE BEGIN Header_ChassisTask */
-/**
-* @brief Function implementing the Chassis_Task thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_ChassisTask */
-void ChassisTask(void const * argument)
-{
-  /* USER CODE BEGIN ChassisTask */
-	while(GetLostCounterData()[CHASSIS_MOTOR_0]>CHASSIS_LOST_TOLERANCE_MS)
-	{
-		osDelay(1);
-	}
-
-	while(GetLostCounterData()[CHASSIS_MOTOR_1]>CHASSIS_LOST_TOLERANCE_MS)
-	{
-		osDelay(1);
-	}
-
-	while(GetLostCounterData()[CHASSIS_MOTOR_2]>CHASSIS_LOST_TOLERANCE_MS)
-	{
-		osDelay(1);
-	}
-
-	while(GetLostCounterData()[CHASSIS_MOTOR_3]>CHASSIS_LOST_TOLERANCE_MS)
-	{
-		osDelay(1);
-	}
-  /* Infinite loop */
-  for(;;)
-  {
-		ChassisControlTask();
-    osDelay(4);
-  }
-  /* USER CODE END ChassisTask */
 }
 
 /* USER CODE BEGIN Header_FeedMotorTask */
@@ -235,10 +218,12 @@ void ChassisTask(void const * argument)
 void FeedMotorTask(void const * argument)
 {
   /* USER CODE BEGIN FeedMotorTask */
+	 // TriggerInit();
   /* Infinite loop */
   for(;;)
-  {
-		FeedMotorControlLogic();
+  {		
+		//TriggerControl();//扳机控制
+    //FeedMotorControlLogic();//拉线电机控制
     osDelay(4);
   }
   /* USER CODE END FeedMotorTask */
@@ -304,22 +289,81 @@ void LostCounterTask(void const * argument)
 void GimbalTask(void const * argument)
 {
   /* USER CODE BEGIN GimbalTask */
-	while(GetLostCounterData()[GIMBAL_MOTOR_PITCH]>GIMBAL_LOST_TOLERANCE_MS)
-	{
-		vTaskDelay(1);								//精准控制时间离散节奏
-	}
 
-	while(GetLostCounterData()[GIMBAL_MOTOR_YAW]>GIMBAL_LOST_TOLERANCE_MS)
-	{
-		vTaskDelay(1);								//精准控制时间离散节奏
-	}
+		//StraightLineMotorInit();
+	GimbalInit();
   /* Infinite loop */
   for(;;)
   {
-//		GimbalControlTask();
+		//StraightLineMotorControl();//直线电机控制
+		GimbalControlTask();//Yaw和拨弹电机控制
     osDelay(1);
   }
   /* USER CODE END GimbalTask */
+}
+
+/* USER CODE BEGIN Header_WifiTask */
+/**
+* @brief Function implementing the WIFI_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_WifiTask */
+void WifiTask(void const * argument)
+{
+  /* USER CODE BEGIN WifiTask */
+  /* Infinite loop */
+	
+  for(;;)
+  {
+    if(xSemaphoreTake(xSemaphore,0)==pdTRUE)
+		{
+			//处理收到的数据
+			GetOrder();
+		}
+		if(init_Wifi_flag<9)
+		{
+			data_transmit_clock();
+			osDelay(2);
+		}
+		else
+		{
+			if(PostFlag)
+			{
+				SendMessageToWifi();
+				osDelay(50);
+			}
+			else
+			{
+				WifiPost();
+				
+				osDelay(100);
+			}
+			
+		}
+		
+  }
+  /* USER CODE END WifiTask */
+}
+
+/* USER CODE BEGIN Header_ChassisTask */
+/**
+* @brief Function implementing the Chassis_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_ChassisTask */
+void ChassisTask(void const * argument)
+{
+  /* USER CODE BEGIN ChassisTask */
+	Chassis_Init();
+  /* Infinite loop */
+  for(;;)
+  {
+		Chassis_Control();
+    osDelay(1);
+  }
+  /* USER CODE END ChassisTask */
 }
 
 /* Private application code --------------------------------------------------*/
@@ -328,6 +372,10 @@ void DMAUsart1DataFinishedHandle(void)
 {
 	osSignalSet(Remote_TaskHandle,REMOTE_UART_RX_SIGNAL);
 }
+
+
+
+
 
 /* USER CODE END Application */
 

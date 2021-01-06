@@ -15,10 +15,10 @@
 
 //CAN过滤器采用16位idlist模式
 //0x000关闭该过滤器
-#define CAN1_FILTER_ID_FMI0	(0x201)
-#define CAN1_FILTER_ID_FMI1	(0x202)
+#define CAN1_FILTER_ID_FMI0	(0x201)//拨弹电机
+#define CAN1_FILTER_ID_FMI1	(0x205)//拉线电机
 #define CAN1_FILTER_ID_FMI2	(0x203)
-#define CAN1_FILTER_ID_FMI3	(0x204)
+#define CAN1_FILTER_ID_FMI3	(0x000)
 
 //开启第二个
 #define FILTER_NUMBER_2_OPEN	(0)
@@ -35,9 +35,9 @@
 
 //CAN过滤器采用16位idlist模式
 //0x000关闭该过滤器
-#define CAN2_FILTER_ID_FMI0	(0x205)
+#define CAN2_FILTER_ID_FMI0	(0x205)//Yaw轴电机
 #define CAN2_FILTER_ID_FMI1	(0x206)
-#define CAN2_FILTER_ID_FMI2	(0x207)
+#define CAN2_FILTER_ID_FMI2	(0x000)
 #define CAN2_FILTER_ID_FMI3	(0x000)
 
 
@@ -65,7 +65,7 @@
 /****************************************************
 *											MPU9250接口										*
 ****************************************************/
-#define	CONFIG_USE_MPU9250		1
+#define	CONFIG_USE_MPU9250		0
 
 #if	CONFIG_USE_MPU9250
 		#define CONFIG_USE_MPU9250_DMP	1
@@ -75,7 +75,7 @@
 /****************************************************
 *											GIMBAL接口										*
 ****************************************************/
-#define PITCH_INIT_VALUE_SET	(0.418f)
+#define PITCH_INIT_VALUE_SET	(0.50f)
 #define YAW_INIT_VALUE_SET	(0.850f)
 
 
@@ -110,9 +110,9 @@
 /****************************************************
 *										调试模式接口										*
 ****************************************************/
-#define	DEBUG_USE_GIMBALMOTOR_CANSEND		0
+#define	DEBUG_USE_GIMBALMOTOR_CANSEND		1
 #define DEBUG_USE_CHASSISMOTOR_CANSEND  0
-
+#define DEBUG_USE_PULLMOTOR_CANSEND     1
 
 /****************************************************
 *											内存测试接口									*
@@ -127,7 +127,6 @@
 *										信号量接口										  *
 ****************************************************/
 #define REMOTE_UART_RX_SIGNAL  ( 1 << 0 )
-
 
 
 
