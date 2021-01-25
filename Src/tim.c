@@ -356,9 +356,9 @@ void MX_TIM12_Init(void)
   /* Peripheral clock enable */
   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_TIM12);
 
-  TIM_InitStruct.Prescaler = 3;
+  TIM_InitStruct.Prescaler = 199;
   TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-  TIM_InitStruct.Autoreload = 2099;
+  TIM_InitStruct.Autoreload = 8399;
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   LL_TIM_Init(TIM12, &TIM_InitStruct);
   LL_TIM_SetClockSource(TIM12, LL_TIM_CLOCKSOURCE_INTERNAL);

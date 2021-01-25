@@ -10,4 +10,5 @@ void YawSetLocationValueChange(float Yaw);
 void PitchSetLocationValueChange(float Pitch);
 void StraightLineMotorInit(void);
 void StraightLineMotorControl(void);
+void VisionControl(void);
 #endif

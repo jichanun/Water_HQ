@@ -20,7 +20,7 @@ void ChassisControlTask()
 	
 	ChassisControl(ChassisSpeed);
 }
-int PWMNum=0;
+int PWMNum=630;
 void Chassis_Init(void)
 {
 	LL_TIM_CC_EnableChannel(TIM8,LL_TIM_CHANNEL_CH3);
@@ -32,13 +32,13 @@ void Chassis_Init(void)
 	LL_TIM_CC_EnableChannel(TIM2,LL_TIM_CHANNEL_CH2);	
 	LL_TIM_EnableCounter(TIM2);
 	LL_TIM_EnableAllOutputs(TIM2);
-	PWMNum=0;
+	//PWMNum=0;
 
 }
-
+//420-630-840
 void Chassis_Control(void)
 {
-	#if  0  ///*********************调试接口
+	#if  1  ///*********************调试接口
 	LL_TIM_OC_SetCompareCH1(TIM2,PWMNum);
 	LL_TIM_OC_SetCompareCH2(TIM2,PWMNum);
 	LL_TIM_OC_SetCompareCH3(TIM8,PWMNum);
