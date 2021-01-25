@@ -43,7 +43,6 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
-
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -85,6 +84,8 @@ extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN EV */
 extern SemaphoreHandle_t xSemaphore;//wifi的二值信号
+u8 VisionReceiveFlag=0;
+
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -205,7 +206,6 @@ void DMA1_Stream1_IRQHandler(void)
 /**
   * @brief This function handles DMA1 stream5 global interrupt.
   */
-u8 VisionReceiveFlag=0;
 void DMA1_Stream5_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */

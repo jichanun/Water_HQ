@@ -22,21 +22,32 @@
 #define PITCH_LOCATION_KP (0.1)				//2
 #define PITCH_LOCATION_KI (0)
 #define PITCH_LOCATION_KD (0)
-#define PITCH_SPEED_KP (10)							//20
+#define PITCH_SPEED_KP (0.5)							//20
 #define PITCH_SPEED_KI (0)
 #define PITCH_SPEED_KD (0)
 
 #define YAW (0)
 
-#define YAW_LOCATION_KP (1.3f)					//1.2
+#define YAW_LOCATION_KP (0.1f)					//1.2
 #define YAW_LOCATION_KI (0)
 #define YAW_LOCATION_KD (0)
 #define YAW_LOCATION_KC (0)
-#define YAW_SPEED_KP (5)						//25
+#define YAW_SPEED_KP (0.5)						//25
 #define YAW_SPEED_KI (0)
 #define YAW_SPEED_KD (0)
 
-GimbalMotorStruct	YawMotor,PitchMotor;
+
+#define ROLL (0)
+
+#define ROLL_LOCATION_KP (0.1f)					//1.2
+#define ROLL_LOCATION_KI (0)
+#define ROLL_LOCATION_KD (0)
+#define ROLL_LOCATION_KC (0)
+#define ROLL_SPEED_KP (1)						//25
+#define ROLL_SPEED_KI (0)
+#define ROLL_SPEED_KD (0)
+
+GimbalMotorStruct	YawMotor,PitchMotor,RollMotor;
 extern  RemoteDataUnion RemoteData;
 
 void GimbalInit(void)
@@ -50,8 +61,8 @@ void GimbalInit(void)
 	YawMotor.PIDLocation.clear=&PidClear;
 	YawMotor.PIDLocation.clear(&YawMotor.PIDLocation);
 	
-	YawMotor.PIDSpeed.OutMax=1;
-	YawMotor.PIDSpeed.OutMin=-1;
+	YawMotor.PIDSpeed.OutMax=0.1;
+	YawMotor.PIDSpeed.OutMin=-0.1;
 	YawMotor.PIDSpeed.calc=&PidCalc;
 	YawMotor.PIDSpeed.clear=&PidClear;
 	YawMotor.PIDSpeed.clear(&YawMotor.PIDSpeed);
@@ -62,12 +73,25 @@ void GimbalInit(void)
 	PitchMotor.PIDLocation.clear=&PidClear;
 	PitchMotor.PIDLocation.clear(&PitchMotor.PIDLocation);
 	
-	PitchMotor.PIDSpeed.OutMax=1;
-	PitchMotor.PIDSpeed.OutMin=-1;
+	PitchMotor.PIDSpeed.OutMax=0.1;
+	PitchMotor.PIDSpeed.OutMin=-0.1;
 	PitchMotor.PIDSpeed.calc=&PidCalc;
 	PitchMotor.PIDSpeed.clear=&PidClear;
 	PitchMotor.PIDSpeed.clear(&PitchMotor.PIDSpeed);
 	
+	RollMotor.PIDLocation.OutMax=1;
+	RollMotor.PIDLocation.OutMin=-1;
+	RollMotor.PIDLocation.calc=&PidCalc;
+	RollMotor.PIDLocation.clear=&PidClear;
+	RollMotor.PIDLocation.clear(&RollMotor.PIDLocation);
+	
+	RollMotor.PIDSpeed.OutMax=0.1;
+	RollMotor.PIDSpeed.OutMin=-0.1;
+	RollMotor.PIDSpeed.calc=&PidCalc;
+	RollMotor.PIDSpeed.clear=&PidClear;
+	RollMotor.PIDSpeed.clear(&RollMotor.PIDSpeed);
+
+
 	YawMotor.PIDLocation.Kp	= YAW_LOCATION_KP;
 	YawMotor.PIDLocation.Ki	= YAW_LOCATION_KI;
 	YawMotor.PIDLocation.Kd	= YAW_LOCATION_KD;
@@ -84,6 +108,16 @@ void GimbalInit(void)
 	PitchMotor.PIDSpeed.Kp	=	PITCH_SPEED_KP;
 	PitchMotor.PIDSpeed.Ki	=	PITCH_SPEED_KI;
 	PitchMotor.PIDSpeed.Kd	=	PITCH_SPEED_KD;
+	
+	RollMotor.PIDLocation.Kp	= ROLL_LOCATION_KP;
+	RollMotor.PIDLocation.Ki	= ROLL_LOCATION_KI;
+	RollMotor.PIDLocation.Kd	= ROLL_LOCATION_KD;
+	RollMotor.PIDLocation.Kc	= ROLL_LOCATION_KC;
+	
+	RollMotor.PIDSpeed.Kp	=	ROLL_SPEED_KP;
+	RollMotor.PIDSpeed.Ki	=	ROLL_SPEED_KI;
+	RollMotor.PIDSpeed.Kd	=	ROLL_SPEED_KD;
+
 	
 	LL_TIM_CC_EnableChannel(TIM12,LL_TIM_CHANNEL_CH1);
 	LL_TIM_CC_EnableChannel(TIM12,LL_TIM_CHANNEL_CH2);	
@@ -112,33 +146,38 @@ int RPitchSpeed,RPitchSpeedk;//用于JScope图像显示，K是带滤波之后的
 
 void GimbalSpeedDataUpdate()									//云台速度更新
 {
-	short  yawspeed,lpitchspeed,rpitchspeed;
-	float   yawspeedf,lpitchspeedf,rpitchspeedf;
+	short  yawspeed,rollspeed,rpitchspeed;
+	float   yawspeedf,rollspeedf,rpitchspeedf;
 	yawspeedf = (Gyroscope.speed_z/*-GYROZ_OFFSET*/) /60;//弧度每分
 //	RPitchMotor.Speed.Speed =(Gyroscope.speed_y/*-GYROY_OFFSET*/) *6.28;
 //	RPitchMotor.Speed.Speed	=	RPitchMotor.Speed.Speed*K	/	320+RPitchMotor.Speed.SpeedLast*(1-K);
 //	RPitchMotor.Speed.SpeedLast=RPitchMotor.Speed.Speed;
 	rpitchspeedf=(Gyroscope.speed_y/*-GYROY_OFFSET*/) /60;//弧度每分
-	#if 1	//均值滤波
+	rollspeedf=(Gyroscope.speed_x)/60;
+#	if 1	//均值滤波
 	PitchMotor.Speed.Speed=rpitchspeedf*K+PitchMotor.Speed.SpeedLast*(1-K);
 	PitchMotor.Speed.SpeedLast=PitchMotor.Speed.Speed;
 	YawMotor.Speed.Speed	=	yawspeedf*K	+YawMotor.Speed.SpeedLast*(1-K);
 	YawMotor.Speed.SpeedLast=YawMotor.Speed.Speed;
-
+	RollMotor.Speed.Speed=rollspeedf*K+RollMotor.Speed.SpeedLast*(1-K);
+	RollMotor.Speed.SpeedLast=RollMotor.Speed.Speed;
 	#endif
 }
 extern u8 GimbalInitFlag;
-int YawGyroCount=0,PitchGyroCount=0;
-GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData)				//陀螺仪更新
+int YawGyroCount=0,PitchGyroCount=0,RollGyroCount=0;
+GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData,float RollData)				//陀螺仪更新
 {
 	GyroDataStruct GyroData;
-	float YawGyroDataTemp,PitchGyroDataTemp;
-	static float YawGyroDataLast=0,PitchGyroDataLast=0;
+	float YawGyroDataTemp,PitchGyroDataTemp,RollDataTemp;
+	static float YawGyroDataLast=0,PitchGyroDataLast=0,RollGyroDataLast=0;
 	PitchGyroDataTemp	=	-PitchData;
 	PitchGyroDataTemp/=360;
 
 	YawGyroDataTemp	=	YawData;
 	YawGyroDataTemp	=	YawGyroDataTemp	/	360.0f;
+	
+	RollDataTemp	=	RollData;
+	RollDataTemp	=	RollDataTemp	/	360.0f;
 
 	if (GimbalInitFlag)
 	{
@@ -147,6 +186,7 @@ GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData)				//陀螺仪
 		PitchGyroCount=1;
 		else 
 		PitchGyroCount=0;
+		RollGyroCount=0;
 	}
 
 	if			(YawGyroDataTemp	-	YawGyroDataLast	>	0.8f)
@@ -162,6 +202,13 @@ GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData)				//陀螺仪
 	{PitchGyroCount++;PitchGyroDataLast--;}
 	GyroData.Pitch	=	PitchGyroDataTemp*K+PitchGyroDataLast*(1-K) + PitchGyroCount;//PITCH无过零点
  	PitchGyroDataLast= PitchGyroDataTemp;
+	
+	if			(RollDataTemp	-	RollGyroDataLast	>	0.8f)
+	{RollGyroCount--;RollGyroDataLast++;}
+	else if	(RollDataTemp	-	RollGyroDataLast	<	-0.8f)
+	{RollGyroCount++;RollGyroDataLast--;}
+	GyroData.Roll	=	RollDataTemp*K+RollGyroDataLast*(1-K) + RollGyroCount;
+	RollGyroDataLast 	= RollDataTemp ;
 	return GyroData;
 }
   u16 a;
@@ -225,7 +272,7 @@ void GyroAndEncoderDataGet(void)					//陀螺仪值定时更新，1ms
 	HI229_Get_Gyroscope_Speed(&Gyroscope.speed_x,&Gyroscope.speed_y,&Gyroscope.speed_z);
 
 	//EncoderDataSave	=	YawPitchEncoderDataUpdate();
-	GyroDataSave = YawPitchGyroDataUpdate( Gyroscope.yaw,Gyroscope.pitch);
+	GyroDataSave = YawPitchGyroDataUpdate( Gyroscope.yaw,Gyroscope.pitch,Gyroscope.roll);
 
 }
 void YawSetLocationValueChange(float Yaw);
@@ -249,7 +296,7 @@ void GimbalDataInput(GimbalSetLocationStruct GimbalData)
 		YawMotor.Location.Location	=	EncoderDataSave.Yaw;
 	else
 		YawMotor.Location.Location	=	GyroDataSave.Yaw;
-	
+	RollMotor.Location.Location=GyroDataSave.Roll;
 	if(FlagPitchUseEncoderTemp!=GimbalData.FlagPitchUseEncoder)
 	{
 		PitchMotor.Location.SetLocation	=	PitchMotor.Location.Location;
@@ -269,7 +316,8 @@ void GimbalDataInput(GimbalSetLocationStruct GimbalData)
 float YAWSpinK=1;
 //extern RemoteDataPortStruct	RemoteDataPort;
 float YAWError=0;
-int PitchError=1000;
+float PitchError=0;
+int RollError=0;
 extern  int RemoteLostCount;
 void GimbalControlCalculateAndSend(void)
 {
@@ -283,9 +331,7 @@ void GimbalControlCalculateAndSend(void)
 	YawMotor.PIDSpeed.Ref	=	YawMotor.Speed.SetSpeed;
 	YawMotor.PIDSpeed.Fdb	=	YawMotor.Speed.Speed;	
 	YawMotor.PIDSpeed.calc(&YawMotor.PIDSpeed);
-	YAWError=YawMotor.PIDSpeed.Out;
-//	Can2GimbalSendMessege[0]	=	((s16)(YawMotor.PIDSpeed.Out*30000))>>8;
-//	Can2GimbalSendMessege[1]	=	((s16)(YawMotor.PIDSpeed.Out*30000))&0x00ff;
+	YAWError=YawMotor.PIDSpeed.Out*10;
 	#if 1//使用pitch电机
 	PitchMotor.PIDLocation.Ref	=	PitchMotor.Location.SetLocation;
 	PitchMotor.PIDLocation.Fdb	=	PitchMotor.Location.Location;
@@ -295,21 +341,33 @@ void GimbalControlCalculateAndSend(void)
 	PitchMotor.PIDSpeed.Ref	=	PitchMotor.Speed.SetSpeed;
 	PitchMotor.PIDSpeed.Fdb	=	PitchMotor.Speed.Speed;
 	PitchMotor.PIDSpeed.calc(&PitchMotor.PIDSpeed);
-	PitchError=PitchMotor.PIDSpeed.Out*PitchError+1000;
+	PitchError=PitchMotor.PIDSpeed.Out*10;
+	
+	RollMotor.PIDLocation.Ref=RollMotor.Location.SetLocation;
+	RollMotor.PIDLocation.Fdb=RollMotor.Location.Location;
+	RollMotor.PIDLocation.calc(&RollMotor.PIDLocation);
+	RollMotor.Speed.SetSpeed	=	RollMotor.PIDLocation.Out;
+	
+	RollMotor.PIDSpeed.Ref	=	RollMotor.Speed.SetSpeed;
+	RollMotor.PIDSpeed.Fdb	=	RollMotor.Speed.Speed;
+	RollMotor.PIDSpeed.calc(&RollMotor.PIDSpeed);
+	RollError=RollMotor.PIDSpeed.Out*2000;
+	
+	/************roll的发送放在这里**************/
 #if 1 //启用关控保护
 	if (!RemoteLostCount)
 	{
-		LL_TIM_OC_SetCompareCH1(TIM12,0);
-		LL_TIM_OC_SetCompareCH2(TIM12,0);
+		LL_TIM_OC_SetCompareCH1(TIM12,630);
+		LL_TIM_OC_SetCompareCH2(TIM12,630);
 	}	
 	else 
 	{		
-		LL_TIM_OC_SetCompareCH1(TIM12,PitchError);
-		LL_TIM_OC_SetCompareCH2(TIM12,PitchError);
+		LL_TIM_OC_SetCompareCH1(TIM12,630+RollError);
+		LL_TIM_OC_SetCompareCH2(TIM12,630-RollError);
 	}
 	#else  //关闭关控保护
-		LL_TIM_OC_SetCompareCH1(TIM12,PitchError);
-		LL_TIM_OC_SetCompareCH2(TIM12,PitchError);
+		LL_TIM_OC_SetCompareCH1(TIM12,630+RollError);
+		LL_TIM_OC_SetCompareCH2(TIM12,630-RollError);
 #endif
 	
 	#endif 

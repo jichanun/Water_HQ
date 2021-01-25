@@ -33,6 +33,7 @@ typedef struct
 	float SetSpeedX;
 	float SetSpeedY;
 	float Spin;
+	float SpeedError;
 }ChassisSpeedMessegePort;
 
 extern ChassisMotorStruct ChassisMotor[4];

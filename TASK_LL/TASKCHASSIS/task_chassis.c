@@ -4,11 +4,12 @@
 
 ChassisSpeedMessegePort ChassisSpeed;
 
-void ChassisSetSpeed(float SpeedX,float SpeedY,float Spin)
+void ChassisSetSpeed(float SpeedX,float SpeedY,float Spin,float Error)
 {
-	ChassisSpeed.SetSpeedX	=	 SpeedX;
-	ChassisSpeed.SetSpeedY	=	 SpeedY;
-	ChassisSpeed.Spin	=	 Spin;
+	ChassisSpeed.SetSpeedX	=	 SpeedX/4;
+	ChassisSpeed.SetSpeedY	=	 SpeedY/2;
+	ChassisSpeed.Spin	=	 Spin/2;
+	ChassisSpeed.SpeedError=Error/2;
 }
 
 void ChassisControlTask()
@@ -18,7 +19,7 @@ void ChassisControlTask()
 //	ChassisShakeCalculate(&ChassisSpeed);
 //	ChassisChangeFollow(&ChassisSpeed);
 	
-	ChassisControl(ChassisSpeed);
+	//ChassisControl(ChassisSpeed);
 }
 int PWMNum=630;
 void Chassis_Init(void)
@@ -33,12 +34,19 @@ void Chassis_Init(void)
 	LL_TIM_EnableCounter(TIM2);
 	LL_TIM_EnableAllOutputs(TIM2);
 	//PWMNum=0;
+	LL_TIM_OC_SetCompareCH1(TIM2,PWMNum);
+	LL_TIM_OC_SetCompareCH2(TIM2,PWMNum);
+	LL_TIM_OC_SetCompareCH3(TIM8,PWMNum);
+	LL_TIM_OC_SetCompareCH4(TIM8,PWMNum);
+			LL_TIM_OC_SetCompareCH1(TIM12,PWMNum);
+		LL_TIM_OC_SetCompareCH2(TIM12,PWMNum);
+	//HAL_Delay(1500);
 
 }
 //420-630-840
 void Chassis_Control(void)
 {
-	#if  1  ///*********************调试接口
+	#if  0  ///*********************调试接口
 	LL_TIM_OC_SetCompareCH1(TIM2,PWMNum);
 	LL_TIM_OC_SetCompareCH2(TIM2,PWMNum);
 	LL_TIM_OC_SetCompareCH3(TIM8,PWMNum);

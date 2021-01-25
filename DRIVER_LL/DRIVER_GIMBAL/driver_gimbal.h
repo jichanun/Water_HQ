@@ -54,6 +54,7 @@ typedef struct
 {
 	float Yaw;
 	float Pitch;
+	float Roll;
 }GyroDataStruct;
 
 typedef struct
@@ -66,6 +67,7 @@ typedef struct
 {
 	float PitchSetLocation;
 	float YawSetLocation;
+	float RollSetLocation;
 	u8 FlagPitchUseEncoder;
 	u8 FlagYawUseEncoder;
 }GimbalSetLocationStruct;
@@ -90,7 +92,7 @@ extern GyroscopeStruct Gyroscope;
 void GimbalControlTask(void);
 void GyroAndEncoderDataGet(void);
 EncoderDataStruct YawPitchEncoderDataUpdate(void);
-GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData);
+GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData,float RollData)	;			
 void GimbalDataInput(GimbalSetLocationStruct GimbalData);
 void GimbalControlCalculateAndSend(void);
 void GyroAndEncoderDataGet(void);					//陀螺仪值定时更新，1ms
