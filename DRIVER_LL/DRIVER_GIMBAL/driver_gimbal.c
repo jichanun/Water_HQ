@@ -319,6 +319,8 @@ float YAWError=0;
 float PitchError=0;
 int RollError=0;
 extern  int RemoteLostCount;
+extern RemoteDataPortStruct	RemoteDataPort;
+
 void GimbalControlCalculateAndSend(void)
 {
 	u8 Can2GimbalSendMessege[8];
@@ -351,8 +353,8 @@ void GimbalControlCalculateAndSend(void)
 	RollMotor.PIDSpeed.Ref	=	RollMotor.Speed.SetSpeed;
 	RollMotor.PIDSpeed.Fdb	=	RollMotor.Speed.Speed;
 	RollMotor.PIDSpeed.calc(&RollMotor.PIDSpeed);
-	RollError=RollMotor.PIDSpeed.Out*2000;
-	
+	//RollError=RollMotor.PIDSpeed.Out*2000;
+	RollError=RemoteDataPort.PitchIncrement*250;
 	/************roll的发送放在这里**************/
 #if 1 //启用关控保护
 	if (!RemoteLostCount)
@@ -363,7 +365,7 @@ void GimbalControlCalculateAndSend(void)
 	else 
 	{		
 		LL_TIM_OC_SetCompareCH1(TIM12,630+RollError);
-		LL_TIM_OC_SetCompareCH2(TIM12,630-RollError);
+		LL_TIM_OC_SetCompareCH2(TIM12,630+RollError);
 	}
 	#else  //关闭关控保护
 		LL_TIM_OC_SetCompareCH1(TIM12,630+RollError);

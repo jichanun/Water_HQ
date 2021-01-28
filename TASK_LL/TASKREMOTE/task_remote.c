@@ -491,8 +491,8 @@ void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 //		RemoteDataPort.YawIncrement=0;
 //	YawSetLocationValueChange(YawMotor.Location.SetLocation+(RemoteDataPort.YawIncrement)/800);
 	//**************下面的是工训代码
-	#if 0 //****如果不使用陀螺仪，右摇杆控制方向
-	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,RemoteDataPort.YawIncrement,RemoteDataPort.PitchIncrement);	
+	#if 1 //****如果不使用陀螺仪，右摇杆控制方向
+	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,RemoteDataPort.YawIncrement,0);//RemoteDataPort.PitchIncrement);	
 	#else  //***如果使用陀螺仪，右摇杆控制位置增量
 	YawSetLocationValueChange((RemoteDataPort.YawIncrement)/800);
 	PitchSetLocationValueChange(RemoteDataPort.PitchIncrement/1000);

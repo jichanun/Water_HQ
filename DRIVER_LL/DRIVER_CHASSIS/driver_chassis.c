@@ -187,9 +187,9 @@ void ChassisControl(ChassisSpeedMessegePort ChassisSpeed)
 #endif
 }
 extern int RemoteLostCount;
-float SpeedControlK=200;	
+float SpeedControlK=1000;	
 u16 speed0=0,speed1=0,speed2=0,speed3=0;
-
+float KKK=1.1;
 void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 {
 	ChassisMotor[0].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+	1.8f*ChassisSpeed.Spin + 0.9*ChassisSpeed.SpeedError;
@@ -217,7 +217,7 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 		speed0=(u16)((ChassisMotor[0].Speed.SetSpeed*SpeedControlK)+630);
 		speed1=(u16)((ChassisMotor[1].Speed.SetSpeed*SpeedControlK)+630);
 		speed2=(u16)((ChassisMotor[2].Speed.SetSpeed*SpeedControlK)+630);
-		speed3=(u16)((ChassisMotor[3].Speed.SetSpeed*SpeedControlK)+630);
+		speed3=(u16)(-(ChassisMotor[3].Speed.SetSpeed*SpeedControlK)*KKK+630);
 		LL_TIM_OC_SetCompareCH1(TIM2,speed2);
 		LL_TIM_OC_SetCompareCH2(TIM2,speed3);
 		LL_TIM_OC_SetCompareCH3(TIM8,speed1);
