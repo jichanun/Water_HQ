@@ -196,11 +196,29 @@ void DMA1_Stream1_IRQHandler(void)
 	}
 	LL_DMA_ClearFlag_HT1(DMA1);
 	LL_DMA_ClearFlag_TC1(DMA1);
+	VisionReceiveFlag=1;
+
   /* USER CODE END DMA1_Stream1_IRQn 0 */
   
   /* USER CODE BEGIN DMA1_Stream1_IRQn 1 */
 
   /* USER CODE END DMA1_Stream1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 stream3 global interrupt.
+  */
+void DMA1_Stream3_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Stream3_IRQn 0 */
+	LL_DMA_ClearFlag_TC3(DMA1);                 //串口3发送
+	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
+
+  /* USER CODE END DMA1_Stream3_IRQn 0 */
+  
+  /* USER CODE BEGIN DMA1_Stream3_IRQn 1 */
+
+  /* USER CODE END DMA1_Stream3_IRQn 1 */
 }
 
 /**
@@ -211,7 +229,6 @@ void DMA1_Stream5_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
 	LL_DMA_ClearFlag_HT5(DMA1);
 	LL_DMA_ClearFlag_TC5(DMA1);
-	VisionReceiveFlag=1;
   /* USER CODE END DMA1_Stream5_IRQn 0 */
   
   /* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
@@ -225,7 +242,7 @@ void DMA1_Stream5_IRQHandler(void)
 void DMA1_Stream6_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream6_IRQn 0 */
-	LL_DMA_ClearFlag_TC6(DMA1);                 //裁判系统发送
+	LL_DMA_ClearFlag_TC6(DMA1);                 //发送串口2
 	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_6);
 
   /* USER CODE END DMA1_Stream6_IRQn 0 */
@@ -316,9 +333,8 @@ if(((USART3->SR)&(1<<4))!=0)
 		LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_1);
 		(void)USART3->SR;				//清除中断
 		(void)USART3->DR;				//清除数据
-		LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_1);
 		LL_DMA_ClearFlag_TC1(DMA1);
-		xSemaphoreGiveFromISR(xSemaphore,&xHigherPriorityTaskWoken);//发送信号
+		LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_1);
 	}
   /* USER CODE END USART3_IRQn 0 */
   /* USER CODE BEGIN USART3_IRQn 1 */

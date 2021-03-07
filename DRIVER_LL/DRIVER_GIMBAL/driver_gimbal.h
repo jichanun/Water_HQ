@@ -48,6 +48,9 @@ typedef struct
 	SpeedStruct	Speed;
 	PID	PIDSpeed;
 	u8 CANReceiveMessege[8];
+	int RollError;
+	int RollSink;
+	
 }GimbalMotorStruct;
 
 typedef struct
@@ -86,7 +89,14 @@ float GetYawGyroValue(void);
 void GimbalPIDClear(void);
 void GimbalDataInit(void);
 void PitchDataInit(void);
-
+typedef struct 
+{
+	float rho;
+	float angle;
+	float change_rho;
+	float change_angle;
+	float change_angle_last;
+}VisionDataStruct;
 extern GyroscopeStruct Gyroscope;
 
 void GimbalControlTask(void);
@@ -97,5 +107,5 @@ void GimbalDataInput(GimbalSetLocationStruct GimbalData);
 void GimbalControlCalculateAndSend(void);
 void GyroAndEncoderDataGet(void);					//陀螺仪值定时更新，1ms
 void GimbalSpeedDataUpdate(void);									//云台速度更新
-
+void VisionInit(void);
 #endif

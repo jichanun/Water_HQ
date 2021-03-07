@@ -73,6 +73,9 @@
 
 #include "interface_base.h"
 #include "task_wifi.h"
+#include "LobotSerialServo.h"
+#include "task_grasp.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -99,7 +102,7 @@ osThreadId FeedMotor_TaskHandle;
 osThreadId Remote_TaskHandle;
 osThreadId LostCounter_TaskHandle;
 osThreadId Gimbal_TaskHandle;
-osThreadId WIFI_TaskHandle;
+osThreadId Grasp_TaskHandle;
 osThreadId Chassis_TaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,7 +116,7 @@ void FeedMotorTask(void const * argument);
 void RemoteTask(void const * argument);
 void LostCounterTask(void const * argument);
 void GimbalTask(void const * argument);
-void WifiTask(void const * argument);
+void GraspTask(void const * argument);
 void ChassisTask(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -161,9 +164,9 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(Gimbal_Task, GimbalTask, osPriorityHigh, 0, 512);
   Gimbal_TaskHandle = osThreadCreate(osThread(Gimbal_Task), NULL);
 
-  /* definition and creation of WIFI_Task */
-  osThreadDef(WIFI_Task, WifiTask, osPriorityIdle, 0, 512);
-  WIFI_TaskHandle = osThreadCreate(osThread(WIFI_Task), NULL);
+  /* definition and creation of Grasp_Task */
+  osThreadDef(Grasp_Task, GraspTask, osPriorityIdle, 0, 512);
+  Grasp_TaskHandle = osThreadCreate(osThread(Grasp_Task), NULL);
 
   /* definition and creation of Chassis_Task */
   osThreadDef(Chassis_Task, ChassisTask, osPriorityIdle, 0, 512);
@@ -292,6 +295,7 @@ void GimbalTask(void const * argument)
 
 		//StraightLineMotorInit();
 	GimbalInit();
+	VisionInit();
   /* Infinite loop */
   for(;;)
   {
@@ -302,48 +306,23 @@ void GimbalTask(void const * argument)
   /* USER CODE END GimbalTask */
 }
 
-/* USER CODE BEGIN Header_WifiTask */
+/* USER CODE BEGIN Header_GraspTask */
 /**
-* @brief Function implementing the WIFI_Task thread.
+* @brief Function implementing the Grasp_Task thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_WifiTask */
-void WifiTask(void const * argument)
+/* USER CODE END Header_GraspTask */
+void GraspTask(void const * argument)
 {
-  /* USER CODE BEGIN WifiTask */
+  /* USER CODE BEGIN GraspTask */
   /* Infinite loop */
-	
   for(;;)
   {
-    if(xSemaphoreTake(xSemaphore,0)==pdTRUE)
-		{
-			//处理收到的数据
-			GetOrder();
-		}
-		if(init_Wifi_flag<9)
-		{
-			data_transmit_clock();
-			osDelay(2);
-		}
-		else
-		{
-			if(PostFlag)
-			{
-				SendMessageToWifi();
-				osDelay(50);
-			}
-			else
-			{
-				WifiPost();
-				
-				osDelay(100);
-			}
-			
-		}
-		
+		GraspControlTask();
+    osDelay(1);
   }
-  /* USER CODE END WifiTask */
+  /* USER CODE END GraspTask */
 }
 
 /* USER CODE BEGIN Header_ChassisTask */

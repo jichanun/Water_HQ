@@ -8,13 +8,17 @@
 #define PITCH_REMOTE_SENSITIVE (0.0005f)
 #define ONE1 0x3F800000
 #define TWO1 0x800000
-
+float Rho_Maximum=500;
 GimbalSetLocationStruct	GimbalSetLocationDataTemp;
+extern PID VisionRhoIncreasement , VisionYawIncreasement ;
 extern  RemoteDataUnion RemoteData;
 extern  FeedMotorStruct FeedMotor;
 extern  SwitchStruct Switch;
 extern  int  Target_mode;
 extern u8 VisionReceiveFlag;
+extern  GimbalMotorStruct	YawMotor,PitchMotor,RollMotor;
+extern float VisionRho;
+extern u8 AutomaticAiming;
 //换弹电机控制标志位
 int flag_init=0; //换弹电机初始化标志位
 //Switch.Reload1 换弹标志位
@@ -79,12 +83,11 @@ void PitchSetLocationValueChange(float Pitch)
 {
 	GimbalSetLocationDataTemp.PitchSetLocation	+=	Pitch;
 }
-extern u8 UART2BUFF[15];
+extern u8 UART3BUFF[15];
 u32 VisionReceiveData[2]={0};
-float VisionData[2]={0};
-void UART2Unpack(u8 *buff,u32 *num)
+VisionDataStruct VisionData;
+void UART3Unpack(u8 *buff,u32 *num)
 {
-	int a ;
 	for (int i =0;i<2;i++)
 	{
 		u32 a  = ((buff[i*4+2]<<24)|(buff[i*4+3]<<16)|(buff[i*4+4]<<8)|(buff[i*4+5]));
@@ -93,12 +96,53 @@ void UART2Unpack(u8 *buff,u32 *num)
 		num[i]=x+(a-ONE1-TWO1*n)*x/TWO1;
 	}
 }
+void VisionReceiveDataClear(VisionDataStruct *Data)
+{
+	Data->angle=0;
+	Data->rho=0;
+}
+float FilterK=0.05;
 void VisionControl(void)
 {
 	VisionReceiveFlag=0;
-	if (UART2BUFF[0]==0XFF&&UART2BUFF[1]==0XFF)
-		UART2Unpack(UART2BUFF,VisionReceiveData);
-	VisionData[0]=(float)VisionReceiveData[0]-330;//偏离值
-	VisionData[1]=(float)atan((VisionReceiveData[1]-320)/140)*57.3;//角度值
+	int b ;
+	
+	if (UART3BUFF[0]==0XFF&&UART3BUFF[1]==0XFF)
+	{
+		UART3Unpack(UART3BUFF,VisionReceiveData);
+		b=VisionReceiveData[1]-320;
+		float a =b;
+		a/=140;
+		VisionData.rho=(float)VisionReceiveData[0]-330;//偏离值
+		VisionData.angle=(float)atan(a)*57.3;//角度值
+		VisionData.angle=VisionData.angle*FilterK+VisionData.angle*(1-FilterK);
+		
+	#if 1 //视觉处的变结构PID
+		VisionRhoIncreasement.Ref=VisionData.rho;
+		VisionRhoIncreasement.calc(&VisionRhoIncreasement);
+		VisionData.change_rho=VisionRhoIncreasement.Out;
+		//计算有问题
+		VisionYawIncreasement.Ref=VisionData.angle;
+		VisionYawIncreasement.calc(&VisionYawIncreasement);
+		VisionData.change_angle=VisionYawIncreasement.Out/1000;
+	#endif 
+		//视觉处理****************************************************
+			if(AutomaticAiming)
+		{
+//			if((VisionData.change_angle<=12.5f*VisionYawIncreasement.Kp&&VisionData.change_angle>=0.5f*VisionYawIncreasement.Kp)||
+//					(VisionData.change_angle>=-12.5f*VisionYawIncreasement.Kp&&VisionData.change_angle<=-0.5f*VisionYawIncreasement.Kp))
+			{
+				if(fabs(YawMotor.Location.SetLocation-YawMotor.Location.Location)<0.02)
+				{
+					YawSetLocationValueChange(-VisionData.change_angle);
+				}
+			}
+	//		if((VisionData.change_rho<=12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho>=0.5f*VisionYawIncreasement.Kp)||
+	//				(VisionData.change_rho>=-12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho<=-0.5f*VisionYawIncreasement.Kp))
+				VisionRho=VisionData.change_rho/Rho_Maximum;
+		}
+		//VisionReceiveDataClear(&VisionData);//接收重置
+		VisionData.change_angle_last=VisionData.angle;
+	}
 	
 }

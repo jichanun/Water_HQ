@@ -21,7 +21,7 @@ void ChassisControlTask()
 	
 	//ChassisControl(ChassisSpeed);
 }
-int PWMNum=630;
+int PWMNum=MIDDLE_PWM;
 void Chassis_Init(void)
 {
 	LL_TIM_CC_EnableChannel(TIM8,LL_TIM_CHANNEL_CH3);

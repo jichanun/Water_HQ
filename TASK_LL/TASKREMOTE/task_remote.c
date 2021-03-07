@@ -8,6 +8,7 @@
 extern RemoteDataUnion RemoteData;
 extern GimbalMotorStruct	YawMotor,PitchMotor;
 extern SwitchStruct Switch;
+u8 AutomaticAiming=0;
 int Target_mode;  //发射目标，0基地，1前哨战
 
 
@@ -425,12 +426,16 @@ RemoteDataPortStruct RemoteDataCalculate(RemoteDataProcessedStruct	RemoteDataRec
 	{
 		case	REMOTE_MODE:
 			RemoteDataPortTemp	=	RemoteModeProcessData(RemoteDataReceive);
+				AutomaticAiming=0;
 			break;
 		case	KEYBOARD_MODE:
 			RemoteDataPortTemp	=	KeyboardModeProcessData(RemoteDataReceive);
+				AutomaticAiming=0;
 			break;
 		case	AUTO_MODE:
-			RemoteDataPortTemp	=	AutoModeProcessData(RemoteDataReceive);
+			RemoteDataPortTemp	=	RemoteModeProcessData(RemoteDataReceive);
+			AutomaticAiming=1;
+		
 			break;
 	}
 	
@@ -473,6 +478,7 @@ void ChassisRampProcessed(RemoteDataPortStruct	*RemoteDataPortTemp)
 //********************************************缺了一部分*************************************//
 extern float YAWError;
 extern float PitchError;
+float VisionRho=0;
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 {
 ////	if(Target_mode==0)//基地
@@ -491,13 +497,13 @@ void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 //		RemoteDataPort.YawIncrement=0;
 //	YawSetLocationValueChange(YawMotor.Location.SetLocation+(RemoteDataPort.YawIncrement)/800);
 	//**************下面的是工训代码
-	#if 1 //****如果不使用陀螺仪，右摇杆控制方向
-	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,RemoteDataPort.YawIncrement,0);//RemoteDataPort.PitchIncrement);	
-	#else  //***如果使用陀螺仪，右摇杆控制位置增量
+	#if CONFIG_USE_GYROSCOPE //***如果使用陀螺仪，右摇杆控制位置增量
 	YawSetLocationValueChange((RemoteDataPort.YawIncrement)/800);
 	PitchSetLocationValueChange(RemoteDataPort.PitchIncrement/1000);
-	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError,PitchError);	
-
+	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError,0);	//yaw轴测试用。需要注释
+//	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY+VisionRho,YAWError,PitchError);	
+	#else //****如果不使用陀螺仪，右摇杆控制方向 
+	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY+VisionRho,RemoteDataPort.YawIncrement,0);//RemoteDataPort.PitchIncrement);	
 	#endif
 
 }

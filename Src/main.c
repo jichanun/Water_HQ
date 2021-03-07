@@ -138,7 +138,7 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-u8 UART2BUFF[15];
+u8 UART3BUFF[15];
 
 /* USER CODE END 0 */
 
@@ -200,8 +200,8 @@ int main(void)
   GimbalInit();
   FeedMotorInit();
 //	icm20689_dmp_setup();
-	WifiInit("192.168.1.113",8888,"RoboMaster2","bufujiugan",USART3);
-	ConfigUsart2DMA((u32)UART2BUFF,18);
+	//WifiInit("192.168.1.113",8888,"RoboMaster2","bufujiugan",USART3);
+	ConfigUsart3DMA((u32)UART3BUFF,18);
 
   LostCounterInit();
   WatchDogInit();
