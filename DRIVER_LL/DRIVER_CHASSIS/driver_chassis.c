@@ -190,7 +190,7 @@ extern int RemoteLostCount;
 float ChassisSpeedK=210;	
 u16 speed0=0,speed1=0,speed2=0,speed3=0;
 float ReverseError=1.1;
-float ChassisSpeedMax=0.08;//※※※※※※※※※※速度最大值，
+float ChassisSpeedMax=0.5;//※※※※※※※※※※速度最大值，
 void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 {
 	ChassisMotor[0].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+	1.8f*ChassisSpeed.Spin + 0.9*ChassisSpeed.SpeedError;
@@ -203,7 +203,7 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 			ChassisMotor[i].Speed.SetSpeed=ChassisSpeedMax;
 		else if (ChassisMotor[i].Speed.SetSpeed<-ChassisSpeedMax)
 			ChassisMotor[i].Speed.SetSpeed=-ChassisSpeedMax;
-		if (i==1||i==4)
+		if (i==1||i==2)
 		{
 			if (ChassisMotor[i].Speed.SetSpeed<0)
 				ChassisMotor[i].Speed.SetSpeed*=ReverseError;//反转倍率
@@ -223,10 +223,10 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 	}	
 	else 
 	{		
-		speed0=(s16)((ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed1=(s16)((ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed2=(s16)((ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed3=(s16)((ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		LL_TIM_OC_SetCompareCH1(TIM2,speed2);
 		LL_TIM_OC_SetCompareCH2(TIM2,speed3);
 		LL_TIM_OC_SetCompareCH3(TIM8,speed1);
@@ -236,7 +236,7 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 		speed0=(u16)((ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		speed1=(u16)((ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		speed2=(u16)((ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed3=(u16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)*ReverseError+MIDDLE_PWM);
+		speed3=(u16)((ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		LL_TIM_OC_SetCompareCH1(TIM2,speed2);
 		LL_TIM_OC_SetCompareCH2(TIM2,speed3);
 		LL_TIM_OC_SetCompareCH3(TIM8,speed1);

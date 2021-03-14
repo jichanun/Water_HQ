@@ -92,7 +92,9 @@ void PitchDataInit(void);
 typedef struct 
 {
 	float rho;
+	float rho_last;
 	float angle;
+	float angle_last;
 	float change_rho;
 	float change_angle;
 	float change_angle_last;

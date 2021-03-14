@@ -36,11 +36,11 @@
 
 #if 1 //使用YAW PID 
 	#define YAW (0)
-	#define YAW_LOCATION_KP (0.5f)					//0.5
+	#define YAW_LOCATION_KP (-0.6f)					//0.5
 	#define YAW_LOCATION_KI (0)
 	#define YAW_LOCATION_KD (0)
 	#define YAW_LOCATION_KC (0)
-	#define YAW_SPEED_KP (0.05)						//0.05
+	#define YAW_SPEED_KP (-0.1)						//0.05
 	#define YAW_SPEED_KI (0)
 	#define YAW_SPEED_KD (0)
 #else 
@@ -56,11 +56,11 @@
 #if 1 //使用ROLL PID
 	#define ROLL (0)
 
-	#define ROLL_LOCATION_KP (0.5f)					//0.5
+	#define ROLL_LOCATION_KP (-0.4f)					//0.5
 	#define ROLL_LOCATION_KI (0)
 	#define ROLL_LOCATION_KD (0)
 	#define ROLL_LOCATION_KC (0)
-	#define ROLL_SPEED_KP (5)						//5
+	#define ROLL_SPEED_KP (-30)						//5
 	#define ROLL_SPEED_KI (0)
 	#define ROLL_SPEED_KD (0)
 #else 
@@ -89,14 +89,14 @@
 #define VISION_YAW_BP (0)
 #define VISION_YAW_CP (1)
 #else 
-#define VISION_RHO_KP (1.0)
+#define VISION_RHO_KP (-0.2)
 #define VISION_RHO_KI (0.0)
 #define VISION_RHO_KD (0.0)
 #define VISION_RHO_AP (0.0)
 #define VISION_RHO_BP (0)
 #define VISION_RHO_CP (0.0)
 
-#define VISION_YAW_KP (0.0)
+#define VISION_YAW_KP (0.02)
 #define VISION_YAW_KI (0.0)
 #define VISION_YAW_KD (0.0)
 #define VISION_YAW_AP (0.0)
@@ -143,8 +143,8 @@ void GimbalInit(void)
 	RollMotor.PIDLocation.clear=&PidClear;
 	RollMotor.PIDLocation.clear(&RollMotor.PIDLocation);
 	
-	RollMotor.PIDSpeed.OutMax=0.1;
-	RollMotor.PIDSpeed.OutMin=-0.1;
+	RollMotor.PIDSpeed.OutMax=0.3;
+	RollMotor.PIDSpeed.OutMin=-0.3;
 	RollMotor.PIDSpeed.calc=&PidCalc;
 	RollMotor.PIDSpeed.clear=&PidClear;
 	RollMotor.PIDSpeed.clear(&RollMotor.PIDSpeed);
