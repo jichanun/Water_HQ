@@ -6,7 +6,7 @@ ChassisSpeedMessegePort ChassisSpeed;
 
 void ChassisSetSpeed(float SpeedX,float SpeedY,float Spin,float Error)
 {
-	ChassisSpeed.SetSpeedX	=	 SpeedX/4;
+	ChassisSpeed.SetSpeedX	=	 -SpeedX/4;
 	ChassisSpeed.SetSpeedY	=	 SpeedY/2;
 	ChassisSpeed.Spin	=	 Spin/2;
 	ChassisSpeed.SpeedError=Error/2;

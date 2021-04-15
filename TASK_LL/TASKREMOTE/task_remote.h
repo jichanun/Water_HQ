@@ -22,5 +22,5 @@ typedef struct
 
 u8 RemoteTaskControl(void);
 
-
+void CAN1Control(RemoteDataPortStruct RemoteDataPort);
 #endif

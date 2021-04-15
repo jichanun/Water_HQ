@@ -5,6 +5,8 @@
 #include "math.h"
 #include "driver_gimbal.h"
 #include "driver_chassis.h"
+#include "task_grasp.h"
+
 extern RemoteDataUnion RemoteData;
 extern GimbalMotorStruct	YawMotor,PitchMotor;
 extern SwitchStruct Switch;
@@ -42,6 +44,7 @@ RemoteDataPortStruct RemoteModeProcessData(RemoteDataProcessedStruct	RemoteDataR
 			break;
 		case 3:RemoteDataPortTemp.Friction=ENABLE;
 					RemoteDataPortTemp.FeedMotor=DISABLE;
+					
 			break;
 		default:
 			break;
@@ -407,6 +410,7 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 	
 	return RemoteDataPortTemp;
 }
+extern int RollSinkControl;
 
 RemoteDataPortStruct AutoModeProcessData(RemoteDataProcessedStruct	RemoteDataReceive)
 {
@@ -430,7 +434,43 @@ RemoteDataPortStruct AutoModeProcessData(RemoteDataProcessedStruct	RemoteDataRec
 			break;
 		case 3:RemoteDataPortTemp.Friction=ENABLE;
 					RemoteDataPortTemp.FeedMotor=DISABLE;
-					RemoteDataPortTemp.ChassisSpeedY	=		0.3;
+			break;
+		default:
+			break;
+	}
+	RemoteDataPortTemp.Laser=RemoteDataPortTemp.Friction;
+	
+	return RemoteDataPortTemp;
+}RemoteDataPortStruct AutoModeProcessData1(RemoteDataProcessedStruct	RemoteDataReceive)
+{
+	RemoteDataPortStruct	RemoteDataPortTemp={0};
+	RemoteDataPortTemp.ChassisSpeedX	=	-	RemoteDataReceive.Channel_2;
+	RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3;
+		
+	RemoteDataPortTemp.PitchIncrement	=		RemoteDataReceive.Channel_1;
+	RemoteDataPortTemp.YawIncrement		=	-	RemoteDataReceive.Channel_0;
+	
+	RockerDataConvert(&(RemoteDataPortTemp.ChassisSpeedX),&(RemoteDataPortTemp.ChassisSpeedY));
+	
+	
+	RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3+0.1;
+	if (RollSinkControl<-20)
+			RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3+0.2;
+	
+	
+	switch(RemoteDataReceive.RightSwitch)
+		
+	{
+		case 1:RemoteDataPortTemp.Friction=DISABLE;
+					RemoteDataPortTemp.FeedMotor=DISABLE;
+					
+			break;
+		case 2:RemoteDataPortTemp.Friction=ENABLE;
+					RemoteDataPortTemp.FeedMotor=ENABLE;
+			break;
+		case 3:RemoteDataPortTemp.Friction=ENABLE;
+					RemoteDataPortTemp.FeedMotor=DISABLE;
+
 			break;
 		default:
 			break;
@@ -453,8 +493,8 @@ RemoteDataPortStruct RemoteDataCalculate(RemoteDataProcessedStruct	RemoteDataRec
 				AutomaticAiming=0;
 			break;
 		case	KEYBOARD_MODE:
-			RemoteDataPortTemp	=	KeyboardModeProcessData(RemoteDataReceive);
-				AutomaticAiming=0;
+			RemoteDataPortTemp	=	AutoModeProcessData1(RemoteDataReceive);
+				AutomaticAiming=1;
 			break;
 		case	AUTO_MODE:
 			RemoteDataPortTemp	=	AutoModeProcessData(RemoteDataReceive);
@@ -529,6 +569,8 @@ void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 	#else //****如果不使用陀螺仪，右摇杆控制方向 
 	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY+VisionRho,RemoteDataPort.YawIncrement,0);//RemoteDataPort.PitchIncrement);	
 	#endif
+	CAN1Control(RemoteDataPort);
+
 
 }
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort);
@@ -553,4 +595,26 @@ u8 RemoteTaskControl()
 	
 
 	return 1;
+}
+extern LobotServoData LServo;
+
+void CAN1Control(RemoteDataPortStruct RemoteDataPort)
+{
+	if (RemoteDataPort.Friction)
+	{
+		LServo.Servo[3].Posi=500;//舵机开
+		if (RemoteDataPort.FeedMotor)
+			{
+				
+			}
+			else 
+			{
+				
+			}		
+	}
+			else
+	{
+				LServo.Servo[3].Posi=800;//舵机关
+		
+	}
 }

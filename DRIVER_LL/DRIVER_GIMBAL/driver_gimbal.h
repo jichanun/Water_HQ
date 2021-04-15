@@ -91,6 +91,12 @@ void GimbalDataInit(void);
 void PitchDataInit(void);
 typedef struct 
 {
+	u8 circle;
+	u8 square;
+	
+}StatusCountStruct;
+typedef struct 
+{
 	float rho;
 	float rho_last;
 	float angle;
@@ -98,6 +104,11 @@ typedef struct
 	float change_rho;
 	float change_angle;
 	float change_angle_last;
+	float error_x;
+	float error_y;
+	u8 status;
+	u8 statusfinal;
+	StatusCountStruct statuscount;
 }VisionDataStruct;
 extern GyroscopeStruct Gyroscope;
 

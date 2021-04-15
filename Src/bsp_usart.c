@@ -4,7 +4,6 @@
 
 u32 Usart1DMAMemoryBaseAddress,Usart1DMABufferSize;
 u32 Usart3DMAMemoryBaseAddress,Usart3DMABufferSize;
-
 void ConfigUsart1DMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize)
 {
 	Usart1DMAMemoryBaseAddress=DMA_Memory0BaseAddr;

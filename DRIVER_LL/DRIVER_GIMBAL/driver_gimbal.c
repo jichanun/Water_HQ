@@ -36,7 +36,7 @@
 
 #if 1 //使用YAW PID 
 	#define YAW (0)
-	#define YAW_LOCATION_KP (-0.6f)					//0.5
+	#define YAW_LOCATION_KP (-0.8f)					//0.5
 	#define YAW_LOCATION_KI (0)
 	#define YAW_LOCATION_KD (0)
 	#define YAW_LOCATION_KC (0)
@@ -56,11 +56,11 @@
 #if 1 //使用ROLL PID
 	#define ROLL (0)
 
-	#define ROLL_LOCATION_KP (-0.4f)					//0.5
+	#define ROLL_LOCATION_KP (0.2f)					//0.5
 	#define ROLL_LOCATION_KI (0)
 	#define ROLL_LOCATION_KD (0)
 	#define ROLL_LOCATION_KC (0)
-	#define ROLL_SPEED_KP (-30)						//5
+	#define ROLL_SPEED_KP (50)						//5
 	#define ROLL_SPEED_KI (0)
 	#define ROLL_SPEED_KD (0)
 #else 
@@ -85,20 +85,20 @@
 #define VISION_YAW_KP (0.0)
 #define VISION_YAW_KI (0.0)
 #define VISION_YAW_KD (2.0)
-#define VISION_YAW_AP (0.004)
+#define VISION_YAW_AP (0.003)
 #define VISION_YAW_BP (0)
 #define VISION_YAW_CP (1)
 #else 
-#define VISION_RHO_KP (-0.2)
+#define VISION_RHO_KP (-2)
 #define VISION_RHO_KI (0.0)
-#define VISION_RHO_KD (0.0)
+#define VISION_RHO_KD (5.0)
 #define VISION_RHO_AP (0.0)
 #define VISION_RHO_BP (0)
 #define VISION_RHO_CP (0.0)
 
-#define VISION_YAW_KP (0.02)
+#define VISION_YAW_KP (0.05)
 #define VISION_YAW_KI (0.0)
-#define VISION_YAW_KD (0.0)
+#define VISION_YAW_KD (5.0)
 #define VISION_YAW_AP (0.0)
 #define VISION_YAW_BP (0)
 #define VISION_YAW_CP (0)
@@ -182,6 +182,15 @@ void GimbalInit(void)
 	LL_TIM_CC_EnableChannel(TIM12,LL_TIM_CHANNEL_CH2);	
 	LL_TIM_EnableCounter(TIM12);
 	LL_TIM_EnableAllOutputs(TIM12);
+	
+	LL_TIM_CC_EnableChannel(TIM4,LL_TIM_CHANNEL_CH2);	
+	LL_TIM_EnableCounter(TIM4);
+	LL_TIM_EnableAllOutputs(TIM4);
+	
+	LL_TIM_CC_EnableChannel(TIM5,LL_TIM_CHANNEL_CH1);
+	LL_TIM_CC_EnableChannel(TIM5,LL_TIM_CHANNEL_CH2);	
+	LL_TIM_EnableCounter(TIM5);
+	LL_TIM_EnableAllOutputs(TIM5);
 
 }
 void VisionInit(void)
@@ -238,8 +247,8 @@ void GimbalSpeedDataUpdate()									//云台速度更新
 //	RPitchMotor.Speed.Speed =(Gyroscope.speed_y/*-GYROY_OFFSET*/) *6.28;
 //	RPitchMotor.Speed.Speed	=	RPitchMotor.Speed.Speed*K	/	320+RPitchMotor.Speed.SpeedLast*(1-K);
 //	RPitchMotor.Speed.SpeedLast=RPitchMotor.Speed.Speed;
-	rpitchspeedf=(Gyroscope.speed_y/*-GYROY_OFFSET*/) /60;//弧度每分
-	rollspeedf=(Gyroscope.speed_x)/60;//y轴为roll轴，因为放置位置不同而改为x
+	rpitchspeedf=(Gyroscope.speed_x/*-GYROY_OFFSET*/) /60;//弧度每分
+	rollspeedf=(Gyroscope.speed_y)/60;
 #	if 1	//均值滤波
 	PitchMotor.Speed.Speed=rpitchspeedf*K+PitchMotor.Speed.SpeedLast*(1-K);
 	PitchMotor.Speed.SpeedLast=PitchMotor.Speed.Speed;
@@ -268,11 +277,11 @@ GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData,float RollDa
 	if (GimbalInitFlag)
 	{
 		YawGyroCount=0;
-		if (PitchGyroDataTemp<0)
-			PitchGyroCount=0.5;
+		if (RollDataTemp<0)
+			RollGyroCount=0.5;
 		else 
-			PitchGyroCount=-0.5;
-		RollGyroCount=0;
+			RollGyroCount=-0.5;
+		PitchGyroCount=0;
 	}
 
 	if			(YawGyroDataTemp	-	YawGyroDataLast	>	0.8f)
@@ -359,7 +368,7 @@ void GyroAndEncoderDataGet(void)					//陀螺仪值定时更新，1ms
 	HI229_Get_Gyroscope_Speed(&Gyroscope.speed_x,&Gyroscope.speed_y,&Gyroscope.speed_z);
 
 	//EncoderDataSave	=	YawPitchEncoderDataUpdate();
-	GyroDataSave = YawPitchGyroDataUpdate( Gyroscope.yaw,Gyroscope.pitch,Gyroscope.roll);
+	GyroDataSave = YawPitchGyroDataUpdate( Gyroscope.yaw,Gyroscope.roll,Gyroscope.pitch);
 
 }
 void YawSetLocationValueChange(float Yaw);
@@ -406,7 +415,8 @@ float YAWError=0;
 float PitchError=0;
 extern  int RemoteLostCount;
 extern RemoteDataPortStruct	RemoteDataPort;
-
+int RollSinkControl=0;
+extern  float yaw_OFFSET;
 void GimbalControlCalculateAndSend(void)
 {
 	u8 Can2GimbalSendMessege[8];
@@ -441,7 +451,14 @@ void GimbalControlCalculateAndSend(void)
 	RollMotor.PIDSpeed.calc(&RollMotor.PIDSpeed);
 	
 	RollMotor.RollError=RollMotor.PIDSpeed.Out*MAX_PWM;
-	RollMotor.RollSink=RemoteDataPort.PitchIncrement*MAX_PWM*GimbalSpeedK;//下沉不经过PID故使用K参数
+	
+	if (YawMotor.Location.SetLocation-yaw_OFFSET<-0.25)
+		RollSinkControl=-78;
+	else 
+		RollSinkControl=0;
+
+	RollMotor.RollSink=RemoteDataPort.PitchIncrement*MAX_PWM*GimbalSpeedK+RollSinkControl;//下沉不经过PID故使用K参数
+	
 	/************roll的发送放在这里**************/
 #if 1 //启用关控保护
 	if (!RemoteLostCount)

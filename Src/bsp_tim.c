@@ -1,6 +1,7 @@
 #include "bsp_tim.h"
 #include "BSPconfig.h"
 #include "stm32f4xx_hal.h"
+u32 TIM3DMAMemoryBaseAddress,TIM3DMABufferSize;
 
 void UserTim1Config(void)//摩擦轮
 {
@@ -40,6 +41,30 @@ void UserTim1Config(void)//摩擦轮
 	
 	LL_TIM_EnableCounter(TIM1); 
 }
+void ConfigTIM3DMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize)
+{
+	TIM3DMAMemoryBaseAddress=DMA_Memory0BaseAddr;
+	TIM3DMABufferSize=DMA_BufferSize;
+	
+	TIM3ConfigEnable();
+}
+
+void TIM3ConfigEnable(void)
+{
+	LL_DMA_SetMemoryAddress(DMA1,LL_DMA_STREAM_4,(u32)TIM3DMAMemoryBaseAddress);
+	LL_DMA_SetPeriphAddress(DMA1,LL_DMA_STREAM_4,(u32)&(TIM3->CCR1));
+	LL_DMA_SetDataLength(DMA1,LL_DMA_STREAM_4,TIM3DMABufferSize);	
+	LL_DMA_ClearFlag_TC7(DMA1);//清除中断标志
+	LL_DMA_EnableIT_TC(DMA1, LL_DMA_STREAM_4);
+	LL_TIM_EnableDMAReq_CC1(TIM3);//使能TIM1的CC3 DMA请求
+	LL_TIM_EnableAllOutputs(TIM3);//使能TIM的输出
+	LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_4);
+	
+	LL_TIM_CC_SetDMAReqTrigger(TIM3,LL_TIM_CCDMAREQUEST_CC);//设置TIM1 DMA请求触发器	
+	LL_TIM_CC_EnableChannel(TIM3,LL_TIM_CHANNEL_CH1);//使能TIM1 的cc通道ch3	
+
+}
+
 
 void UserTim3Config(void)
 {

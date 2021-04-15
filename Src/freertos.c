@@ -75,7 +75,7 @@
 #include "task_wifi.h"
 #include "LobotSerialServo.h"
 #include "task_grasp.h"
-
+#include "driver_laser.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -196,16 +196,27 @@ void MX_FREERTOS_Init(void) {
 extern u8 init_Wifi_flag;
 SemaphoreHandle_t xSemaphore;//wifi的二值信号
 int code;
+int PWM42=0;
+int PWM51=0;
+int PWM52=0;
 extern  RemoteDataUnion RemoteData;
+extern VisionDataStruct VisionData;
+
 /* USER CODE END Header_LEDTask */
 void LEDTask(void const * argument)
 {
 
   /* USER CODE BEGIN LEDTask */
+	 LaserInit();
+
   /* Infinite loop */
 	 for(;;)
   {
 		LED0=!LED0;
+		LEDControl(VisionData.statusfinal);			
+		LL_TIM_OC_SetCompareCH2(TIM4,PWM42);//350开600关
+		LL_TIM_OC_SetCompareCH1(TIM5,PWM51);//300左550中700右
+		LL_TIM_OC_SetCompareCH2(TIM5,PWM52);//中570
     osDelay(500);
   }
   /* USER CODE END LEDTask */
@@ -313,14 +324,17 @@ void GimbalTask(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_GraspTask */
+extern LobotServoData LServo;
+
 void GraspTask(void const * argument)
 {
   /* USER CODE BEGIN GraspTask */
+	LServoInit();
   /* Infinite loop */
   for(;;)
   {
 		GraspControlTask();
-    osDelay(1);
+    osDelay(LServo.time);
   }
   /* USER CODE END GraspTask */
 }

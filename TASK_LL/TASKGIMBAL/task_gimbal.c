@@ -3,6 +3,8 @@
 #include "driver_feedmotor.h"
 #include "driver_remote.h"
 #include "math.h"
+#include "driver_laser.h"
+
 //遥控器灵敏度
 #define YAW_REMOTE_SENSITIVE (0.0005f)
 #define PITCH_REMOTE_SENSITIVE (0.0005f)
@@ -24,7 +26,23 @@ int flag_init=0; //换弹电机初始化标志位
 //Switch.Reload1 换弹标志位
 u8 GimbalInitFlag = 2;//云台初始化标识位
  float yaw_OFFSET;
+VisionDataStruct VisionData;
+extern u8 UART3BUFF[20];
+u8 UART3BUFFLast[20];
+u32 VisionReceiveData[4]={0};
 
+void VisionReceiveDataClear(VisionDataStruct *Data)
+{
+	Data->angle_last=Data->angle;
+	Data->rho_last=Data->rho;
+	Data->angle=0;
+	Data->rho=0;
+	for(int i =0;i<20;i++)
+	{
+		UART3BUFFLast[i]=UART3BUFF[i];
+		UART3BUFF[i]=0;
+	}
+}
 
 void GimbalControlTask()
 {
@@ -44,6 +62,8 @@ void GimbalControlTask()
 	}
 	if (VisionReceiveFlag)
 		VisionControl();
+	//VisionReceiveDataClear(&VisionData);//接收重置
+
 ///**************************换弹电机（2006）**********************************/
 //	//初始化
 //	if(flag_init==0)
@@ -83,30 +103,18 @@ void PitchSetLocationValueChange(float Pitch)
 {
 	GimbalSetLocationDataTemp.PitchSetLocation	+=	Pitch;
 }
-extern u8 UART3BUFF[15];
-u8 UART3BUFFLast[15];
-u32 VisionReceiveData[2]={0};
-VisionDataStruct VisionData;
+/**************
+通信协议
+偏移量			角度值 			x坐标 			y坐标				状态码
+*///////////////
 void UART3Unpack(u8 *buff,u32 *num)
 {
-	for (int i =0;i<2;i++)
+	for (int i =0;i<4;i++)
 	{
 		u32 a  = ((buff[i*4+2]<<24)|(buff[i*4+3]<<16)|(buff[i*4+4]<<8)|(buff[i*4+5]));
 		int  n = (a-ONE1)/TWO1;
 		u32 x = 1<<n;
 		num[i]=x+(a-ONE1-TWO1*n)*x/TWO1;
-	}
-}
-void VisionReceiveDataClear(VisionDataStruct *Data)
-{
-	Data->angle_last=Data->angle;
-	Data->rho_last=Data->rho;
-	Data->angle=0;
-	Data->rho=0;
-	for(int i =0;i<15;i++)
-	{
-		UART3BUFFLast[i]=UART3BUFF[i];
-		UART3BUFF[i]=0;
 	}
 }
 float FilterK=0.05;
@@ -125,7 +133,40 @@ void VisionControl(void)
 		VisionData.rho=(float)VisionReceiveData[0]-330;//偏离值
 		VisionData.angle=(float)atan(a)*57.3;//角度值
 		VisionData.angle=VisionData.angle*FilterK+VisionData.angle*(1-FilterK);
-		
+		VisionData.error_x=VisionReceiveData[2];
+		VisionData.error_y=VisionReceiveData[3];
+	#if  0			////////////////使用滤波
+		VisionData.status=UART3BUFF[18];
+		switch (VisionData.status)
+		{
+			case 'C':
+				VisionData.statuscount.circle++;
+			break;
+			case 'S':
+				VisionData.statuscount.square++;
+			break;
+			case 'N':
+			{
+				VisionData.statuscount.circle=VisionData.statuscount.square=0;
+			VisionData.statusfinal='N';
+				break;
+			}
+			default:
+				break;
+		}
+		if (VisionData.statuscount.circle>3)
+		{
+			VisionData.statusfinal='C';
+			VisionData.statuscount.circle=VisionData.statuscount.square=0;
+		}
+		else if (VisionData.statuscount.square>3)
+		{
+			VisionData.statusfinal='S';
+			VisionData.statuscount.circle=VisionData.statuscount.square=0;
+		}
+	#else         ///////////不使用滤波
+		VisionData.statusfinal=UART3BUFF[18];
+	#endif 
 	#if 1 //视觉处的变结构PID
 		VisionRhoIncreasement.Ref=VisionData.rho;
 		VisionRhoIncreasement.calc(&VisionRhoIncreasement);
@@ -143,16 +184,17 @@ void VisionControl(void)
 			{
 				if(fabs(YawMotor.Location.SetLocation-YawMotor.Location.Location)<0.05)
 				{
-					if (VisionData.angle>50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20){
-						YawSetLocationValueChange(-0.25);
-						TurnFlag=60;
-					}
-					else if (VisionData.angle<-50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20)
-					{
-						YawSetLocationValueChange(-0.25);
-						TurnFlag=60;
-					}
-					else 
+					//这些注释是用来弯道快速转弯
+//					if (VisionData.angle>50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20){
+//						YawSetLocationValueChange(-0.25);
+//						TurnFlag=60;
+//					}
+//					else if (VisionData.angle<-50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20)
+//					{
+//						YawSetLocationValueChange(-0.25);
+//						TurnFlag=60;
+//					}
+//					else 
 					{
 						YawSetLocationValueChange(-VisionData.change_angle);
 						if (TurnFlag>-10)
@@ -163,12 +205,7 @@ void VisionControl(void)
 //		if((VisionData.change_rho<=12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho>=0.5f*VisionYawIncreasement.Kp)||
 //				(VisionData.change_rho>=-12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho<=-0.5f*VisionYawIncreasement.Kp))
 				VisionRho=VisionData.change_rho/Rho_Maximum;
-			if (YawMotor.Location.SetLocation-yaw_OFFSET<-0.25)
-				RollMotor.RollSink=-00;
-			else 
-				RollMotor.RollSink=0;
 		}
-		VisionReceiveDataClear(&VisionData);//接收重置
 	}
 //	else 				RollMotor.RollSink=0;
 
