@@ -294,8 +294,8 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 	
-	memcpy(UsbRxBuf,Buf,*Len);										//½ÓÊÕµÄÊı¾İ·ÅÔÚUsbRxBufÖĞ
-	CDC_Transmit_FS(UsbRxBuf,sizeof(UsbRxBuf));		//·¢ËÍ
+	memcpy(UsbRxBuf,Buf,*Len);										//æ¥æ”¶çš„æ•°æ®æ”¾åœ¨UsbRxBufä¸­
+	CDC_Transmit_FS(UsbRxBuf,sizeof(UsbRxBuf));		//å‘é€
 
   return (USBD_OK);
   /* USER CODE END 6 */

@@ -1,5 +1,5 @@
 /**
- * ¹¤¿Ø»ú·¢ËÍÓë½ÓÊÕÂß¼­´¦Àí£¬¶ÔÊý¾Ý½øÐÐ·â×°£¬³ÖÓÐ·¢ËÍÊý¾Ý»º´æ£¬Í¨¹ý´ø²Îº¯ÊýÏòÉÏ²ãÌá¹©¹¤¿Ø»ú·¢ËÍÄÜÁ¦¡£
+ * å·¥æŽ§æœºå‘é€ä¸ŽæŽ¥æ”¶é€»è¾‘å¤„ç†ï¼Œå¯¹æ•°æ®è¿›è¡Œå°è£…ï¼ŒæŒæœ‰å‘é€æ•°æ®ç¼“å­˜ï¼Œé€šè¿‡å¸¦å‚å‡½æ•°å‘ä¸Šå±‚æä¾›å·¥æŽ§æœºå‘é€èƒ½åŠ›ã€‚
  */
 #include "data_channel_pc.h"
 #include "interface_base.h"

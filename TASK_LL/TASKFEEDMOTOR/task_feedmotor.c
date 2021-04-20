@@ -8,22 +8,22 @@
 #include "bsp_can.h"
 #include "delay.h"
 
-//300³õÊ¼Î»ÖÃ
-//ÈÈÁ¿¿ØÖÆ²ÎÊı
+//300åˆå§‹ä½ç½®
+//çƒ­é‡æ§åˆ¶å‚æ•°
 #define HEAT_UPPER_LIMIT  (480.0f)
 #define COOLlNG_RATIO   	(160.0f)
 #define SHOOT_SPEED     	(23.0f)
 #define SPARE_HEAT        (20.0f)
 
-//²¦µ¯²ÎÊı
+//æ‹¨å¼¹å‚æ•°
 #define ENCODER_LINE (36.0f)
 #define SHOOT_NUMBER (8.0f)
 #define SHOOT_ONCE_LOCATION ( ENCODER_LINE/SHOOT_NUMBER )
 
-//¶Â×ª»Ø×ª²¦ÅÌ¸ñÊı
+//å µè½¬å›è½¬æ‹¨ç›˜æ ¼æ•°
 #define MOTOR_RETURN_RATE (0.5f)
 
-//°â»ú²ÎÊı
+//æ‰³æœºå‚æ•°
 #define Trigger_initcode 2400
 #define Trigger_firecode 930
 
@@ -35,33 +35,33 @@ extern  SwitchStruct Switch;
 TriggerStruct Trigger;
 
 
-//----------------------------------------------²¦µ¯ÖÜÆÚÈÎÎñ----------------------------------------------------------
+//----------------------------------------------æ‹¨å¼¹å‘¨æœŸä»»åŠ¡----------------------------------------------------------
 
 int IsDeverseLocked=0;
-void LockedMotorDetectionAndProcessed(void)		//¶Â×ª¼ì²âËã·¨
+void LockedMotorDetectionAndProcessed(void)		//å µè½¬æ£€æµ‹ç®—æ³•
 {
-	static int 		TimeCount=0;								//ÓÃÀ´²úÉú0.1sÊ±¶Î¹©¶Â×ªÊ¹ÓÃ
+	static int 		TimeCount=0;								//ç”¨æ¥äº§ç”Ÿ0.1sæ—¶æ®µä¾›å µè½¬ä½¿ç”¨
 	static float 	Current[10]={0,0,0,0,0,0,0,0,0,0};
 	static float  CurrentMean;
-	static int MotorLockedCount = 0;//¶Â×ª´ÎÊı¼ÆËã
+	static int MotorLockedCount = 0;//å µè½¬æ¬¡æ•°è®¡ç®—
 
-	//¸üĞÂµçÁ÷
+	//æ›´æ–°ç”µæµ
 	for(int i=0;i<9;i++)
 	{
 			Current[i]=Current[i+1];
 	}
 	Current[9]=GetFeedMotorCurrent();
 	
-	//¶Â×ª¼ì²â
+	//å µè½¬æ£€æµ‹
 	if(IsDeverseLocked==1)
 	{
-			if(TimeCount<25)			//0.1sÒ»¸öÖÜÆÚ
+			if(TimeCount<25)			//0.1sä¸€ä¸ªå‘¨æœŸ
 			  TimeCount++; 
 			else
 			{
 				TimeCount = 0;
 				IsDeverseLocked = 0;
-				SetLocation += MOTOR_RETURN_RATE * SHOOT_ONCE_LOCATION;	//Õı×ª
+				SetLocation += MOTOR_RETURN_RATE * SHOOT_ONCE_LOCATION;	//æ­£è½¬
 				SetFeedMotorSetLocation(SetLocation);
 			}
 	}
@@ -72,7 +72,7 @@ void LockedMotorDetectionAndProcessed(void)		//¶Â×ª¼ì²âËã·¨
 			if( fabs(CurrentMean) > 6000.0f)
 			{
 				MotorLockedCount++;
-				SetLocation = GetFeedMotorLocation() - MOTOR_RETURN_RATE * SHOOT_ONCE_LOCATION;	//·´×ª
+				SetLocation = GetFeedMotorLocation() - MOTOR_RETURN_RATE * SHOOT_ONCE_LOCATION;	//åè½¬
 				SetFeedMotorSetLocation(SetLocation);
 				IsDeverseLocked = 1;					
 			}
@@ -83,9 +83,9 @@ void LockedMotorDetectionAndProcessed(void)		//¶Â×ª¼ì²âËã·¨
 }
 
 
-void FeedMotorLocationUpdate(unsigned char ShootNumber)	//Éè¶¨×Óµ¯·¢Éä¸öÊı½Ó¿Ú
+void FeedMotorLocationUpdate(unsigned char ShootNumber)	//è®¾å®šå­å¼¹å‘å°„ä¸ªæ•°æ¥å£
 {
-		if(IsDeverseLocked == 0)	//²»¶Â×ª
+		if(IsDeverseLocked == 0)	//ä¸å µè½¬
 		{
 			if( fabs(GetFeedMotorLocationError()) < fabs(SHOOT_ONCE_LOCATION) )	
 			{
@@ -95,7 +95,7 @@ void FeedMotorLocationUpdate(unsigned char ShootNumber)	//Éè¶¨×Óµ¯·¢Éä¸öÊı½Ó¿Ú
 		}
 }
 
-void FeedMotorSingleShootSet(u8 FeedMotorJudge)		//µ¥·¢º¯Êı
+void FeedMotorSingleShootSet(u8 FeedMotorJudge)		//å•å‘å‡½æ•°
 {
 	static int SingleShootEnable=1;
 	if(FeedMotorJudge&&SingleShootEnable)
@@ -108,7 +108,7 @@ void FeedMotorSingleShootSet(u8 FeedMotorJudge)		//µ¥·¢º¯Êı
 			SingleShootEnable = 1;
 	}
 }
-//À­Ïßµç»ú·¢Éä¿ØÖÆ
+//æ‹‰çº¿ç”µæœºå‘å°„æ§åˆ¶
 void PitchControlCalculateAndSend(void)
 {
 	u8 Can1PitchSendMessege[8];
@@ -143,7 +143,7 @@ void PitchControlCalculateAndSend(void)
 #endif
 }
 
-//À­Ïßµç»ú¿ØÖÆ
+//æ‹‰çº¿ç”µæœºæ§åˆ¶
 int Flag_=1;
 int count_ = 0;
 int location = 0;
@@ -151,12 +151,12 @@ int loction_1 = 0;
 int flag_count=1;
 void FeedMotorControlLogic()
 {	
-/*****************************À­Ïß¸´Î»Ò»Ìå»¯*************************************/
+/*****************************æ‹‰çº¿å¤ä½ä¸€ä½“åŒ–*************************************/
 	Switch.Reload0=PBin(15);
 	if(RemoteData.RemoteDataProcessed.RCValue.s1==2)
 	{
 		location=PitchMotor.Location.Location+10;
-		if(Switch.Reload0==1)//´¥·¢ÏŞÎ»¿ª¹Ø
+		if(Switch.Reload0==1)//è§¦å‘é™ä½å¼€å…³
 		{
 			count_++;
 			if(Flag_==1)
@@ -187,12 +187,12 @@ void FeedMotorControlLogic()
 	  PitchControlCalculateAndSend();
 }
 
-/**************************Ò£¿ØÆ÷¿ØÖÆÀ­Ïß¡¢Ò£¿ØÆ÷¿ØÖÆÀ­Ïß¸´Î»*****************************/
+/**************************é¥æ§å™¨æ§åˆ¶æ‹‰çº¿ã€é¥æ§å™¨æ§åˆ¶æ‹‰çº¿å¤ä½*****************************/
 //	Switch.Reload0=PBin(15);
 //	if(RemoteData.RemoteDataProcessed.RCValue.s1==2)
 //	{
 //		location=PitchMotor.Location.Location+10;
-//		if(Switch.Reload0==1)//´¥·¢ÏŞÎ»¿ª¹Ø
+//		if(Switch.Reload0==1)//è§¦å‘é™ä½å¼€å…³
 //		{
 //			if(Flag_==1)
 //			{
@@ -212,7 +212,7 @@ void FeedMotorControlLogic()
 //}
 
 	
-//*************************************°â»úÏà¹Øº¯Êı*****************************************//
+//*************************************æ‰³æœºç›¸å…³å‡½æ•°*****************************************//
 void TriggerInit(void)
 {
 	LL_TIM_CC_EnableChannel(TIM1,LL_TIM_CHANNEL_CH1);

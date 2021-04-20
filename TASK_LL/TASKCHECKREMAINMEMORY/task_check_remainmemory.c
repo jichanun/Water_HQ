@@ -1,5 +1,5 @@
 /****************************************************
-*			Title:		ÄÚ´æ¼ì²â
+*			Title:		å†…å­˜æ£€æµ‹
 *			ChipType:	STM32F405RGT6
 *			Version:	1.0.7
 *			Date:			2017.10.18
@@ -31,7 +31,7 @@ UBaseType_t LostCounterTask_Handler_64;
 UBaseType_t MPU6050Task_Handler_512;
 UBaseType_t StartTask_Handler_128;
 
-//²âÊÔÈÎÎñ ÒÑ½«INCLUDE_uxTaskGetStackHighWaterMarkÖÃ1£¬²âÊÔÍêÒªÖÃ0;
+//æµ‹è¯•ä»»åŠ¡ å·²å°†INCLUDE_uxTaskGetStackHighWaterMarkç½®1ï¼Œæµ‹è¯•å®Œè¦ç½®0;
 
 void HighWater_task(void *pvParameters)
 { 

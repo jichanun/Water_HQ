@@ -5,7 +5,7 @@
 
 
 
-//½Ó¿Ú6£ºµ÷ÊÔ¹¦ÂÊ»·
+//æ¥å£6ï¼šè°ƒè¯•åŠŸç‡ç¯
 extern Pacer_Vehicle_Condition_TypeDef pacer_vehicle_condition;
 void set_pacer_vihecle_condition(Pacer_Vehicle_Condition_TypeDef* pacer_vehicle_condition_args){
 	pacer_vehicle_condition.chassis_motor1_condition=pacer_vehicle_condition_args->chassis_motor1_condition;
@@ -19,10 +19,10 @@ void set_pacer_vihecle_condition(Pacer_Vehicle_Condition_TypeDef* pacer_vehicle_
 	pacer_vehicle_condition.shooter2_motor_condition=pacer_vehicle_condition_args->shooter2_motor_condition;
 }
 
-//½Ó¿Ú7£ºµ÷ÊÔ³µÊı¾İ
+//æ¥å£7ï¼šè°ƒè¯•è½¦æ•°æ®
 extern Debug_Vehicle_Data debug_vehicle_data;
 void set_debug_vehicle_data(Debug_Vehicle_Data* debug_vehicle_data_args){
-	//Ìî³ä×Ô¼ºµÄÊı¾İ////////////////////////
+	//å¡«å……è‡ªå·±çš„æ•°æ®////////////////////////
 		debug_vehicle_data.power=debug_vehicle_data_args->power;
 		debug_vehicle_data.gyroscope_yaw=debug_vehicle_data_args->gyroscope_yaw;
 		debug_vehicle_data.gyroscope_pitch=debug_vehicle_data_args->gyroscope_pitch;
@@ -38,7 +38,7 @@ void set_debug_vehicle_data(Debug_Vehicle_Data* debug_vehicle_data_args){
 		debug_vehicle_data.encoding_disk_pitch=debug_vehicle_data_args->encoding_disk_pitch;
 }
 
-//´¦ÀíÊÕµ½µÄ·Ö¶Îpid²ÎÊı
+//å¤„ç†æ”¶åˆ°çš„åˆ†æ®µpidå‚æ•°
 float current_kp[10];
 void handle_subsection_pid_values(PID_value *pid_value){
 		current_kp[0]=pid_value->Ki[0];

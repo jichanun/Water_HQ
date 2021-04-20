@@ -140,7 +140,7 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN 0 */
 u8 UART3BUFF[20];
 #define NUM 8
-#define LENTH (NUM*24+240)//ºó100¸ö
+#define LENTH (NUM*24+240)//å100ä¸ª
 extern u32 data1[LENTH];
 
 /* USER CODE END 0 */
@@ -197,7 +197,7 @@ int main(void)
   //GPIO_Config();
   //UserTim1Config();
   
-	//ÕâĞĞÒÔÏÂ5¸ö¶¼ÒªÉ¾µô×¢ÊÍ
+	//è¿™è¡Œä»¥ä¸‹5ä¸ªéƒ½è¦åˆ æ‰æ³¨é‡Š
   CanInit();
   ChassisInit();
   GimbalInit();

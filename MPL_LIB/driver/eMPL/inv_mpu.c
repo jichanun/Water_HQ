@@ -59,8 +59,8 @@ unsigned char *mpl_key = (unsigned char*)"eMPL 5.1";
 #define delay_ms    delay_ms
 #define get_ms      mget_ms
 
-//#define log_i       printf  //´òÓ¡ĞÅÏ¢
-//#define log_e       printf  //´òÓ¡ĞÅÏ¢
+//#define log_i       printf  //æ‰“å°ä¿¡æ¯
+//#define log_e       printf  //æ‰“å°ä¿¡æ¯
 #define min(a,b) ((a<b)?a:b)
    
 #elif defined MOTION_DRIVER_TARGET_MSP430
@@ -3298,21 +3298,21 @@ lp_int_restore:
 }
 
 /********************************************************************************/
-//q30£¬q16¸ñÊ½,long×ªfloatÊ±µÄ³ıÊı.
+//q30ï¼Œq16æ ¼å¼,longè½¬floatæ—¶çš„é™¤æ•°.
 #define q30  1073741824.0f
 #define q16  65536.0f
 
-//ÍÓÂİÒÇ·½ÏòÉèÖÃ
+//é™€èºä»ªæ–¹å‘è®¾ç½®
 static signed char gyro_orientation[9] = { 1, 0, 0,
                                            0, 1, 0,
                                            0, 0, 1};
-//´ÅÁ¦¼Æ·½ÏòÉèÖÃ
+//ç£åŠ›è®¡æ–¹å‘è®¾ç½®
 static signed char comp_orientation[9] = { 0, 1, 0,
                                            1, 0, 0,
                                            0, 0,-1};
-//MPU9250×Ô²âÊÔ
-//·µ»ØÖµ:0,Õı³£
-//    ÆäËû,Ê§°Ü
+//MPU9250è‡ªæµ‹è¯•
+//è¿”å›å€¼:0,æ­£å¸¸
+//    å…¶ä»–,å¤±è´¥
 u8 run_self_test(void)
 {
 	int result;
@@ -3343,7 +3343,7 @@ u8 run_self_test(void)
 	}else return 1;
 }
 
-//·½Ïò×ª»»
+//æ–¹å‘è½¬æ¢
 unsigned short inv_row_2_scale(const signed char *row)
 {
     unsigned short b;
@@ -3364,14 +3364,14 @@ unsigned short inv_row_2_scale(const signed char *row)
         b = 7;      // error
     return b;
 }
-//¿Õº¯Êı,Î´ÓÃµ½.
+//ç©ºå‡½æ•°,æœªç”¨åˆ°.
 void mget_ms(unsigned long *time)
 {
     //*time=(unsigned long)HAL_GetTick();
 }
-//mpu9250,mpl³õÊ¼»¯
-//·µ»ØÖµ:0,Õı³£
-//    ÆäËû,Ê§°Ü
+//mpu9250,mplåˆå§‹åŒ–
+//è¿”å›å€¼:0,æ­£å¸¸
+//    å…¶ä»–,å¤±è´¥
 u8 mpu_dmp_init(void)
 {
 	u8 res=0;
@@ -3380,9 +3380,9 @@ u8 mpu_dmp_init(void)
     unsigned short gyro_rate, gyro_fsr;
     unsigned short compass_fsr;
     
-	if(mpu_init(&int_param)==0)	//³õÊ¼»¯MPU9250
+	if(mpu_init(&int_param)==0)	//åˆå§‹åŒ–MPU9250
 	{	 
-        res=inv_init_mpl();		//³õÊ¼»¯MPL
+        res=inv_init_mpl();		//åˆå§‹åŒ–MPL
         if(res)return 1;
         inv_enable_quaternion();
         inv_enable_9x_sensor_fusion();
@@ -3391,15 +3391,15 @@ u8 mpu_dmp_init(void)
         inv_enable_vector_compass_cal();
         inv_enable_magnetic_disturbance();
         inv_enable_eMPL_outputs();
-        res=inv_start_mpl();                //¿ªÆôMPL
+        res=inv_start_mpl();                //å¼€å¯MPL
         if(res)return 1;
-		res=mpu_set_sensors(INV_XYZ_GYRO|INV_XYZ_ACCEL|INV_XYZ_COMPASS);//ÉèÖÃËùĞèÒªµÄ´«¸ĞÆ÷
+		res=mpu_set_sensors(INV_XYZ_GYRO|INV_XYZ_ACCEL|INV_XYZ_COMPASS);//è®¾ç½®æ‰€éœ€è¦çš„ä¼ æ„Ÿå™¨
 		if(res)return 2; 
-		res=mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);//ÉèÖÃFIFO
+		res=mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);//è®¾ç½®FIFO
 		if(res)return 3; 
-		res=mpu_set_sample_rate(DEFAULT_MPU_HZ);	//ÉèÖÃ²ÉÑùÂÊ
+		res=mpu_set_sample_rate(DEFAULT_MPU_HZ);	//è®¾ç½®é‡‡æ ·ç‡
 		if(res)return 4; 
-        res=mpu_set_compass_sample_rate(1000/COMPASS_READ_MS);    //ÉèÖÃ´ÅÁ¦¼Æ²ÉÑùÂÊ
+        res=mpu_set_compass_sample_rate(1000/COMPASS_READ_MS);    //è®¾ç½®ç£åŠ›è®¡é‡‡æ ·ç‡
         if(res)return 5;
         mpu_get_sample_rate(&gyro_rate);
         mpu_get_gyro_fsr(&gyro_fsr);
@@ -3415,29 +3415,29 @@ u8 mpu_dmp_init(void)
         inv_set_compass_orientation_and_scale(
             inv_orientation_matrix_to_scalar(comp_orientation),(long)compass_fsr<<15);
             
-		res=dmp_load_motion_driver_firmware();		             //¼ÓÔØdmp¹Ì¼ş
+		res=dmp_load_motion_driver_firmware();		             //åŠ è½½dmpå›ºä»¶
 		if(res)return 6; 
-		res=dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation));//ÉèÖÃÍÓÂİÒÇ·½Ïò
+		res=dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation));//è®¾ç½®é™€èºä»ªæ–¹å‘
 		if(res)return 7; 
-		res=dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT|DMP_FEATURE_TAP|	//ÉèÖÃdmp¹¦ÄÜ
+		res=dmp_enable_feature(DMP_FEATURE_6X_LP_QUAT|DMP_FEATURE_TAP|	//è®¾ç½®dmpåŠŸèƒ½
 		    DMP_FEATURE_ANDROID_ORIENT|DMP_FEATURE_SEND_RAW_ACCEL|DMP_FEATURE_SEND_CAL_GYRO|
 		    DMP_FEATURE_GYRO_CAL);
 		if(res)return 8; 
-		res=dmp_set_fifo_rate(DEFAULT_MPU_HZ);	//ÉèÖÃDMPÊä³öËÙÂÊ(×î´ó²»³¬¹ı200Hz)
+		res=dmp_set_fifo_rate(DEFAULT_MPU_HZ);	//è®¾ç½®DMPè¾“å‡ºé€Ÿç‡(æœ€å¤§ä¸è¶…è¿‡200Hz)
 		if(res)return 9;   
-		res=run_self_test();		//×Ô¼ì
-		if(res)return 10; //×Ô¼ìÌ«´àÈõÁË   
-		res=mpu_set_dmp_state(1);	//Ê¹ÄÜDMP
+		res=run_self_test();		//è‡ªæ£€
+		if(res)return 10; //è‡ªæ£€å¤ªè„†å¼±äº†   
+		res=mpu_set_dmp_state(1);	//ä½¿èƒ½DMP
 		if(res)return 11;     
 	}
 	return 0;
 }
-//µÃµ½dmp´¦ÀíºóµÄÊı¾İ(×¢Òâ,±¾º¯ÊıĞèÒª±È½Ï¶à¶ÑÕ»,¾Ö²¿±äÁ¿ÓĞµã¶à)
-//pitch:¸©Ñö½Ç ¾«¶È:0.1¡ã   ·¶Î§:-90.0¡ã <---> +90.0¡ã
-//roll:ºá¹ö½Ç  ¾«¶È:0.1¡ã   ·¶Î§:-180.0¡ã<---> +180.0¡ã
-//yaw:º½Ïò½Ç   ¾«¶È:0.1¡ã   ·¶Î§:-180.0¡ã<---> +180.0¡ã
-//·µ»ØÖµ:0,Õı³£
-//    ÆäËû,Ê§°Ü
+//å¾—åˆ°dmpå¤„ç†åçš„æ•°æ®(æ³¨æ„,æœ¬å‡½æ•°éœ€è¦æ¯”è¾ƒå¤šå †æ ˆ,å±€éƒ¨å˜é‡æœ‰ç‚¹å¤š)
+//pitch:ä¿¯ä»°è§’ ç²¾åº¦:0.1Â°   èŒƒå›´:-90.0Â° <---> +90.0Â°
+//roll:æ¨ªæ»šè§’  ç²¾åº¦:0.1Â°   èŒƒå›´:-180.0Â°<---> +180.0Â°
+//yaw:èˆªå‘è§’   ç²¾åº¦:0.1Â°   èŒƒå›´:-180.0Â°<---> +180.0Â°
+//è¿”å›å€¼:0,æ­£å¸¸
+//    å…¶ä»–,å¤±è´¥
 u8 mpu_dmp_get_data(float *pitch,float *roll,float *yaw)
 {
 	float q0=1.0f,q1=0.0f,q2=0.0f,q3=0.0f;
@@ -3458,11 +3458,11 @@ u8 mpu_dmp_get_data(float *pitch,float *roll,float *yaw)
 	**/
 	if(sensors&INV_WXYZ_QUAT) 
 	{
-		q0 = quat[0] / q30;	//q30¸ñÊ½×ª»»Îª¸¡µãÊı
+		q0 = quat[0] / q30;	//q30æ ¼å¼è½¬æ¢ä¸ºæµ®ç‚¹æ•°
 		q1 = quat[1] / q30;
 		q2 = quat[2] / q30;
 		q3 = quat[3] / q30; 
-		//¼ÆËãµÃµ½¸©Ñö½Ç/ºá¹ö½Ç/º½Ïò½Ç
+		//è®¡ç®—å¾—åˆ°ä¿¯ä»°è§’/æ¨ªæ»šè§’/èˆªå‘è§’
 		*pitch = asin(-2 * q1 * q3 + 2 * q0* q2)* 57.3;	// pitch
 		*roll  = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1)* 57.3;	// roll
 		*yaw   = atan2(2*(q1*q2 + q0*q3),q0*q0+q1*q1-q2*q2-q3*q3) * 57.3;	//yaw
@@ -3470,12 +3470,12 @@ u8 mpu_dmp_get_data(float *pitch,float *roll,float *yaw)
 	return 0;
 }
 
-//µÃµ½mpl´¦ÀíºóµÄÊı¾İ(×¢Òâ,±¾º¯ÊıĞèÒª±È½Ï¶à¶ÑÕ»,¾Ö²¿±äÁ¿ÓĞµã¶à)
-//pitch:¸©Ñö½Ç ¾«¶È:0.1¡ã   ·¶Î§:-90.0¡ã <---> +90.0¡ã
-//roll:ºá¹ö½Ç  ¾«¶È:0.1¡ã   ·¶Î§:-180.0¡ã<---> +180.0¡ã
-//yaw:º½Ïò½Ç   ¾«¶È:0.1¡ã   ·¶Î§:-180.0¡ã<---> +180.0¡ã
-//·µ»ØÖµ:0,Õı³£
-//    ÆäËû,Ê§°Ü
+//å¾—åˆ°mplå¤„ç†åçš„æ•°æ®(æ³¨æ„,æœ¬å‡½æ•°éœ€è¦æ¯”è¾ƒå¤šå †æ ˆ,å±€éƒ¨å˜é‡æœ‰ç‚¹å¤š)
+//pitch:ä¿¯ä»°è§’ ç²¾åº¦:0.1Â°   èŒƒå›´:-90.0Â° <---> +90.0Â°
+//roll:æ¨ªæ»šè§’  ç²¾åº¦:0.1Â°   èŒƒå›´:-180.0Â°<---> +180.0Â°
+//yaw:èˆªå‘è§’   ç²¾åº¦:0.1Â°   èŒƒå›´:-180.0Â°<---> +180.0Â°
+//è¿”å›å€¼:0,æ­£å¸¸
+//    å…¶ä»–,å¤±è´¥
 u8 mpu_mpl_get_data(float *pitch,float *roll,float *yaw)
 {
 	unsigned long sensor_timestamp,timestamp;
@@ -3489,23 +3489,23 @@ u8 mpu_mpl_get_data(float *pitch,float *roll,float *yaw)
 
     if(sensors&INV_XYZ_GYRO)
     {
-        inv_build_gyro(gyro,sensor_timestamp);  		//°ÑĞÂÊı¾İ·¢ËÍ¸øMPL
+        inv_build_gyro(gyro,sensor_timestamp);  		//æŠŠæ–°æ•°æ®å‘é€ç»™MPL
         mpu_get_temperature(&temperature,&sensor_timestamp);
-        inv_build_temp(temperature,sensor_timestamp);   //°ÑÎÂ¶ÈÖµ·¢¸øMPL£¬Ö»ÓĞÍÓÂİÒÇĞèÒªÎÂ¶ÈÖµ
+        inv_build_temp(temperature,sensor_timestamp);   //æŠŠæ¸©åº¦å€¼å‘ç»™MPLï¼Œåªæœ‰é™€èºä»ªéœ€è¦æ¸©åº¦å€¼
     } 
     if(sensors&INV_XYZ_ACCEL)
     {
         accel[0] = (long)accel_short[0];
         accel[1] = (long)accel_short[1];
         accel[2] = (long)accel_short[2];
-        inv_build_accel(accel,0,sensor_timestamp);		//°Ñ¼ÓËÙ¶ÈÖµ·¢¸øMPL
+        inv_build_accel(accel,0,sensor_timestamp);		//æŠŠåŠ é€Ÿåº¦å€¼å‘ç»™MPL
     }
     if (!mpu_get_compass_reg(compass_short, &sensor_timestamp)) 
     {
         compass[0]=(long)compass_short[0];
         compass[1]=(long)compass_short[1];
         compass[2]=(long)compass_short[2];
-        inv_build_compass(compass,0,sensor_timestamp); //°Ñ´ÅÁ¦¼ÆÖµ·¢¸øMPL
+        inv_build_compass(compass,0,sensor_timestamp); //æŠŠç£åŠ›è®¡å€¼å‘ç»™MPL
     }
     inv_execute_on_data();
     inv_get_sensor_type_euler(data,&accuracy,&timestamp);

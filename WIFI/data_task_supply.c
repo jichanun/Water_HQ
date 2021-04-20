@@ -3,10 +3,10 @@
 #include "interface_base.h"
 
 extern u8 role_id;
-//²¹¸øÕ¾×´Ì¬ĞÅÏ¢ÆµÂÊ¿ØÖÆ
+//è¡¥ç»™ç«™çŠ¶æ€ä¿¡æ¯é¢‘ç‡æ§åˆ¶
 u32 supply_clock_count_1=0;
 
-//ÓÃ»§·¢ËÍÕ½³µÀë¿ª²¹¸øÕ¾ĞÅÏ¢µÄflag
+//ç”¨æˆ·å‘é€æˆ˜è½¦ç¦»å¼€è¡¥ç»™ç«™ä¿¡æ¯çš„flag
 u8 user_send_leave_supply_flag=0;
 
 

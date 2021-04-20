@@ -13,26 +13,26 @@ extern u8 init_Wifi_flag;
 extern float Power_Judge;
 
 
-//ÓÃ»§·¢ËÍ»ùµØÉËº¦ĞÅÏ¢µÄflag
+//ç”¨æˆ·å‘é€åŸºåœ°ä¼¤å®³ä¿¡æ¯çš„flag
 u8 user_send_matrix_hurt_flag=0;
 
-//Õû³µ×´Ì¬ĞÅÏ¢ÆµÂÊ¿ØÖÆ
+//æ•´è½¦çŠ¶æ€ä¿¡æ¯é¢‘ç‡æ§åˆ¶
 u32 pacer_clock_count_1=0;
-//²ÃÅĞÏµÍ³ĞÅÏ¢ÆµÂÊ¿ØÖÆ
+//è£åˆ¤ç³»ç»Ÿä¿¡æ¯é¢‘ç‡æ§åˆ¶
 u32 send_wifi_count_5=0;
-//Ç°·½µĞÈËĞÅÏ¢ÆµÂÊ¿ØÖÆ
+//å‰æ–¹æ•Œäººä¿¡æ¯é¢‘ç‡æ§åˆ¶
 u32 send_wifi_count_7=0;
 
-//µ÷ÊÔ³µĞÅÏ¢ÆµÂÊ¿ØÖÆ
+//è°ƒè¯•è½¦ä¿¡æ¯é¢‘ç‡æ§åˆ¶
 u32 debug_vehicle_data_count_1=0;
 
 
 extern u8 race_progress_data[35];
 
 extern Shoot_Data_TypeDef shoot_data;
-//Ê£ÓàĞ¡×Óµ¯ÊıÁ¿
+//å‰©ä½™å°å­å¼¹æ•°é‡
 extern u16 remain_small_bullet_num;
-//Ê£Óà´ó×Óµ¯ÊıÁ¿
+//å‰©ä½™å¤§å­å¼¹æ•°é‡
 extern u16 remain_big_bullet_num;
 
 void clock_pacer_task(){
@@ -47,7 +47,7 @@ void pacer_task(){
 }
 
 
-//·¢ËÍµ÷ÊÔ³µÊı¾İ
+//å‘é€è°ƒè¯•è½¦æ•°æ®
 Debug_Vehicle_Data debug_vehicle_data;
 Debug_Vehicle_Data_Union debug_vehicle_data_union;
 void send_debug_vehicle_data_task(){
@@ -58,7 +58,7 @@ extern float Energy_Integral;
 extern float SuperC_Voltage;
 //extern int J_60;
 //extern float Current_Limit;
-//·¢ËÍÕû³µ×´Ì¬ĞÅÏ¢ÈÎÎñ
+//å‘é€æ•´è½¦çŠ¶æ€ä¿¡æ¯ä»»åŠ¡
 Pacer_Vehicle_Condition_TypeDef pacer_vehicle_condition;
 
 int test0_sun=0;

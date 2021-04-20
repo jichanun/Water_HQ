@@ -6,7 +6,7 @@
 #define Code0 34
 
 #define NUM 8
-#define LENTH (NUM*24+240)//ºó100¸ö
+#define LENTH (NUM*24+240)//å100ä¸ª
 void LaserControl(unsigned char judge)
 {
 	PCout(7)=judge;
@@ -96,7 +96,7 @@ void LED_setdata(void)
 			data1[i*24+j+16]=((led[i].b)>>(7-j))&1?Code1:Code0;
 		}
 	}
-	LL_TIM_CC_EnableChannel(TIM3,LL_TIM_CHANNEL_CH1);//Ê¹ÄÜTIM1 µÄccÍ¨µÀch3	
+	LL_TIM_CC_EnableChannel(TIM3,LL_TIM_CHANNEL_CH1);//ä½¿èƒ½TIM1 çš„ccé€šé“ch3	
     LL_TIM_EnableCounter(TIM3);
 	LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_4);
 }

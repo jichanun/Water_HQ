@@ -12,10 +12,10 @@ char passWord[50];
 USART_TypeDef* WIFI_USART;
 struct
 {
-	SendData sendData[200];//¼ÙÉè×î¶àÓĞ200¸öÖµ
+	SendData sendData[200];//å‡è®¾æœ€å¤šæœ‰200ä¸ªå€¼
 	int number;
 }Alldatas;
-int number=0;//³õÊ¼»¯ÓÃ
+int number=0;//åˆå§‹åŒ–ç”¨
 int PostFlag=0;
 float textc=334.55;
 u32 time;
@@ -28,7 +28,7 @@ void WifiInit(char* ip,int port,char* wifiname,char* password,USART_TypeDef* pUS
 	WIFI_USART=pUSART;
 	WIFI_ConfigUsartDMA((u32)receives,100);
 	Port=port;
-	data_transmit_init(port,ip);  //¶Ë¿Ú IP
+	data_transmit_init(port,ip);  //ç«¯å£ IP
 	sends[0]=sends[1]=0x5A;
 	sends[2]=sends[3]=0;
 	
@@ -63,7 +63,7 @@ void SendAll(void)
 	sends[6]=c[2];
 	sends[7]=c[3];
 	
-	sends[8]=(char)TIMING_WAY;//¶¨Ê±·¢ËÍËùÓĞÊı¾İ
+	sends[8]=(char)TIMING_WAY;//å®šæ—¶å‘é€æ‰€æœ‰æ•°æ®
 	sends[9]=Alldatas.number;
 	for(int i=0;i<Alldatas.number;i++)
 	{
@@ -98,14 +98,14 @@ void WifiPost(void)
 	{
 		u16 lenth;
 		time=HAL_GetTick();
-		u16 count;//Ãû×Ö³¤¶È
+		u16 count;//åå­—é•¿åº¦
 		const char* name=Alldatas.sendData[number].name;
 	
 		sends[4]=c[0];
 		sends[5]=c[1];
 		sends[6]=c[2];
 		sends[7]=c[3];
-		sends[8]=(char)INSERT_WAY;//Ôö¼ÓÊı¾İÖ¸Áî
+		sends[8]=(char)INSERT_WAY;//å¢åŠ æ•°æ®æŒ‡ä»¤
 		sends[9]=Alldatas.sendData[number].number;
 		sends[10]=Alldatas.sendData[number].rf;
 		sends[11]=Alldatas.sendData[number].rt;
@@ -135,7 +135,7 @@ void WifiPost(void)
 
 void GetOrder()
 {
-	if(receives[0]!=0x5A||receives[0]!=0x5A)//Í·Ğ£Ñé
+	if(receives[0]!=0x5A||receives[0]!=0x5A)//å¤´æ ¡éªŒ
 	{
 		return ;
 	}
@@ -146,7 +146,7 @@ void GetOrder()
 	{
 		if(Alldatas.sendData[i].number==number)
 		{
-			if(Alldatas.sendData[i].rt!=CONDITION)//²»ÊÇconditionÄ£Ê½
+			if(Alldatas.sendData[i].rt!=CONDITION)//ä¸æ˜¯conditionæ¨¡å¼
 				return;
 			Alldatas.sendData[i].address[0]=receives[3];
 			Alldatas.sendData[i].address[1]=receives[4];

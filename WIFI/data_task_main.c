@@ -17,14 +17,14 @@
 
 
 
-//ÔÚ100ms½øÒ»´ÎµÄÖĞ¶Ïº¯ÊıÖĞµ÷ÓÃ
+//åœ¨100msè¿›ä¸€æ¬¡çš„ä¸­æ–­å‡½æ•°ä¸­è°ƒç”¨
 void clock_main(){
 	clock_pacer_task();
 	clock_wifi();
 }
 
 
-//·¢ËÍº¯Êı
+//å‘é€å‡½æ•°
 void SendMessageToWifi(void)
 {
 	SendAll();

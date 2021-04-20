@@ -10,8 +10,8 @@ static CAN_TxHeaderTypeDef Tx2Message;
 
 void CanInit(void)
 {
-  UserCan1FilterConfig();													//CAN1:µ×ÅÌµç»ú*4£¬²¦µ¯µç»ú*1
-  UserCan2FilterConfig();													//CAN2:ÔÆÌ¨µç»ú*2
+  UserCan1FilterConfig();													//CAN1:åº•ç›˜ç”µæœº*4ï¼Œæ‹¨å¼¹ç”µæœº*1
+  UserCan2FilterConfig();													//CAN2:äº‘å°ç”µæœº*2
 	HAL_CAN_Start(&hcan1);
 	HAL_CAN_Start(&hcan2);
 }
@@ -20,20 +20,20 @@ unsigned char UserCan1FilterConfig()
 {
 	CAN_FilterTypeDef  CAN1_FilerConf;
 
-	CAN1_FilerConf.FilterIdHigh=CAN1_FILTER_ID_FMI2<<5;     //32Î»ID
+	CAN1_FilerConf.FilterIdHigh=CAN1_FILTER_ID_FMI2<<5;     //32ä½ID
   CAN1_FilerConf.FilterIdLow=CAN1_FILTER_ID_FMI0<<5;
-  CAN1_FilerConf.FilterMaskIdHigh=CAN1_FILTER_ID_FMI3<<5; //32Î»MASK
+  CAN1_FilerConf.FilterMaskIdHigh=CAN1_FILTER_ID_FMI3<<5; //32ä½MASK
   CAN1_FilerConf.FilterMaskIdLow=CAN1_FILTER_ID_FMI1<<5;
-  CAN1_FilerConf.FilterFIFOAssignment=CAN_FILTER_FIFO0;//¹ıÂËÆ÷0¹ØÁªµ½FIFO0
-  CAN1_FilerConf.FilterBank=0;          //¹ıÂËÆ÷0
+  CAN1_FilerConf.FilterFIFOAssignment=CAN_FILTER_FIFO0;//è¿‡æ»¤å™¨0å…³è”åˆ°FIFO0
+  CAN1_FilerConf.FilterBank=0;          //è¿‡æ»¤å™¨0
   CAN1_FilerConf.FilterMode=CAN_FILTERMODE_IDLIST;
   CAN1_FilerConf.FilterScale=CAN_FILTERSCALE_16BIT;
-  CAN1_FilerConf.FilterActivation=ENABLE; //¼¤»îÂË²¨Æ÷0
+  CAN1_FilerConf.FilterActivation=ENABLE; //æ¿€æ´»æ»¤æ³¢å™¨0
   CAN1_FilerConf.SlaveStartFilterBank=14;
 	
-	if(HAL_CAN_ConfigFilter(&hcan1,&CAN1_FilerConf)!=HAL_OK) return 1;//ÂË²¨Æ÷³õÊ¼»¯
+	if(HAL_CAN_ConfigFilter(&hcan1,&CAN1_FilerConf)!=HAL_OK) return 1;//æ»¤æ³¢å™¨åˆå§‹åŒ–
 
-	__HAL_CAN_ENABLE_IT(&hcan1,CAN_IT_RX_FIFO0_MSG_PENDING);//FIFO0ÏûÏ¢¹ÒÆğÖĞ¶ÏÔÊĞí.	  
+	__HAL_CAN_ENABLE_IT(&hcan1,CAN_IT_RX_FIFO0_MSG_PENDING);//FIFO0æ¶ˆæ¯æŒ‚èµ·ä¸­æ–­å…è®¸.	  
 
 	return 0;
 }
@@ -42,20 +42,20 @@ unsigned char UserCan2FilterConfig()
 {
 	CAN_FilterTypeDef  CAN2_FilerConf;
 	
-	CAN2_FilerConf.FilterIdHigh=CAN2_FILTER_ID_FMI2<<5;     //32Î»ID
+	CAN2_FilerConf.FilterIdHigh=CAN2_FILTER_ID_FMI2<<5;     //32ä½ID
   CAN2_FilerConf.FilterIdLow=CAN2_FILTER_ID_FMI0<<5;
-  CAN2_FilerConf.FilterMaskIdHigh=CAN2_FILTER_ID_FMI3<<5; //32Î»MASK
+  CAN2_FilerConf.FilterMaskIdHigh=CAN2_FILTER_ID_FMI3<<5; //32ä½MASK
   CAN2_FilerConf.FilterMaskIdLow=CAN2_FILTER_ID_FMI1<<5;
-  CAN2_FilerConf.FilterFIFOAssignment=CAN_FILTER_FIFO0<<5;//¹ıÂËÆ÷0¹ØÁªµ½FIFO0
-  CAN2_FilerConf.FilterBank=14;          //¹ıÂËÆ÷0
+  CAN2_FilerConf.FilterFIFOAssignment=CAN_FILTER_FIFO0<<5;//è¿‡æ»¤å™¨0å…³è”åˆ°FIFO0
+  CAN2_FilerConf.FilterBank=14;          //è¿‡æ»¤å™¨0
   CAN2_FilerConf.FilterMode=CAN_FILTERMODE_IDLIST;
   CAN2_FilerConf.FilterScale=CAN_FILTERSCALE_16BIT;
-  CAN2_FilerConf.FilterActivation=ENABLE; //¼¤»îÂË²¨Æ÷0
+  CAN2_FilerConf.FilterActivation=ENABLE; //æ¿€æ´»æ»¤æ³¢å™¨0
   CAN2_FilerConf.SlaveStartFilterBank=14;
 	
-	if(HAL_CAN_ConfigFilter(&hcan2,&CAN2_FilerConf)!=HAL_OK) return 1;//ÂË²¨Æ÷³õÊ¼»¯
+	if(HAL_CAN_ConfigFilter(&hcan2,&CAN2_FilerConf)!=HAL_OK) return 1;//æ»¤æ³¢å™¨åˆå§‹åŒ–
 
-	__HAL_CAN_ENABLE_IT(&hcan2,CAN_IT_RX_FIFO0_MSG_PENDING);//FIFO0ÏûÏ¢¹ÒÆğÖĞ¶ÏÔÊĞí.	  
+	__HAL_CAN_ENABLE_IT(&hcan2,CAN_IT_RX_FIFO0_MSG_PENDING);//FIFO0æ¶ˆæ¯æŒ‚èµ·ä¸­æ–­å…è®¸.	  
 	return 0;	
 }
 
@@ -181,14 +181,14 @@ u8 CAN1_Send_Msg(u8* msg,u8 len,u16 ID)
 {
     u16 i=0;
 	  uint8_t Data[8];
-    Tx1Message.StdId=ID;        //±ê×¼±êÊ¶·û
-    Tx1Message.ExtId=0x12;        //À©Õ¹±êÊ¶·û(29Î»)
-    Tx1Message.IDE=CAN_ID_STD;    //Ê¹ÓÃ±ê×¼Ö¡
-    Tx1Message.RTR=CAN_RTR_DATA;  //Êı¾İÖ¡
+    Tx1Message.StdId=ID;        //æ ‡å‡†æ ‡è¯†ç¬¦
+    Tx1Message.ExtId=0x12;        //æ‰©å±•æ ‡è¯†ç¬¦(29ä½)
+    Tx1Message.IDE=CAN_ID_STD;    //ä½¿ç”¨æ ‡å‡†å¸§
+    Tx1Message.RTR=CAN_RTR_DATA;  //æ•°æ®å¸§
     Tx1Message.DLC=len;
     for(i=0;i<len;i++)
 			Data[i]=msg[i];
-		if(HAL_CAN_AddTxMessage(&hcan1,&Tx1Message,Data,(uint32_t *)CAN_TX_MAILBOX0)!=HAL_OK) return 1;     //·¢ËÍ
+		if(HAL_CAN_AddTxMessage(&hcan1,&Tx1Message,Data,(uint32_t *)CAN_TX_MAILBOX0)!=HAL_OK) return 1;     //å‘é€
     return 0;		
 }
 
@@ -196,13 +196,13 @@ u8 CAN2_Send_Msg(u8* msg,u8 len)
 {
     u16 i=0;
 		uint8_t Data[8];
-    Tx2Message.StdId=0x1FF;        //±ê×¼±êÊ¶·û
-    Tx2Message.ExtId=0x12;        //À©Õ¹±êÊ¶·û(29Î»)
-    Tx2Message.IDE=CAN_ID_STD;    //Ê¹ÓÃ±ê×¼Ö¡
-    Tx2Message.RTR=CAN_RTR_DATA;  //Êı¾İÖ¡
+    Tx2Message.StdId=0x1FF;        //æ ‡å‡†æ ‡è¯†ç¬¦
+    Tx2Message.ExtId=0x12;        //æ‰©å±•æ ‡è¯†ç¬¦(29ä½)
+    Tx2Message.IDE=CAN_ID_STD;    //ä½¿ç”¨æ ‡å‡†å¸§
+    Tx2Message.RTR=CAN_RTR_DATA;  //æ•°æ®å¸§
     Tx2Message.DLC=len;
     for(i=0;i<len;i++)
 			Data[i]=msg[i];
-		if(HAL_CAN_AddTxMessage(&hcan2,&Tx2Message,Data,(uint32_t *)CAN_TX_MAILBOX0)!=HAL_OK) return 1;     //·¢ËÍ
+		if(HAL_CAN_AddTxMessage(&hcan2,&Tx2Message,Data,(uint32_t *)CAN_TX_MAILBOX0)!=HAL_OK) return 1;     //å‘é€
     return 0;		
 }

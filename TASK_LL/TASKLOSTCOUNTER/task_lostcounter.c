@@ -30,7 +30,7 @@ extern u8 GimbalInitFlag;
 
 void LostCounterControl(u16 SystemErrorStatus)
 {
-	if((SystemErrorStatus>>REMOTE_LOST_COUNT)&1) //Ò£¿ØÆ÷¶ªÊı¾İ
+	if((SystemErrorStatus>>REMOTE_LOST_COUNT)&1) //é¥æ§å™¨ä¸¢æ•°æ®
 	{
 		 RemoteLostCount=0;
 		GimbalInitFlag=1;

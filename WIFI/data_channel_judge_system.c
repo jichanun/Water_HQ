@@ -1,5 +1,5 @@
 /**
- * ²ÃÅĞÏµÍ³·¢ËÍÓë½ÓÊÕÂß¼­´¦Àí£¬¶ÔÊı¾İ½øĞĞ·â×°£¬³ÖÓĞ·¢ËÍÊı¾İ»º´æ£¬Í¨¹ı´ø²Îº¯ÊıÏòÉÏ²ãÌá¹©²ÃÅĞÏµÍ³·¢ËÍÄÜÁ¦¡£
+ * è£åˆ¤ç³»ç»Ÿå‘é€ä¸æ¥æ”¶é€»è¾‘å¤„ç†ï¼Œå¯¹æ•°æ®è¿›è¡Œå°è£…ï¼ŒæŒæœ‰å‘é€æ•°æ®ç¼“å­˜ï¼Œé€šè¿‡å¸¦å‚å‡½æ•°å‘ä¸Šå±‚æä¾›è£åˆ¤ç³»ç»Ÿå‘é€èƒ½åŠ›ã€‚
  */
 #include "data_channel_judge_system.h"
 #include "data_task_main.h"
@@ -9,20 +9,20 @@
 #include "data_channel_wifi.h"
 
 
-//part16£º·¢¸ø²ÃÅĞÏµÍ³µÄ×Ô¶¨ÒåĞÅÏ¢
+//part16ï¼šå‘ç»™è£åˆ¤ç³»ç»Ÿçš„è‡ªå®šä¹‰ä¿¡æ¯
 #define DATA_PART_16_LENGTH 21
-//·¢¸ø²ÃÅĞÏµÍ³µÄ×Ô¶¨ÒåĞÅÏ¢
+//å‘ç»™è£åˆ¤ç³»ç»Ÿçš„è‡ªå®šä¹‰ä¿¡æ¯
 char send_custom_message_flag=0;
 u8 wifi_data_custom_message[DATA_PART_16_LENGTH];
 
-//×Ô¶¨Òå²ÃÅĞÏµÍ³Êı¾İ-²½±ø
+//è‡ªå®šä¹‰è£åˆ¤ç³»ç»Ÿæ•°æ®-æ­¥å…µ
 Custom_Message_TypeDef custom_data_pacer;
-//×Ô¶¨Òå²ÃÅĞÏµÍ³Êı¾İ-¹¤³Ì³µ
+//è‡ªå®šä¹‰è£åˆ¤ç³»ç»Ÿæ•°æ®-å·¥ç¨‹è½¦
 Custom_Message_TypeDef custom_data_engineer;
-//×Ô¶¨Òå²ÃÅĞÏµÍ³Êı¾İ-Ó¢ĞÛ³µ
+//è‡ªå®šä¹‰è£åˆ¤ç³»ç»Ÿæ•°æ®-è‹±é›„è½¦
 Custom_Message_TypeDef custom_data_hero;
 
-//³¡µØ»ú¹Ø×´Ì¬Êı¾İ
+//åœºåœ°æœºå…³çŠ¶æ€æ•°æ®
 Field_Data_TypeDef field_data;
 
 extern u8 role_id;

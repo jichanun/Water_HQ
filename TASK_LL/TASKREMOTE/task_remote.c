@@ -11,7 +11,7 @@ extern RemoteDataUnion RemoteData;
 extern GimbalMotorStruct	YawMotor,PitchMotor;
 extern SwitchStruct Switch;
 u8 AutomaticAiming=0;
-int Target_mode;  //·¢ÉäÄ¿±ê£¬0»ùµØ£¬1Ç°ÉÚÕ½
+int Target_mode;  //å‘å°„ç›®æ ‡ï¼Œ0åŸºåœ°ï¼Œ1å‰å“¨æˆ˜
 
 
 enum
@@ -100,7 +100,7 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 	u8 FlagTurningTemp;
 	
 	static u16 ShiftCount=0;
-//-----------------------------°´¼üÇĞ»»×´Ì¬½á¹¹Ä£ĞÍ---------------------------	
+//-----------------------------æŒ‰é”®åˆ‡æ¢çŠ¶æ€ç»“æ„æ¨¡å‹---------------------------	
 //	static u8 RemoteDataReceive.KeyQ_judge;
 //	static u8 RemoteDataReceive.KeyQ_t;
 //	if(RemoteDataReceive.KeyQ==0)
@@ -117,9 +117,9 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 //	}
 //	
 //	if(RemoteDataReceive.KeyQ_t%2==1)
-//		RemoteDataPortTemp.Friction=1;					//ÊÂ¼ş¸ÄÕâÀï
+//		RemoteDataPortTemp.Friction=1;					//äº‹ä»¶æ”¹è¿™é‡Œ
 //	else
-//		RemoteDataPortTemp.Friction=0;					//ÊÂ¼ş¸ÄÕâÀï
+//		RemoteDataPortTemp.Friction=0;					//äº‹ä»¶æ”¹è¿™é‡Œ
 //--------------------------------------------------------------------------
 
 //--------------------WIFI____CALL_ENGINEER---------------------------------
@@ -129,7 +129,7 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 //	}
 //--------------------------------------------------------------------------	
 	
-//---------------------------µ×ÅÌ°´¼ü¿ØÖÆÂß¼­-------------------------------	
+//---------------------------åº•ç›˜æŒ‰é”®æ§åˆ¶é€»è¾‘-------------------------------	
 	if(RemoteDataReceive.KeyShift)
 	{
 		RemoteDataPortTemp.ChassisSpeedY=(float)(RemoteDataReceive.KeyS-RemoteDataReceive.KeyW)*(KEY_MIN_SPEED);
@@ -141,7 +141,7 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 		RemoteDataPortTemp.ChassisSpeedX=(float)(RemoteDataReceive.KeyA-RemoteDataReceive.KeyD)*(KEY_MAX_SPEED);
 	}
 
-//-------------------------Êó±ê¾«¶È¿ØÖÆ--------------------------------
+//-------------------------é¼ æ ‡ç²¾åº¦æ§åˆ¶--------------------------------
 	if(RemoteDataReceive.KeyShift)
 	{
 		MouseYSentitiveValue = MOUSE_Y_SENTIVIVE_SLOW;
@@ -153,12 +153,12 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 	}
 //---------------------------------------------------------------------
 	
-//---------------------ÔÆÌ¨Êó±ê¿ØÖÆÂß¼­--------------------------------	
+//---------------------äº‘å°é¼ æ ‡æ§åˆ¶é€»è¾‘--------------------------------	
 	
 	RemoteDataPortTemp.PitchIncrement = MouseYSentitiveValue*RemoteDataReceive.MouseY;
 	RemoteDataPortTemp.YawIncrement = MouseXSentitiveValue*RemoteDataReceive.MouseX;
 	
-//---------------Êó±ê°´¼üÇĞ»»Ä£ĞÍ----------------------------
+//---------------é¼ æ ‡æŒ‰é”®åˆ‡æ¢æ¨¡å‹----------------------------
 //	if(RemoteDataReceive.RightMousePress==0)
 //	{
 //		mouse_r_judge=1;
@@ -178,7 +178,7 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 //		RemoteDataPortTemp.Friction = DISABLE;
 //-----------------------------------------------------------
 
-//*****************Êó±êÉä»÷Ä£ĞÍ******************************
+//*****************é¼ æ ‡å°„å‡»æ¨¡å‹******************************
 	if(RemoteDataReceive.RightMousePress)
 		MouseRCount++;
 	else
@@ -313,7 +313,7 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 		RemoteDataPortTemp.ShakeEnable=DISABLE;
 	}
 	
-//----------------------------µ¯²Ö¿ØÖÆÂß¼­-------------------------	
+//----------------------------å¼¹ä»“æ§åˆ¶é€»è¾‘-------------------------	
 	if(RemoteDataReceive.KeyF)
 	{
 		FlagTurning180=0;
@@ -338,7 +338,7 @@ RemoteDataPortStruct KeyboardModeProcessData(RemoteDataProcessedStruct	RemoteDat
 		MagazineState=RemoteDataPortTemp.Friction;
 	}
 	
-	if(FlagGimbalLock)					//¿ªµ¯²Ö²¹³äÂß¼­
+	if(FlagGimbalLock)					//å¼€å¼¹ä»“è¡¥å……é€»è¾‘
 	{
 		ChassisFollowInit();
 		FlagTurning180=0;
@@ -441,8 +441,14 @@ RemoteDataPortStruct AutoModeProcessData(RemoteDataProcessedStruct	RemoteDataRec
 	RemoteDataPortTemp.Laser=RemoteDataPortTemp.Friction;
 	
 	return RemoteDataPortTemp;
-}RemoteDataPortStruct AutoModeProcessData1(RemoteDataProcessedStruct	RemoteDataReceive)
+	
+}
+extern VisionDataStruct VisionData;
+  int  ReceiveCount=0;
+
+RemoteDataPortStruct AutoModeProcessData1(RemoteDataProcessedStruct	RemoteDataReceive)
 {
+	static  int  ReceiveCount=0;
 	RemoteDataPortStruct	RemoteDataPortTemp={0};
 	RemoteDataPortTemp.ChassisSpeedX	=	-	RemoteDataReceive.Channel_2;
 	RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3;
@@ -456,25 +462,43 @@ RemoteDataPortStruct AutoModeProcessData(RemoteDataProcessedStruct	RemoteDataRec
 	RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3+0.1;
 	if (RollSinkControl<-20)
 			RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3+0.2;
-	
-	
-	switch(RemoteDataReceive.RightSwitch)
-		
+	if (VisionData.statusfinal!='N')
 	{
-		case 1:RemoteDataPortTemp.Friction=DISABLE;
-					RemoteDataPortTemp.FeedMotor=DISABLE;
-					
-			break;
-		case 2:RemoteDataPortTemp.Friction=ENABLE;
-					RemoteDataPortTemp.FeedMotor=ENABLE;
-			break;
-		case 3:RemoteDataPortTemp.Friction=ENABLE;
-					RemoteDataPortTemp.FeedMotor=DISABLE;
-
-			break;
-		default:
-			break;
+		ReceiveCount++;
 	}
+	if (ReceiveCount>100)
+	{
+		ReceiveCount++;
+		RemoteDataPortTemp.Friction=ENABLE;
+	}
+	if (ReceiveCount>500)
+	{
+		ReceiveCount++;
+		RemoteDataPortTemp.FeedMotor=ENABLE;
+	}
+	if (ReceiveCount>2000)
+	{
+		ReceiveCount=0;
+		RemoteDataPortTemp.Friction=DISABLE;
+		RemoteDataPortTemp.FeedMotor=DISABLE;
+	}
+//	switch(RemoteDataReceive.RightSwitch)
+//		
+//	{
+//		case 1:RemoteDataPortTemp.Friction=DISABLE;
+//					RemoteDataPortTemp.FeedMotor=DISABLE;
+//					
+//			break;
+//		case 2:RemoteDataPortTemp.Friction=ENABLE;
+//					RemoteDataPortTemp.FeedMotor=ENABLE;
+//			break;
+//		case 3:RemoteDataPortTemp.Friction=ENABLE;
+//					RemoteDataPortTemp.FeedMotor=DISABLE;
+
+//			break;
+//		default:
+//			break;
+//	}
 	RemoteDataPortTemp.Laser=RemoteDataPortTemp.Friction;
 	
 	return RemoteDataPortTemp;
@@ -539,17 +563,17 @@ void ChassisRampProcessed(RemoteDataPortStruct	*RemoteDataPortTemp)
 	ChassisSpeedYSave = RemoteDataPortTemp->ChassisSpeedY;
 }
 
-//********************************************È±ÁËÒ»²¿·Ö*************************************//
+//********************************************ç¼ºäº†ä¸€éƒ¨åˆ†*************************************//
 extern float YAWError;
 extern float PitchError;
 float VisionRho=0;
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 {
-////	if(Target_mode==0)//»ùµØ
+////	if(Target_mode==0)//åŸºåœ°
 ////	{
 ////		YawSetLocationValueChange(YAW_TARGET_MODE0);
 ////	}
-////	if(Target_mode==1)//Ç°ÉÚÕ½
+////	if(Target_mode==1)//å‰å“¨æˆ˜
 ////	{
 ////	  YawSetLocationValueChange(YAW_TARGET_MODE1);
 ////	}
@@ -560,13 +584,13 @@ void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 //	if(RemoteData.RemoteDataProcessed.RCValue.Ch0==1024)
 //		RemoteDataPort.YawIncrement=0;
 //	YawSetLocationValueChange(YawMotor.Location.SetLocation+(RemoteDataPort.YawIncrement)/800);
-	//**************ÏÂÃæµÄÊÇ¹¤Ñµ´úÂë
-	#if CONFIG_USE_GYROSCOPE //***Èç¹ûÊ¹ÓÃÍÓÂİÒÇ£¬ÓÒÒ¡¸Ë¿ØÖÆÎ»ÖÃÔöÁ¿
+	//**************ä¸‹é¢çš„æ˜¯å·¥è®­ä»£ç 
+	#if CONFIG_USE_GYROSCOPE //***å¦‚æœä½¿ç”¨é™€èºä»ªï¼Œå³æ‘‡æ†æ§åˆ¶ä½ç½®å¢é‡
 	YawSetLocationValueChange((RemoteDataPort.YawIncrement)/300);
 	PitchSetLocationValueChange(RemoteDataPort.PitchIncrement/1000);
-//	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError,PitchError);	//yawÖá²âÊÔÓÃ¡£ĞèÒª×¢ÊÍ
+//	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError,PitchError);	//yawè½´æµ‹è¯•ç”¨ã€‚éœ€è¦æ³¨é‡Š
 	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX+VisionRho,RemoteDataPort.ChassisSpeedY,YAWError,PitchError);	
-	#else //****Èç¹û²»Ê¹ÓÃÍÓÂİÒÇ£¬ÓÒÒ¡¸Ë¿ØÖÆ·½Ïò 
+	#else //****å¦‚æœä¸ä½¿ç”¨é™€èºä»ªï¼Œå³æ‘‡æ†æ§åˆ¶æ–¹å‘ 
 	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY+VisionRho,RemoteDataPort.YawIncrement,0);//RemoteDataPort.PitchIncrement);	
 	#endif
 	CAN1Control(RemoteDataPort);
@@ -576,7 +600,7 @@ void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort);
 
 RemoteDataPortStruct	RemoteDataPort;
-//	Í¨¹ı
+//	é€šè¿‡
 u8 RemoteTaskControl()
 {
 	//Step	1	:	Receive remote raw data from buffer
@@ -587,7 +611,7 @@ u8 RemoteTaskControl()
 	if(RemoteDataReceive.FlagValidity)
 	{
 	
-		//Step	3	£ºProcess	remote data	and	Save into RemoteDataPort
+		//Step	3	ï¼šProcess	remote data	and	Save into RemoteDataPort
 		RemoteDataPort	=	RemoteDataCalculate(RemoteDataReceive);
 		RemoteDataPortProcessed(RemoteDataPort);
 		return 0;
@@ -597,24 +621,24 @@ u8 RemoteTaskControl()
 	return 1;
 }
 extern LobotServoData LServo;
-
+int  PWMON=100;
 void CAN1Control(RemoteDataPortStruct RemoteDataPort)
 {
 	if (RemoteDataPort.Friction)
 	{
-		LServo.Servo[3].Posi=500;//¶æ»ú¿ª
+		LL_TIM_OC_SetCompareCH2(TIM5,2550);//èˆµæœºå¼€
 		if (RemoteDataPort.FeedMotor)
 			{
-				
+				LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM+PWMON);//å¼€
 			}
 			else 
 			{
-				
+				LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM);//å…³
 			}		
 	}
-			else
+		else
 	{
-				LServo.Servo[3].Posi=800;//¶æ»ú¹Ø
-		
+			LL_TIM_OC_SetCompareCH2(TIM5,2950);//èˆµæœºå…³
+			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM);//ç”µæœºå…³
 	}
 }

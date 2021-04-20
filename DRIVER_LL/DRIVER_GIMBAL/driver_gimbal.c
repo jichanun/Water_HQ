@@ -1,5 +1,5 @@
 /****************************************************
-*			Title:		‘∆Ã®øÿ÷∆
+*			Title:		‰∫ëÂè∞ÊéßÂà∂
 *			Version:	6.1.2
 *			Data:			2017.09.24
 *												LD.
@@ -16,7 +16,7 @@
 #define ENCODER_LINE (8191)
 #define GYROY_OFFSET (0)
 #define GYROZ_OFFSET (0)
-#if 0 // π”√PITCH PID
+#if 0 //‰ΩøÁî®PITCH PID
 	#define PITCH (1)
 	#define PITCH_LOCATION_KP (0.5)				//0.5
 	#define PITCH_LOCATION_KI (0)
@@ -34,13 +34,13 @@
 	#define PITCH_SPEED_KD (0)
 #endif
 
-#if 1 // π”√YAW PID 
+#if 1 //‰ΩøÁî®YAW PID 
 	#define YAW (0)
-	#define YAW_LOCATION_KP (-0.8f)					//0.5
+	#define YAW_LOCATION_KP (-0.5f)					//0.5
 	#define YAW_LOCATION_KI (0)
 	#define YAW_LOCATION_KD (0)
 	#define YAW_LOCATION_KC (0)
-	#define YAW_SPEED_KP (-0.1)						//0.05
+	#define YAW_SPEED_KP (-0.18f)						//0.05
 	#define YAW_SPEED_KI (0)
 	#define YAW_SPEED_KD (0)
 #else 
@@ -53,7 +53,7 @@
 	#define YAW_SPEED_KI (0)
 	#define YAW_SPEED_KD (0)
 #endif
-#if 1 // π”√ROLL PID
+#if 1 //‰ΩøÁî®ROLL PID
 	#define ROLL (0)
 
 	#define ROLL_LOCATION_KP (0.2f)					//0.5
@@ -74,7 +74,7 @@
 	#define ROLL_SPEED_KI (0)
 	#define ROLL_SPEED_KD (0)
 #endif
-#if 0     // π”√ ”æıPID
+#if 0     //‰ΩøÁî®ËßÜËßâPID
 #define VISION_PITCH_KP (1.0)
 #define VISION_PITCH_KI (0.0)
 #define VISION_PITCH_KD (0.0)
@@ -102,17 +102,26 @@
 #define VISION_YAW_AP (0.0)
 #define VISION_YAW_BP (0)
 #define VISION_YAW_CP (0)
+#if 0
+	#define VISION_YAW_OFFSET (-4)
+	#define VISION_RHO_OFFSET (20)
+#else 
+	#define VISION_YAW_OFFSET (0)
+	#define VISION_RHO_OFFSET (0)
+#endif 
 #endif
 
 #define MAX_PWM  210
 GimbalMotorStruct	YawMotor,PitchMotor,RollMotor;
 extern  RemoteDataUnion RemoteData;
+extern VisionDataStruct VisionData;
+
 PID VisionRhoIncreasement , VisionYawIncreasement ;
 void GimbalInit(void)
 {
 	YawMotor.Location.SetLocation=YAW_INIT_VALUE;
 	PitchMotor.Location.SetLocation=PITCH_INIT_VALUE;	
-	//Yaw÷·Œª÷√PID≥ı ºªØ
+	//YawËΩ¥‰ΩçÁΩÆPIDÂàùÂßãÂåñ
 	YawMotor.PIDLocation.OutMax=1;
 	YawMotor.PIDLocation.OutMin=-1;
 	YawMotor.PIDLocation.calc=&PidCalc;
@@ -178,6 +187,8 @@ void GimbalInit(void)
 	RollMotor.RollError=0;
 	RollMotor.RollSink=0;
 	
+	VisionData.yaw_offset = VISION_YAW_OFFSET;
+	VisionData.rho_offset	=	VISION_RHO_OFFSET;
 	LL_TIM_CC_EnableChannel(TIM12,LL_TIM_CHANNEL_CH1);
 	LL_TIM_CC_EnableChannel(TIM12,LL_TIM_CHANNEL_CH2);	
 	LL_TIM_EnableCounter(TIM12);
@@ -191,7 +202,7 @@ void GimbalInit(void)
 	LL_TIM_CC_EnableChannel(TIM5,LL_TIM_CHANNEL_CH2);	
 	LL_TIM_EnableCounter(TIM5);
 	LL_TIM_EnableAllOutputs(TIM5);
-
+	
 }
 void VisionInit(void)
 {
@@ -237,19 +248,19 @@ void GimbalPIDLocationClear(u8 IfPitch,u8 IfYaw)
 		PitchMotor.PIDLocation.clear(&PitchMotor.PIDLocation);
 }
 float K=0.1;
-int RPitchSpeed,RPitchSpeedk;//”√”⁄JScopeÕºœÒœ‘ æ£¨K «¥¯¬À≤®÷Æ∫Ûµƒ
+int RPitchSpeed,RPitchSpeedk;//Áî®‰∫éJScopeÂõæÂÉèÊòæÁ§∫ÔºåKÊòØÂ∏¶Êª§Ê≥¢‰πãÂêéÁöÑ
 
-void GimbalSpeedDataUpdate()									//‘∆Ã®ÀŸ∂»∏¸–¬
+void GimbalSpeedDataUpdate()									//‰∫ëÂè∞ÈÄüÂ∫¶Êõ¥Êñ∞
 {
 	short  yawspeed,rollspeed,rpitchspeed;
 	float   yawspeedf,rollspeedf,rpitchspeedf;
-	yawspeedf = (Gyroscope.speed_z/*-GYROZ_OFFSET*/) /60;//ª°∂»√ø∑÷
+	yawspeedf = (Gyroscope.speed_z/*-GYROZ_OFFSET*/) /60;//ÂºßÂ∫¶ÊØèÂàÜ
 //	RPitchMotor.Speed.Speed =(Gyroscope.speed_y/*-GYROY_OFFSET*/) *6.28;
 //	RPitchMotor.Speed.Speed	=	RPitchMotor.Speed.Speed*K	/	320+RPitchMotor.Speed.SpeedLast*(1-K);
 //	RPitchMotor.Speed.SpeedLast=RPitchMotor.Speed.Speed;
-	rpitchspeedf=(Gyroscope.speed_x/*-GYROY_OFFSET*/) /60;//ª°∂»√ø∑÷
+	rpitchspeedf=(Gyroscope.speed_x/*-GYROY_OFFSET*/) /60;//ÂºßÂ∫¶ÊØèÂàÜ
 	rollspeedf=(Gyroscope.speed_y)/60;
-#	if 1	//æ˘÷µ¬À≤®
+#	if 1	//ÂùáÂÄºÊª§Ê≥¢
 	PitchMotor.Speed.Speed=rpitchspeedf*K+PitchMotor.Speed.SpeedLast*(1-K);
 	PitchMotor.Speed.SpeedLast=PitchMotor.Speed.Speed;
 	YawMotor.Speed.Speed	=	yawspeedf*K	+YawMotor.Speed.SpeedLast*(1-K);
@@ -260,7 +271,7 @@ void GimbalSpeedDataUpdate()									//‘∆Ã®ÀŸ∂»∏¸–¬
 }
 extern u8 GimbalInitFlag;
 float YawGyroCount=0,PitchGyroCount=0,RollGyroCount=0;
-GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData,float RollData)				//Õ”¬›“«∏¸–¬
+GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData,float RollData)				//ÈôÄËû∫‰ª™Êõ¥Êñ∞
 {
 	GyroDataStruct GyroData;
 	float YawGyroDataTemp,PitchGyroDataTemp,RollDataTemp;
@@ -295,9 +306,9 @@ GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData,float RollDa
 	{PitchGyroCount--;PitchGyroDataLast++;}
 	else if	(PitchGyroDataTemp	-	PitchGyroDataLast	<	-0.8f)
 	{PitchGyroCount++;PitchGyroDataLast--;}
-	GyroData.Roll	=	PitchGyroDataTemp*K+PitchGyroDataLast*(1-K) + PitchGyroCount;//PITCHŒﬁπ˝¡„µ„
+	GyroData.Roll	=	PitchGyroDataTemp*K+PitchGyroDataLast*(1-K) + PitchGyroCount;//PITCHÊó†ËøáÈõ∂ÁÇπ
 	RollGyroDataLast 	= RollDataTemp ;
-	//’‚±ﬂ∏¸ªªµƒ‘≠“Ú «Õ”¬›“«∞≤◊∞Œª÷√∫Õ‘À∂Ø∑ΩœÚ≤ªÕ¨
+	//ËøôËæπÊõ¥Êç¢ÁöÑÂéüÂõ†ÊòØÈôÄËû∫‰ª™ÂÆâË£Ö‰ΩçÁΩÆÂíåËøêÂä®ÊñπÂêë‰∏çÂêå
 	if			(RollDataTemp	-	RollGyroDataLast	>	0.8f)
 	{RollGyroCount--;RollGyroDataLast++;}
 	else if	(RollDataTemp	-	RollGyroDataLast	<	-0.8f)
@@ -308,7 +319,7 @@ GyroDataStruct YawPitchGyroDataUpdate(float YawData,float PitchData,float RollDa
 	return GyroData;
 }
   u16 a;
-EncoderDataStruct YawPitchEncoderDataUpdate()										//±‡¬Î∆˜ ˝æ›∏¸–¬
+EncoderDataStruct YawPitchEncoderDataUpdate()										//ÁºñÁ†ÅÂô®Êï∞ÊçÆÊõ¥Êñ∞
 {
 	EncoderDataStruct EncoderData;
 	static float YawEncoderDataTemp=YAW_TEMPSET,YawEncoderDataLast=YAW_TEMPSET;
@@ -357,7 +368,7 @@ float GetYawGyroValue()
 	return	GyroDataSave.Yaw;
 }
 
-void GyroAndEncoderDataGet(void)					//Õ”¬›“«÷µ∂® ±∏¸–¬£¨1ms
+void GyroAndEncoderDataGet(void)					//ÈôÄËû∫‰ª™ÂÄºÂÆöÊó∂Êõ¥Êñ∞Ôºå1ms
 {
 //	float roll;
 //	if(get_dmp_data(&MPU9250Yaw,&MPU9250Pitch,&roll)==0)
@@ -378,7 +389,7 @@ void GimbalDataInput(GimbalSetLocationStruct GimbalData)
 	static u8 FlagPitchUseEncoderTemp=1,FlagYawUseEncoderTemp=1;
 	GimbalSetLocationData.YawSetLocation	=	GimbalData.YawSetLocation;
 	GimbalSetLocationData.PitchSetLocation=	GimbalData.PitchSetLocation;
-//‘∆Ã®µÁª˙…Ë∂®÷µ∏¯∂®
+//‰∫ëÂè∞ÁîµÊú∫ËÆæÂÆöÂÄºÁªôÂÆö
 	PitchMotor.Location.SetLocation	=	GimbalData.PitchSetLocation;
 	YawMotor.Location.SetLocation	=	GimbalData.YawSetLocation;
 	
@@ -417,6 +428,8 @@ extern  int RemoteLostCount;
 extern RemoteDataPortStruct	RemoteDataPort;
 int RollSinkControl=0;
 extern  float yaw_OFFSET;
+float SinkPara=7;
+extern u8 AutomaticAiming;
 void GimbalControlCalculateAndSend(void)
 {
 	u8 Can2GimbalSendMessege[8];
@@ -430,7 +443,7 @@ void GimbalControlCalculateAndSend(void)
 	YawMotor.PIDSpeed.Fdb	=	YawMotor.Speed.Speed;	
 	YawMotor.PIDSpeed.calc(&YawMotor.PIDSpeed);
 	YAWError=YawMotor.PIDSpeed.Out*MAX_PWM;
-	#if 1// π”√pitchµÁª˙
+	#if 1//‰ΩøÁî®pitchÁîµÊú∫
 	PitchMotor.PIDLocation.Ref	=	PitchMotor.Location.SetLocation;
 	PitchMotor.PIDLocation.Fdb	=	PitchMotor.Location.Location;
 	PitchMotor.PIDLocation.calc(&PitchMotor.PIDLocation);
@@ -452,15 +465,15 @@ void GimbalControlCalculateAndSend(void)
 	
 	RollMotor.RollError=RollMotor.PIDSpeed.Out*MAX_PWM;
 	
-	if (YawMotor.Location.SetLocation-yaw_OFFSET<-0.25)
-		RollSinkControl=-78;
+	if (YawMotor.Location.SetLocation-yaw_OFFSET<-0.35&&AutomaticAiming)
+		RollSinkControl=VisionData.error_x*(-SinkPara);
 	else 
 		RollSinkControl=0;
 
-	RollMotor.RollSink=RemoteDataPort.PitchIncrement*MAX_PWM*GimbalSpeedK+RollSinkControl;//œ¬≥¡≤ªæ≠π˝PIDπ  π”√K≤Œ ˝
+	RollMotor.RollSink=RemoteDataPort.PitchIncrement*MAX_PWM*GimbalSpeedK+RollSinkControl;//‰∏ãÊ≤â‰∏çÁªèËøáPIDÊïÖ‰ΩøÁî®KÂèÇÊï∞
 	
-	/************rollµƒ∑¢ÀÕ∑≈‘⁄’‚¿Ô**************/
-#if 1 //∆Ù”√πÿøÿ±£ª§
+	/************rollÁöÑÂèëÈÄÅÊîæÂú®ËøôÈáå**************/
+#if 1 //ÂêØÁî®ÂÖ≥Êéß‰øùÊä§
 	if (!RemoteLostCount)
 	{
 		LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM);
@@ -476,7 +489,7 @@ void GimbalControlCalculateAndSend(void)
 			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollSink);
 		#endif
 	}
-	#else  //πÿ±’πÿøÿ±£ª§
+	#else  //ÂÖ≥Èó≠ÂÖ≥Êéß‰øùÊä§
 		LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollError+RollSink);
 		LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM-RollError+RollSink);
 #endif
@@ -484,7 +497,7 @@ void GimbalControlCalculateAndSend(void)
 	#endif 
 	
 	
-	#if 0 //√ª”–CAN∑¢ÀÕÀ˘“‘◊¢ Õ DEBUG_USE_GIMBALMOTOR_CANSEND
+	#if 0 //Ê≤°ÊúâCANÂèëÈÄÅÊâÄ‰ª•Ê≥®Èáä DEBUG_USE_GIMBALMOTOR_CANSEND
 	if(RemoteData.RemoteDataProcessed.RCValue.s2==2)
 	{
 	  Can2GimbalSendMessege[0]	=	0;

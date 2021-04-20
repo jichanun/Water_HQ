@@ -194,7 +194,7 @@ void MX_FREERTOS_Init(void) {
 
 
 extern u8 init_Wifi_flag;
-SemaphoreHandle_t xSemaphore;//wifiµÄ¶şÖµĞÅºÅ
+SemaphoreHandle_t xSemaphore;//wifiçš„äºŒå€¼ä¿¡å·
 int code;
 int PWM42=0;
 int PWM51=0;
@@ -208,15 +208,13 @@ void LEDTask(void const * argument)
 
   /* USER CODE BEGIN LEDTask */
 	 LaserInit();
-
+	LL_TIM_OC_SetCompareCH2(TIM5,2950);//èˆµæœºå…³
   /* Infinite loop */
 	 for(;;)
   {
 		LED0=!LED0;
 		LEDControl(VisionData.statusfinal);			
-		LL_TIM_OC_SetCompareCH2(TIM4,PWM42);//350¿ª600¹Ø
-		LL_TIM_OC_SetCompareCH1(TIM5,PWM51);//300×ó550ÖĞ700ÓÒ
-		LL_TIM_OC_SetCompareCH2(TIM5,PWM52);//ÖĞ570
+		LL_TIM_OC_SetCompareCH1(TIM5,PWM51);//300å·¦550ä¸­700å³
     osDelay(500);
   }
   /* USER CODE END LEDTask */
@@ -236,8 +234,8 @@ void FeedMotorTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {		
-		//TriggerControl();//°â»ú¿ØÖÆ
-    //FeedMotorControlLogic();//À­Ïßµç»ú¿ØÖÆ
+		//TriggerControl();//æ‰³æœºæ§åˆ¶
+    //FeedMotorControlLogic();//æ‹‰çº¿ç”µæœºæ§åˆ¶
     osDelay(4);
   }
   /* USER CODE END FeedMotorTask */
@@ -261,7 +259,7 @@ void RemoteTask(void const * argument)
 		event = osSignalWait(REMOTE_UART_RX_SIGNAL,osWaitForever);
 		if(event.status==osEventSignal)									
 		{
-			if(event.value.signals & REMOTE_UART_RX_SIGNAL)//ÊÕµ½Ò£¿ØÆ÷ĞÅºÅÁ¿
+			if(event.value.signals & REMOTE_UART_RX_SIGNAL)//æ”¶åˆ°é¥æ§å™¨ä¿¡å·é‡
 			{
          if(!RemoteTaskControl())
 			 {
@@ -310,8 +308,8 @@ void GimbalTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		//StraightLineMotorControl();//Ö±Ïßµç»ú¿ØÖÆ
-		GimbalControlTask();//YawºÍ²¦µ¯µç»ú¿ØÖÆ
+		//StraightLineMotorControl();//ç›´çº¿ç”µæœºæ§åˆ¶
+		GimbalControlTask();//Yawå’Œæ‹¨å¼¹ç”µæœºæ§åˆ¶
     osDelay(1);
   }
   /* USER CODE END GimbalTask */

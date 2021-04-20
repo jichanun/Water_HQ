@@ -1,5 +1,5 @@
 ///**
-// * Ԥ����������ݴ����йص�Ӳ���豸
+// * 预定义的与数据传输有关的硬件设备
 // */
 //#include "sys.h"
 ////#include "usart.h"	
@@ -136,37 +136,37 @@
 //	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC,ENABLE);
 //	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);
 // 
-//	//����1��Ӧ���Ÿ���ӳ��
-//	GPIO_PinAFConfig(GPIOC,GPIO_PinSource10,GPIO_AF_USART3); //GPIOA9����ΪUSART1
-//	GPIO_PinAFConfig(GPIOC,GPIO_PinSource11,GPIO_AF_USART3); //GPIOA10����ΪUSART1
+//	//串口1对应引脚复用映射
+//	GPIO_PinAFConfig(GPIOC,GPIO_PinSource10,GPIO_AF_USART3); //GPIOA9复用为USART1
+//	GPIO_PinAFConfig(GPIOC,GPIO_PinSource11,GPIO_AF_USART3); //GPIOA10复用为USART1
 //	
-//	//USART1�˿�����
-//  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11; //GPIOA9��GPIOA10
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;//���ù���
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	//�ٶ�50MHz
-//	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP; //���츴�����
-//	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP; //����
-//	GPIO_Init(GPIOC,&GPIO_InitStructure); //��ʼ��PA2��PA3
+//	//USART1端口配置
+//  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11; //GPIOA9与GPIOA10
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;//复用功能
+//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	//速度50MHz
+//	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP; //推挽复用输出
+//	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP; //上拉
+//	GPIO_Init(GPIOC,&GPIO_InitStructure); //初始化PA2，PA3
 
-//   //USART1 ��ʼ������
-//	USART_InitStructure.USART_BaudRate = bound;//����������
-//	USART_InitStructure.USART_WordLength = USART_WordLength_8b;//�ֳ�Ϊ8λ���ݸ�ʽ
-//	USART_InitStructure.USART_StopBits = USART_StopBits_1;//һ��ֹͣλ
-//	USART_InitStructure.USART_Parity = USART_Parity_No;//����żУ��λ
-//	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;//��Ӳ������������
-//	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;	//�շ�ģʽ
-//  USART_Init(USART3, &USART_InitStructure); //��ʼ������1
+//   //USART1 初始化设置
+//	USART_InitStructure.USART_BaudRate = bound;//波特率设置
+//	USART_InitStructure.USART_WordLength = USART_WordLength_8b;//字长为8位数据格式
+//	USART_InitStructure.USART_StopBits = USART_StopBits_1;//一个停止位
+//	USART_InitStructure.USART_Parity = USART_Parity_No;//无奇偶校验位
+//	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;//无硬件数据流控制
+//	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;	//收发模式
+//  USART_Init(USART3, &USART_InitStructure); //初始化串口1
 //	
-//  USART_Cmd(USART3, ENABLE);  //ʹ�ܴ���1 
+//  USART_Cmd(USART3, ENABLE);  //使能串口1 
 //	
-//	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);//��������ж�
+//	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);//开启相关中断
 
-//	//Usart1 NVIC ����
-//  NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;//����1�ж�ͨ��
-//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;//��ռ���ȼ�3
-//	NVIC_InitStructure.NVIC_IRQChannelSubPriority =3;		//�����ȼ�3
-//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQͨ��ʹ��
-//	NVIC_Init(&NVIC_InitStructure);	//����ָ���Ĳ�����ʼ��VIC�Ĵ�����
+//	//Usart1 NVIC 配置
+//  NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;//串口1中断通道
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;//抢占优先级3
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority =3;		//子优先级3
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
+//	NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器、
 //}
 //void uart4_init(u32 bound)
 //{
@@ -250,19 +250,19 @@
 //////	}
 ////}
 ////WIFI
-////void USART3_IRQHandler(void)                	//����3�жϷ������
+////void USART3_IRQHandler(void)                	//串口3中断服务程序
 ////{
 ////	u8 Res;
-////#if SYSTEM_SUPPORT_OS 		//���SYSTEM_SUPPORT_OSΪ�棬����Ҫ֧��OS.
+////#if SYSTEM_SUPPORT_OS 		//如果SYSTEM_SUPPORT_OS为真，则需要支持OS.
 ////	OSIntEnter();
 ////#endif
-////	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //�����ж�(���յ������ݱ�����0x0d 0x0a��β)
+////	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 ////	{
-////		Res =USART_ReceiveData(USART3);//(USART1->DR);	//��ȡ���յ�������
+////		Res =USART_ReceiveData(USART3);//(USART1->DR);	//读取接收到的数据
 ////		//Receive_Prepare(Res);
 ////		receive_one_byte_from_judge_system(Res);//????
 ////  } 
-////#if SYSTEM_SUPPORT_OS 	//���SYSTEM_SUPPORT_OSΪ�棬����Ҫ֧��OS.
+////#if SYSTEM_SUPPORT_OS 	//如果SYSTEM_SUPPORT_OS为真，则需要支持OS.
 ////	OSIntExit();  											 
 ////#endif
 ////}

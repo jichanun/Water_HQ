@@ -85,7 +85,7 @@ void FeedMotorDataUpdate()
 		FeedMotorCurrentDataUpdate();
 }
 
-//²¦µ¯µç»ú·¢Ö¸Áî
+//æ‹¨å¼¹ç”µæœºå‘æŒ‡ä»¤
 void MotorLocationControlLogic(void)
 {
 	u8 Can1FeedMotorSendMessege[8] = {0};

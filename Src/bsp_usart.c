@@ -66,10 +66,10 @@ void USART3ConfigEnable(void)
 }
 
 
-//WifiChange Begin   ×¢£ºÈç¹ûÐèÒª¸ü¸ÄwifiµÄ´®¿ÚºÅ£¬Ö»ÐèÔÚcubeÏÂÖØÐÂÉú³ÉÏàÓ¦ÅäÖÃ£¬ÔÚ´Ë´¦¸ü¸ÄdmaºÍdmaÍ¨µÀÐÅÏ¢£¬²¢ÔÚmainº¯ÊýÖÐwifiinit()µÚÈý¸ö²ÎÊýÐ´ÏàÓ¦´®¿Ú
-//×¢£ºwifi´®¿Ú²¨ÌØÂÊ115200
+//WifiChange Begin   æ³¨ï¼šå¦‚æžœéœ€è¦æ›´æ”¹wifiçš„ä¸²å£å·ï¼Œåªéœ€åœ¨cubeä¸‹é‡æ–°ç”Ÿæˆç›¸åº”é…ç½®ï¼Œåœ¨æ­¤å¤„æ›´æ”¹dmaå’Œdmaé€šé“ä¿¡æ¯ï¼Œå¹¶åœ¨mainå‡½æ•°ä¸­wifiinit()ç¬¬ä¸‰ä¸ªå‚æ•°å†™ç›¸åº”ä¸²å£
+//æ³¨ï¼šwifiä¸²å£æ³¢ç‰¹çŽ‡115200
 u32 WIFI_UsartDMAMemoryBaseAddress,WIFI_UsartDMABufferSize;
-void WIFI_ConfigUsartDMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize)//wifi´®¿Ú³õÊ¼»¯±ØÐëÔÚWiFi³õÊ¼»¯Ö®ºó,·ñÔò»á³öÏÖWIFI_USARTÎª¿ÕµÄÇé¿ö
+void WIFI_ConfigUsartDMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize)//wifiä¸²å£åˆå§‹åŒ–å¿…é¡»åœ¨WiFiåˆå§‹åŒ–ä¹‹åŽ,å¦åˆ™ä¼šå‡ºçŽ°WIFI_USARTä¸ºç©ºçš„æƒ…å†µ
 {
 	WIFI_UsartDMAMemoryBaseAddress=DMA_Memory0BaseAddr;
 	WIFI_UsartDMABufferSize=DMA_BufferSize;
@@ -83,7 +83,7 @@ void WIFI_USARTConfigEnable(void)//
 	LL_DMA_SetPeriphAddress(DMA1,LL_DMA_STREAM_1,(u32)&WIFI_USART->DR);
 	LL_DMA_SetDataLength(DMA1,LL_DMA_STREAM_1,WIFI_UsartDMABufferSize);	
 	
-	LL_USART_EnableIT_IDLE(WIFI_USART);//¿ÕÏÐÖÐ¶Ï
+	LL_USART_EnableIT_IDLE(WIFI_USART);//ç©ºé—²ä¸­æ–­
   LL_USART_EnableDMAReq_RX(WIFI_USART);
 	LL_DMA_EnableIT_TC(DMA1, LL_DMA_STREAM_1);
 }

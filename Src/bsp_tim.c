@@ -3,7 +3,7 @@
 #include "stm32f4xx_hal.h"
 u32 TIM3DMAMemoryBaseAddress,TIM3DMABufferSize;
 
-void UserTim1Config(void)//Ä¦²ÁÂÖ
+void UserTim1Config(void)//æ‘©æ“¦è½®
 {
 	//TIM1-CH2 CONFIG BSGIN
 	LL_TIM_OC_InitTypeDef TIM_OC_InitStruct = {0};
@@ -54,14 +54,14 @@ void TIM3ConfigEnable(void)
 	LL_DMA_SetMemoryAddress(DMA1,LL_DMA_STREAM_4,(u32)TIM3DMAMemoryBaseAddress);
 	LL_DMA_SetPeriphAddress(DMA1,LL_DMA_STREAM_4,(u32)&(TIM3->CCR1));
 	LL_DMA_SetDataLength(DMA1,LL_DMA_STREAM_4,TIM3DMABufferSize);	
-	LL_DMA_ClearFlag_TC7(DMA1);//Çå³ýÖÐ¶Ï±êÖ¾
+	LL_DMA_ClearFlag_TC7(DMA1);//æ¸…é™¤ä¸­æ–­æ ‡å¿—
 	LL_DMA_EnableIT_TC(DMA1, LL_DMA_STREAM_4);
-	LL_TIM_EnableDMAReq_CC1(TIM3);//Ê¹ÄÜTIM1µÄCC3 DMAÇëÇó
-	LL_TIM_EnableAllOutputs(TIM3);//Ê¹ÄÜTIMµÄÊä³ö
+	LL_TIM_EnableDMAReq_CC1(TIM3);//ä½¿èƒ½TIM1çš„CC3 DMAè¯·æ±‚
+	LL_TIM_EnableAllOutputs(TIM3);//ä½¿èƒ½TIMçš„è¾“å‡º
 	LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_4);
 	
-	LL_TIM_CC_SetDMAReqTrigger(TIM3,LL_TIM_CCDMAREQUEST_CC);//ÉèÖÃTIM1 DMAÇëÇó´¥·¢Æ÷	
-	LL_TIM_CC_EnableChannel(TIM3,LL_TIM_CHANNEL_CH1);//Ê¹ÄÜTIM1 µÄccÍ¨µÀch3	
+	LL_TIM_CC_SetDMAReqTrigger(TIM3,LL_TIM_CCDMAREQUEST_CC);//è®¾ç½®TIM1 DMAè¯·æ±‚è§¦å‘å™¨	
+	LL_TIM_CC_EnableChannel(TIM3,LL_TIM_CHANNEL_CH1);//ä½¿èƒ½TIM1 çš„ccé€šé“ch3	
 
 }
 

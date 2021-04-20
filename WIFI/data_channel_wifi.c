@@ -1,5 +1,5 @@
 /**
- * WIFI·¢ËÍÓë½ÓÊÕÂß¼­´¦Àí£¬¶ÔÊı¾İ½øĞĞ·â×°£¬³ÖÓĞ·¢ËÍÊı¾İ»º´æ£¬Í¨¹ı´ø²Îº¯ÊıÏòÉÏ²ãÌá¹©WIFI·¢ËÍÄÜÁ¦¡£
+ * WIFIå‘é€ä¸æ¥æ”¶é€»è¾‘å¤„ç†ï¼Œå¯¹æ•°æ®è¿›è¡Œå°è£…ï¼ŒæŒæœ‰å‘é€æ•°æ®ç¼“å­˜ï¼Œé€šè¿‡å¸¦å‚å‡½æ•°å‘ä¸Šå±‚æä¾›WIFIå‘é€èƒ½åŠ›ã€‚
  */
 #include "delay.h"
 #include "data_channel_wifi.h"
@@ -29,16 +29,16 @@ char debug_environment=DEBUG_ENVIRONMENT_RM;
 
 u8 init_Wifi_flag=100;
 char* server_ip;
-//·¢ËÍµÄ³µµÄ×´Ì¬Êı¾İ×Ü³¤¶È
+//å‘é€çš„è½¦çš„çŠ¶æ€æ•°æ®æ€»é•¿åº¦
 u8 data_length=DATA_PART_1_LENGTH+DATA_PART_2_LENGTH+DATA_PART_3_LENGTH+DATA_PART_4_LENGTH+DATA_PART_5_LENGTH;
 u8 wifi_send_flag;
-//ÒÑ·â×°ºÃµÄÖ±½Ó´«¸øWIFIĞ¾Æ¬µÄÊı¾İ
+//å·²å°è£…å¥½çš„ç›´æ¥ä¼ ç»™WIFIèŠ¯ç‰‡çš„æ•°æ®
 char send_vehicle_condition_flag=0;
 u16 wifi_data_vehicle_condition[DATA_PART_1_LENGTH+DATA_PART_2_LENGTH+DATA_PART_3_LENGTH+DATA_PART_4_LENGTH+DATA_PART_5_LENGTH];
-//Éí·İ±êÊ¶Êı¾İ
+//èº«ä»½æ ‡è¯†æ•°æ®
 char send_connect_id_flag=0;
 u16 wifi_data_connect_id[DATA_PART_1_LENGTH];
-//²âÊÔÊı¾İ
+//æµ‹è¯•æ•°æ®
 char send_test_data_flag=0;
 u16 wifi_data_test_data[DATA_PART_9_LENGTH];
 //A
@@ -49,22 +49,22 @@ u16 wifi_data_self_check[DATA_PART_14_LENGTH];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //****************************************************************************************************************************
-//ÓÃ»§×Ô¶¨ÒåÇøÓò1¿ªÊ¼£º
-//ÓÃ·¨£ºÔÚ´Ë´¦¶¨ÒåÈô¸É¸öu32ĞÍµÄsend_wifi_count_n;²¢ÔÚupdate_wifi_send_flag()ÖĞÊ¹Æä×ÔÔö£¬ÔòÆäÖµÃ¿100ms×ÔÔöÒ»´Î
-//ÓÃÍ¾£ºÔÚwifi_task()ÖĞ¼ì²âÆäÖµÊıÖµ¿ÉÓÃÓÚ¿ØÖÆ²»Í¬·¢ËÍÊı¾İµÄ·¢ËÍÆµÂÊ
+//ç”¨æˆ·è‡ªå®šä¹‰åŒºåŸŸ1å¼€å§‹ï¼š
+//ç”¨æ³•ï¼šåœ¨æ­¤å¤„å®šä¹‰è‹¥å¹²ä¸ªu32å‹çš„send_wifi_count_n;å¹¶åœ¨update_wifi_send_flag()ä¸­ä½¿å…¶è‡ªå¢ï¼Œåˆ™å…¶å€¼æ¯100msè‡ªå¢ä¸€æ¬¡
+//ç”¨é€”ï¼šåœ¨wifi_task()ä¸­æ£€æµ‹å…¶å€¼æ•°å€¼å¯ç”¨äºæ§åˆ¶ä¸åŒå‘é€æ•°æ®çš„å‘é€é¢‘ç‡
 //****************************************************************************************************************************
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//²âÊÔÊı¾İ·¢ËÍÆµÂÊ¿ØÖÆ
+//æµ‹è¯•æ•°æ®å‘é€é¢‘ç‡æ§åˆ¶
 u32 send_wifi_count_1=0;
-//Éí·İÑéÖ¤ĞÅÏ¢ÆµÂÊ¿ØÖÆ
+//èº«ä»½éªŒè¯ä¿¡æ¯é¢‘ç‡æ§åˆ¶
 u32 send_wifi_count_2=0;
-//±£ÁôÎ´ÓÃ
+//ä¿ç•™æœªç”¨
 u32 send_wifi_count_3=0;
 
 
 volatile u16 wifi_init_delay_count=0;
 
-//¸üĞÂwifi·¢ËÍ±êÖ¾Î»£¬INTERRUPT_INTERVALµ÷ÓÃÒ»´Î
+//æ›´æ–°wifiå‘é€æ ‡å¿—ä½ï¼ŒINTERRUPT_INTERVALè°ƒç”¨ä¸€æ¬¡
 void clock_wifi(){
 	if(init_Wifi_flag==9){
 		update_wifi_send_flag();
@@ -158,14 +158,14 @@ void check_init_wifi_flag(){
 	}
 }
 extern unsigned char buffer[BUFFER_SIZE];
-//wifiÄ£¿é³õÊ¼»¯¶ÔÍâ½Ó¿Ú
+//wifiæ¨¡å—åˆå§‹åŒ–å¯¹å¤–æ¥å£
 void init_wifi(int port,char* server_ip_arg)
 {	
 
 	init_wifi_device(port,server_ip_arg);
 }
-//ÏòWIFIĞ¾Æ¬·¢ËÍÖ¸Áî£¬ÕæÕıµØ³õÊ¼»¯WIFIĞ¾Æ¬
-u8 init_wifi_device(int port,char* server_ip_arg)  //ÅäÖÃesp8266Îª STA TCP¿Í»§¶ËÄ£Ê½
+//å‘WIFIèŠ¯ç‰‡å‘é€æŒ‡ä»¤ï¼ŒçœŸæ­£åœ°åˆå§‹åŒ–WIFIèŠ¯ç‰‡
+u8 init_wifi_device(int port,char* server_ip_arg)  //é…ç½®esp8266ä¸º STA TCPå®¢æˆ·ç«¯æ¨¡å¼
 {
 	server_ip=server_ip_arg;
 	if(init_Wifi_flag==100){
@@ -180,14 +180,14 @@ u8 init_wifi_device(int port,char* server_ip_arg)  //ÅäÖÃesp8266Îª STA TCP¿Í»§¶Ë
 		{
 			wifi_data_vehicle_condition[i]=0;
 		}
-		printf("AT+CWMODE=1");       //ÉèÖÃwifiÄ£Ê½ÎªSTAÄ£Ê½
+		printf("AT+CWMODE=1");       //è®¾ç½®wifiæ¨¡å¼ä¸ºSTAæ¨¡å¼
 		printNewLine();
 		init_Wifi_flag=1;
 		return init_Wifi_flag;
 	}
 	else if (init_Wifi_flag==1)
 	{
-		printf("AT+RST");                //ÖØÆôÉúĞ§
+		printf("AT+RST");                //é‡å¯ç”Ÿæ•ˆ
 		printNewLine();
 		init_Wifi_flag=2;
 		return init_Wifi_flag;
@@ -209,7 +209,7 @@ u8 init_wifi_device(int port,char* server_ip_arg)  //ÅäÖÃesp8266Îª STA TCP¿Í»§¶Ë
 	}
 	else if(init_Wifi_flag==3)
 	{
-		printf("AT+CIPMUX=0");    //¿ªÆôµ¥Á¬½Ó
+		printf("AT+CIPMUX=0");    //å¼€å¯å•è¿æ¥
 		printNewLine();
 		init_Wifi_flag=4;
 		return init_Wifi_flag;
@@ -219,21 +219,21 @@ u8 init_wifi_device(int port,char* server_ip_arg)  //ÅäÖÃesp8266Îª STA TCP¿Í»§¶Ë
 		char c[100];
 		printf("AT+CIPSTART=\"TCP\",\"%s\",%d",server_ip,port);
 		
-		//printf("%s",c);//½¨Á¢TCPÁ¬½Ó
+		//printf("%s",c);//å»ºç«‹TCPè¿æ¥
 		printNewLine();
 		init_Wifi_flag=5;
 		return init_Wifi_flag;
 	}
 	else if(init_Wifi_flag==5)
 	{
-		printf("AT+CIPMODE=1");     //¿ªÆôÍ¸´«Ä£Ê½
+		printf("AT+CIPMODE=1");     //å¼€å¯é€ä¼ æ¨¡å¼
 		printNewLine();
 		init_Wifi_flag=6;
 		return init_Wifi_flag;
 	}
 	else if(init_Wifi_flag==6)
 	{
-		printf("AT+CIPSEND");       //¿ªÊ¼´«Êä
+		printf("AT+CIPSEND");       //å¼€å§‹ä¼ è¾“
 		printNewLine();
 		init_Wifi_flag=7;
 		return init_Wifi_flag;
@@ -263,7 +263,7 @@ u8 init_wifi_device(int port,char* server_ip_arg)  //ÅäÖÃesp8266Îª STA TCP¿Í»§¶Ë
 }
 
 
-void printNewLine()//·¢ËÍĞÂĞĞ
+void printNewLine()//å‘é€æ–°è¡Œ
 {
 	printf("\r\n");
 }

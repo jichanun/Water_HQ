@@ -33,7 +33,7 @@
 #define REMOTE_RECEIVER_BAUDRATE (100000)
 
 RemoteDataUnion RemoteData;
-//ÏŞÎ»¿ª¹Ø¿ØÖÆ
+//é™ä½å¼€å…³æ§åˆ¶
 SwitchStruct Switch;
 
 void RemoteDataClear()
@@ -49,8 +49,8 @@ void RemoteInit()
 	ConfigUsart1DMA((u32)RemoteData.RemoteDataRaw,RC_FRAME_LENGTH);
 }
 
-//0,Õı³£
-//1£¬Êı¾İÓĞÎó£¬²»ÒªÓÃ
+//0,æ­£å¸¸
+//1ï¼Œæ•°æ®æœ‰è¯¯ï¼Œä¸è¦ç”¨
 u8 JudgeDataValidity(u16 data)
 {
 	if(data<=1685&&data>=363)
@@ -60,8 +60,8 @@ u8 JudgeDataValidity(u16 data)
 }
 
 #define MOUSEERRORTOLERANCE (0.00003f)
-//0,Õı³£
-//1£¬Êı¾İÓĞÎó£¬²»ÒªÓÃ
+//0,æ­£å¸¸
+//1ï¼Œæ•°æ®æœ‰è¯¯ï¼Œä¸è¦ç”¨
 RemoteDataProcessedStruct RemoteDataProcess(RemoteDataUnion RemoteDataRaw)
 {
 	RemoteDataProcessedStruct RemoteDataProcessed;
@@ -69,24 +69,24 @@ RemoteDataProcessedStruct RemoteDataProcess(RemoteDataUnion RemoteDataRaw)
 	u16 Ch2=0;
 	u8 JudgeDataValiditySum=0;
 	float MouseX,MouseY,MouseZ;
-//**********************************Ò¡¸Ë***********************************************
+//**********************************æ‘‡æ†***********************************************
 	Ch2 = RemoteDataRaw.RemoteDataProcessed.RCValue.Ch2_l | RemoteDataRaw.RemoteDataProcessed.RCValue.Ch2_h<<2;
 	
 	JudgeDataValiditySum = JudgeDataValidity(RemoteDataRaw.RemoteDataProcessed.RCValue.Ch0) + JudgeDataValidity(RemoteDataRaw.RemoteDataProcessed.RCValue.Ch1) + JudgeDataValidity(Ch2) +JudgeDataValidity(RemoteDataRaw.RemoteDataProcessed.RCValue.Ch3);
 	
-	if(JudgeDataValiditySum)					//¼ì²éÊı¾İºÏ·¨ĞÔ
+	if(JudgeDataValiditySum)					//æ£€æŸ¥æ•°æ®åˆæ³•æ€§
 	{
 		RemoteDataProcessed.FlagValidity=0;
 		return RemoteDataProcessed;
 	}
 	
-	//»ù±¾Á¿Æ«ÒÆÏû³ı
+	//åŸºæœ¬é‡åç§»æ¶ˆé™¤
 	if(RemoteDataRaw.RemoteDataProcessed.RCValue.Ch0>1030||RemoteDataRaw.RemoteDataProcessed.RCValue.Ch0<1018)
 		RemoteDataProcessed.Channel_0 =  ((float)(RemoteDataRaw.RemoteDataProcessed.RCValue.Ch0-RC_CH_VALUE_OFFSET))/(RC_CH_VALUE_MAX-RC_CH_VALUE_OFFSET);
 	else
 		RemoteDataProcessed.Channel_0 = 0;
 	
-		//»ù±¾Á¿Æ«ÒÆÏû³ı
+		//åŸºæœ¬é‡åç§»æ¶ˆé™¤
 	if(RemoteDataRaw.RemoteDataProcessed.RCValue.Ch1>1030||RemoteDataRaw.RemoteDataProcessed.RCValue.Ch1<1018)
 		RemoteDataProcessed.Channel_1 =  ((float)(RemoteDataRaw.RemoteDataProcessed.RCValue.Ch1-RC_CH_VALUE_OFFSET))/(RC_CH_VALUE_MAX-RC_CH_VALUE_OFFSET);
 	else
@@ -102,11 +102,11 @@ RemoteDataProcessedStruct RemoteDataProcess(RemoteDataUnion RemoteDataRaw)
 	else
 		RemoteDataProcessed.Channel_3 = 0;
 	
-//**********************************²¦Å¤***********************************************
+//**********************************æ‹¨æ‰­***********************************************
 	RemoteDataProcessed.LeftSwitch = RemoteDataRaw.RemoteDataProcessed.RCValue.s2;
 	RemoteDataProcessed.RightSwitch= RemoteDataRaw.RemoteDataProcessed.RCValue.s1;
 	
-//**********************************Êó±ê***********************************************
+//**********************************é¼ æ ‡***********************************************
 	MouseX = RemoteDataRaw.RemoteDataProcessed.Mouse.x/32768.0f;
 	MouseY = RemoteDataRaw.RemoteDataProcessed.Mouse.y/32768.0f;
 	MouseZ = RemoteDataRaw.RemoteDataProcessed.Mouse.z/32768.0f;
@@ -154,22 +154,22 @@ void RockerDataConvert(float *x,float *y)
 {
 	if(fabs(*x)+fabs(*y)>1)
 	{
-		if(*y>0 && *x>0)				//1ÏóÏŞ
+		if(*y>0 && *x>0)				//1è±¡é™
 		{
 			*y=*y/(*y+*x);
 			*x=*x/(*y+*x);
 		}
-		else if(*y>0 && *x<0)		//2ÏóÏŞ
+		else if(*y>0 && *x<0)		//2è±¡é™
 		{
 			*x=*x/(*y-*x);		
 			*y=*y/(*y-*x);		
 		}
-		else if(*y<0 && *x>0)		//4ÏóÏŞ
+		else if(*y<0 && *x>0)		//4è±¡é™
 		{
 			*x=-*x/(*y-*x);		
 			*y=-*y/(*y-*x);		
 		}
-		else										//3ÏóÏŞ
+		else										//3è±¡é™
 		{
 			*x=-*x/(*x+*y);
 			*y=-*y/(*x+*y);		

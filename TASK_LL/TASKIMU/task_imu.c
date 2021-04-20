@@ -4,8 +4,8 @@
 #include "bsp_tim.h"
 #include "math.h"
 
-#define RAD_TO_DEG 57.295779513082320876798154814105  // »¡¶È×ª½Ç¶È
-#define DEG_TO_RAD 0.01745329251994329576923690768489 // ½Ç¶È×ª»¡¶È
+#define RAD_TO_DEG 57.295779513082320876798154814105  // å¼§åº¦è½¬è§’åº¦
+#define DEG_TO_RAD 0.01745329251994329576923690768489 // è§’åº¦è½¬å¼§åº¦
 
 #define USE_FIRST_WAY_CALC_PITCH_ROLL 1
 
@@ -17,19 +17,19 @@ typedef struct{
 
 typedef struct
 {
-    short Accel_X;  //¼Ä´æÆ÷Ô­ÉúXÖá¼ÓËÙ¶È±íÊ¾Öµ
-    short Accel_Y;  //¼Ä´æÆ÷Ô­ÉúYÖá¼ÓËÙ¶È±íÊ¾Öµ
-    short Accel_Z;  //¼Ä´æÆ÷Ô­ÉúZÖá¼ÓËÙ¶È±íÊ¾Öµ
+    short Accel_X;  //å¯„å­˜å™¨åŸç”ŸXè½´åŠ é€Ÿåº¦è¡¨ç¤ºå€¼
+    short Accel_Y;  //å¯„å­˜å™¨åŸç”ŸYè½´åŠ é€Ÿåº¦è¡¨ç¤ºå€¼
+    short Accel_Z;  //å¯„å­˜å™¨åŸç”ŸZè½´åŠ é€Ÿåº¦è¡¨ç¤ºå€¼
 
-    short Gyro_X;   //¼Ä´æÆ÷Ô­ÉúXÖáÍÓÂİÒÇ±íÊ¾Öµ
-    short Gyro_Y;   //¼Ä´æÆ÷Ô­ÉúYÖáÍÓÂİÒÇ±íÊ¾Öµ
-    short Gyro_Z;   //¼Ä´æÆ÷Ô­ÉúZÖáÍÓÂİÒÇ±íÊ¾Öµ
+    short Gyro_X;   //å¯„å­˜å™¨åŸç”ŸXè½´é™€èºä»ªè¡¨ç¤ºå€¼
+    short Gyro_Y;   //å¯„å­˜å™¨åŸç”ŸYè½´é™€èºä»ªè¡¨ç¤ºå€¼
+    short Gyro_Z;   //å¯„å­˜å™¨åŸç”ŸZè½´é™€èºä»ªè¡¨ç¤ºå€¼
 	
-		short Mag_X;    //¼Ä´æÆ÷Ô­ÉúXÖá´ÅÁ¦¼Æ±íÊ¾Öµ
-		short Mag_Y;    //¼Ä´æÆ÷Ô­ÉúYÖá´ÅÁ¦¼Æ±íÊ¾Öµ
-		short Mag_Z;    //¼Ä´æÆ÷Ô­ÉúZÖá´ÅÁ¦¼Æ±íÊ¾Öµ
+		short Mag_X;    //å¯„å­˜å™¨åŸç”ŸXè½´ç£åŠ›è®¡è¡¨ç¤ºå€¼
+		short Mag_Y;    //å¯„å­˜å™¨åŸç”ŸYè½´ç£åŠ›è®¡è¡¨ç¤ºå€¼
+		short Mag_Z;    //å¯„å­˜å™¨åŸç”ŸZè½´ç£åŠ›è®¡è¡¨ç¤ºå€¼
 	
-//	  short Temp;     //¼Ä´æÆ÷Ô­ÉúÎÂ¶È±íÊ¾Öµ
+//	  short Temp;     //å¯„å­˜å™¨åŸç”Ÿæ¸©åº¦è¡¨ç¤ºå€¼
 }MPU9250_RAW_DATA;
 
 typedef struct
@@ -45,8 +45,8 @@ typedef struct
 typedef struct
 {
 		IMUKalmanStruct     IMUKalman;
-		MPU9250_RAW_DATA    MPU9250_Raw_Data;    //Ô­Ê¼Êı¾İ
-		MPU9250_STATE       MPU9250_State;       //½áËã½á¹û
+		MPU9250_RAW_DATA    MPU9250_Raw_Data;    //åŸå§‹æ•°æ®
+		MPU9250_STATE       MPU9250_State;       //ç»“ç®—ç»“æœ
 }IMULogic;
 
 IMULogic IMU;
@@ -69,7 +69,7 @@ void GetMPU9250MagRawData(void)
 		MPU_Get_Magnetometer(&IMU.MPU9250_Raw_Data.Mag_X , &IMU.MPU9250_Raw_Data.Mag_Y , &IMU.MPU9250_Raw_Data.Mag_Z);
 }
 
-void AccelUpdatePitchRoll(void) //¸ù¾İ¼ÓËÙ¶È¼ÆË¢ĞÂPITCH,ROLL£¬Á½ÖÖ·½·¨
+void AccelUpdatePitchRoll(void) //æ ¹æ®åŠ é€Ÿåº¦è®¡åˆ·æ–°PITCH,ROLLï¼Œä¸¤ç§æ–¹æ³•
 {
 #if USE_FIRST_WAY_CALC_PITCH_ROLL
     IMU.MPU9250_State.AccelRow   = atan2(IMU.MPU9250_Raw_Data.Accel_Y,IMU.MPU9250_Raw_Data.Accel_Z) * RAD_TO_DEG;
@@ -80,7 +80,7 @@ void AccelUpdatePitchRoll(void) //¸ù¾İ¼ÓËÙ¶È¼ÆË¢ĞÂPITCH,ROLL£¬Á½ÖÖ·½·¨
 #endif
 }
  
-void MagUpdateYaw() //¸ù¾İ´ÅÁ¦¼ÆË¢ĞÂYAW
+void MagUpdateYaw() //æ ¹æ®ç£åŠ›è®¡åˆ·æ–°YAW
 { 
     double RollAngle,PitchAngle,Bfy,Bfx;
 		short MagX,MagY,MagZ;
@@ -116,7 +116,7 @@ void IMU_CalcYawPitchRollValue(void)
 		GetMPU9250AccGyroRawData();
 		AccelUpdatePitchRoll();
 	
-		if(dtAdd>0.01)//Ã¿10ms¶ÁÈ¡Ò»´Î´ÅÁ¦¼Æ
+		if(dtAdd>0.01)//æ¯10msè¯»å–ä¸€æ¬¡ç£åŠ›è®¡
 		{
 				GetMPU9250MagRawData();
 				MagUpdateYaw();
@@ -127,19 +127,19 @@ void IMU_CalcYawPitchRollValue(void)
 		GyroYval = (double)IMU.MPU9250_Raw_Data.Gyro_Y / 32.8;
 		GyroZval = (double)IMU.MPU9250_Raw_Data.Gyro_Z / 32.8;
 	
-		Now = GetTimeMicros();//¶ÁÈ¡Ê±¼ä µ¥Î»ÊÇus
+		Now = GetTimeMicros();//è¯»å–æ—¶é—´ å•ä½æ˜¯us
     if(Now<LastUpdate)
 				dt =  (double)((double)(Now + (0xffffffff- LastUpdate)) / 1000000.0f); 
     else
         dt =  (double)((double)(Now - LastUpdate) / 1000000.0f);
-    LastUpdate = Now;	//¸üĞÂÊ±¼ä
+    LastUpdate = Now;	//æ›´æ–°æ—¶é—´
 		dtAdd += dt;
 
  // This fixes the transition problem when the accelerometer angle jumps between -180 and 180 degrees		
 		if((IMU.MPU9250_State.AccelRow<-90&&IMU.IMUKalman.x.angle>90)||(IMU.MPU9250_State.AccelRow>90&&IMU.IMUKalman.x.angle<-90))
 				SetAngle(&IMU.IMUKalman.x,IMU.MPU9250_State.AccelRow);
 		else	
-				KalmanCalc(&IMU.IMUKalman.x , IMU.MPU9250_State.AccelRow , GyroXval ,dt); //Row    ÒÔÍÓÂİÒÇÎªÔ¤²â£¬ÒÔ¼ÓËÙ¶È¼Æ¼ÆËãÖµÎª²âÁ¿
+				KalmanCalc(&IMU.IMUKalman.x , IMU.MPU9250_State.AccelRow , GyroXval ,dt); //Row    ä»¥é™€èºä»ªä¸ºé¢„æµ‹ï¼Œä»¥åŠ é€Ÿåº¦è®¡è®¡ç®—å€¼ä¸ºæµ‹é‡
 
 		if(fabs(IMU.IMUKalman.x.angle)>90)
 				GyroYval = -GyroYval;

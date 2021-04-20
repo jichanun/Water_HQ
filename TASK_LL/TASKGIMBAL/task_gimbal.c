@@ -5,7 +5,7 @@
 #include "math.h"
 #include "driver_laser.h"
 
-//Ò£¿ØÆ÷ÁéÃô¶È
+//é¥æ§å™¨çµæ•åº¦
 #define YAW_REMOTE_SENSITIVE (0.0005f)
 #define PITCH_REMOTE_SENSITIVE (0.0005f)
 #define ONE1 0x3F800000
@@ -21,10 +21,10 @@ extern u8 VisionReceiveFlag;
 extern  GimbalMotorStruct	YawMotor,PitchMotor,RollMotor;
 extern float VisionRho;
 extern u8 AutomaticAiming;
-//»»µ¯µç»ú¿ØÖÆ±êÖ¾Î»
-int flag_init=0; //»»µ¯µç»ú³õÊ¼»¯±êÖ¾Î»
-//Switch.Reload1 »»µ¯±êÖ¾Î»
-u8 GimbalInitFlag = 2;//ÔÆÌ¨³õÊ¼»¯±êÊ¶Î»
+//æ¢å¼¹ç”µæœºæ§åˆ¶æ ‡å¿—ä½
+int flag_init=0; //æ¢å¼¹ç”µæœºåˆå§‹åŒ–æ ‡å¿—ä½
+//Switch.Reload1 æ¢å¼¹æ ‡å¿—ä½
+u8 GimbalInitFlag = 2;//äº‘å°åˆå§‹åŒ–æ ‡è¯†ä½
  float yaw_OFFSET;
 VisionDataStruct VisionData;
 extern u8 UART3BUFF[20];
@@ -57,15 +57,15 @@ void GimbalControlTask()
 		GimbalSetLocationDataTemp.FlagPitchUseEncoder	=	0;
 		GimbalSetLocationDataTemp.FlagYawUseEncoder	=	0;
 		yaw_OFFSET =Gyroscope.yaw/360;
-		GimbalSetLocationDataTemp.YawSetLocation	=	yaw_OFFSET;//Ê¹ÓÃÍÓÂİÒÇÔòÈ¡Ïû×¢ÊÍ
+		GimbalSetLocationDataTemp.YawSetLocation	=	yaw_OFFSET;//ä½¿ç”¨é™€èºä»ªåˆ™å–æ¶ˆæ³¨é‡Š
 
 	}
 	if (VisionReceiveFlag)
 		VisionControl();
-	//VisionReceiveDataClear(&VisionData);//½ÓÊÕÖØÖÃ
+	//VisionReceiveDataClear(&VisionData);//æ¥æ”¶é‡ç½®
 
-///**************************»»µ¯µç»ú£¨2006£©**********************************/
-//	//³õÊ¼»¯
+///**************************æ¢å¼¹ç”µæœºï¼ˆ2006ï¼‰**********************************/
+//	//åˆå§‹åŒ–
 //	if(flag_init==0)
 //	{
 //	  FeedMotor.Location.SetLocation=-9;
@@ -87,7 +87,7 @@ void GimbalControlTask()
 
 	//Gimbal
 	GimbalDataInput(GimbalSetLocationDataTemp);
-	GimbalSpeedDataUpdate();									//ÔÆÌ¨ËÙ¶È¸üĞÂ£¨Ê¹ÓÃÍÓÂİÒÇËÙ¶È£©
+	GimbalSpeedDataUpdate();									//äº‘å°é€Ÿåº¦æ›´æ–°ï¼ˆä½¿ç”¨é™€èºä»ªé€Ÿåº¦ï¼‰
 	GimbalControlCalculateAndSend();
 	
 
@@ -104,8 +104,8 @@ void PitchSetLocationValueChange(float Pitch)
 	GimbalSetLocationDataTemp.PitchSetLocation	+=	Pitch;
 }
 /**************
-Í¨ĞÅĞ­Òé
-Æ«ÒÆÁ¿			½Ç¶ÈÖµ 			x×ø±ê 			y×ø±ê				×´Ì¬Âë
+é€šä¿¡åè®®
+åç§»é‡			è§’åº¦å€¼ 			xåæ ‡ 			yåæ ‡				çŠ¶æ€ç 
 *///////////////
 void UART3Unpack(u8 *buff,u32 *num)
 {
@@ -119,6 +119,7 @@ void UART3Unpack(u8 *buff,u32 *num)
 }
 float FilterK=0.05;
 int16_t TurnFlag=0;
+int down_error=30;
 void VisionControl(void)
 {
 	VisionReceiveFlag=0;
@@ -130,12 +131,14 @@ void VisionControl(void)
 		b=VisionReceiveData[1]-320;
 		float a =b;
 		a/=130;
-		VisionData.rho=(float)VisionReceiveData[0]-330;//Æ«ÀëÖµ
-		VisionData.angle=(float)atan(a)*57.3;//½Ç¶ÈÖµ
+		VisionData.rho=(float)VisionReceiveData[0]-330+VisionData.rho_offset;//åç¦»å€¼
+		VisionData.angle=(float)atan(a)*57.3+VisionData.yaw_offset;//è§’åº¦å€¼
 		VisionData.angle=VisionData.angle*FilterK+VisionData.angle*(1-FilterK);
-		VisionData.error_x=VisionReceiveData[2];
+		VisionData.error_x=(int)(-VisionReceiveData[2])+down_error;//æ·±åº¦
 		VisionData.error_y=VisionReceiveData[3];
-	#if  0			////////////////Ê¹ÓÃÂË²¨
+		if (VisionData.error_x>20)
+			VisionData.error_x=20;
+	#if  0			////////////////ä½¿ç”¨æ»¤æ³¢
 		VisionData.status=UART3BUFF[18];
 		switch (VisionData.status)
 		{
@@ -164,19 +167,19 @@ void VisionControl(void)
 			VisionData.statusfinal='S';
 			VisionData.statuscount.circle=VisionData.statuscount.square=0;
 		}
-	#else         ///////////²»Ê¹ÓÃÂË²¨
+	#else         ///////////ä¸ä½¿ç”¨æ»¤æ³¢
 		VisionData.statusfinal=UART3BUFF[18];
 	#endif 
-	#if 1 //ÊÓ¾õ´¦µÄ±ä½á¹¹PID
+	#if 1 //è§†è§‰å¤„çš„å˜ç»“æ„PID
 		VisionRhoIncreasement.Ref=VisionData.rho;
 		VisionRhoIncreasement.calc(&VisionRhoIncreasement);
 		VisionData.change_rho=VisionRhoIncreasement.Out;
-		//¼ÆËãÓĞÎÊÌâ
+		//è®¡ç®—æœ‰é—®é¢˜
 		VisionYawIncreasement.Ref=VisionData.angle;
 		VisionYawIncreasement.calc(&VisionYawIncreasement);
 		VisionData.change_angle=VisionYawIncreasement.Out/500;
 	#endif 
-		//ÊÓ¾õ´¦Àí****************************************************
+		//è§†è§‰å¤„ç†****************************************************
 			if(AutomaticAiming&&VisionData.rho!=-330)
 		{
 //			if((VisionData.change_angle<=25.0f*VisionYawIncreasement.Kp&&VisionData.change_angle>=3.0f*VisionYawIncreasement.Kp)||
@@ -184,7 +187,7 @@ void VisionControl(void)
 			{
 				if(fabs(YawMotor.Location.SetLocation-YawMotor.Location.Location)<0.05)
 				{
-					//ÕâĞ©×¢ÊÍÊÇÓÃÀ´ÍäµÀ¿ìËÙ×ªÍä
+					//è¿™äº›æ³¨é‡Šæ˜¯ç”¨æ¥å¼¯é“å¿«é€Ÿè½¬å¼¯
 //					if (VisionData.angle>50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20){
 //						YawSetLocationValueChange(-0.25);
 //						TurnFlag=60;

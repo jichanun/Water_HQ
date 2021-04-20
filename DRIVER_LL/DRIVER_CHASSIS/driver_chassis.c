@@ -13,7 +13,7 @@
 
 ChassisMotorStruct ChassisMotor[4];
 
-//µç»ú²ÎÊıºê¶¨Òå
+//ç”µæœºå‚æ•°å®å®šä¹‰
 #define	CHASSIS_MOTOR_KP	(0.8f)
 #define	CHASSIS_MOTOR_KI	(0.0f)
 #define	CHASSIS_MOTOR_KD	(0.0f)
@@ -25,27 +25,27 @@ ChassisMotorStruct ChassisMotor[4];
 
 #define CHASSIS_FOLLOW_INIT_VALUE YAW_INIT_VALUE
 
-#define SHAKECORRECTIONVALUE (1.2f)		//ĞŞÕıÏµÊı
+#define SHAKECORRECTIONVALUE (1.2f)		//ä¿®æ­£ç³»æ•°
 
 #define PIE (3.1415926f)
 
 /*
-µ×ÅÌÔË¶¯¿ØÖÆ¹æÂÉ
-µç»ú°Ú·ÅË³Ğò;
+åº•ç›˜è¿åŠ¨æ§åˆ¶è§„å¾‹
+ç”µæœºæ‘†æ”¾é¡ºåº;
 
 M3   M4
 
 M2   M1
 
-µç»ú£º		M4	M1	M2	M3 
-Ç°½ø£º		+		+		+		+
-ºóÍË£º		-		-		-		-
-ÓÒÆ½ÒÆ£º	-		+		-		+
-×óÆ½ÒÆ£º	+		-		+		-
-Ë³×ÔĞı£º	-		-		+		+
-Äæ×ÔĞı£º	+		+		-		-
-¶¨Òåv,h,spinÎª´¹Ö±£¬Ë®Æ½£¬×ÔĞıÔË¶¯¿ØÖÆ¹éÒ»Á¿£¬Ç°½ø¡¢ÓÒÒÆ¡¢Ë³Ê±Õë×ÔĞıÎªÕı
-µç»ú£º			M1	M2	M3	M4
+ç”µæœºï¼š		M4	M1	M2	M3 
+å‰è¿›ï¼š		+		+		+		+
+åé€€ï¼š		-		-		-		-
+å³å¹³ç§»ï¼š	-		+		-		+
+å·¦å¹³ç§»ï¼š	+		-		+		-
+é¡ºè‡ªæ—‹ï¼š	-		-		+		+
+é€†è‡ªæ—‹ï¼š	+		+		-		-
+å®šä¹‰v,h,spinä¸ºå‚ç›´ï¼Œæ°´å¹³ï¼Œè‡ªæ—‹è¿åŠ¨æ§åˆ¶å½’ä¸€é‡ï¼Œå‰è¿›ã€å³ç§»ã€é¡ºæ—¶é’ˆè‡ªæ—‹ä¸ºæ­£
+ç”µæœºï¼š			M1	M2	M3	M4
 y						+		+		+		+
 x						+		-		+		-
 spin				-		+		+		-
@@ -114,10 +114,10 @@ void ChassisFollowCalculate(ChassisSpeedMessegePort *ChassisSpeed)
 }
 
 /*******************shake kinematics anlysis****************************
-		Õı·½ÏòĞı×ªa½Ç----ÔòÓĞ
+		æ­£æ–¹å‘æ—‹è½¬aè§’----åˆ™æœ‰
 		[	speedy'	]	=	[	cos a		-sin a	]	[	speedy	]
 		[	speedx'	]		[	sin a		cos a		]	[	speedx	]
-		Õı·½Ïò½Ç¶ÈÓëerrÏà·´ ĞŞÕı×ø±êĞı×ª¾ØÕó
+		æ­£æ–¹å‘è§’åº¦ä¸errç›¸å ä¿®æ­£åæ ‡æ—‹è½¬çŸ©é˜µ
 		[	speedy'	]	=	[	cos a		sin a	]	[	speedy	]
 		[	speedx'	]		[	-sin a	cos a	]	[	speedx	]
 ***********************************************************************/
@@ -190,7 +190,7 @@ extern int RemoteLostCount;
 float ChassisSpeedK=210;	
 u16 speed0=0,speed1=0,speed2=0,speed3=0;
 float ReverseError=1.1;
-float ChassisSpeedMax=0.5;//¡ù¡ù¡ù¡ù¡ù¡ù¡ù¡ù¡ù¡ùËÙ¶È×î´óÖµ0.5
+float ChassisSpeedMax=0.5;//â€»â€»â€»â€»â€»â€»â€»â€»â€»â€»é€Ÿåº¦æœ€å¤§å€¼0.5
 void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 {
 	ChassisMotor[0].Speed.SetSpeed=	+0.9f*ChassisSpeed.SetSpeedX	+	0.9f*ChassisSpeed.SetSpeedY		+	1.8f*ChassisSpeed.Spin + 0.9*ChassisSpeed.SpeedError;
@@ -206,14 +206,14 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 		if (i==1||i==2)
 		{
 			if (ChassisMotor[i].Speed.SetSpeed<0)
-				ChassisMotor[i].Speed.SetSpeed*=ReverseError;//·´×ª±¶ÂÊ
+				ChassisMotor[i].Speed.SetSpeed*=ReverseError;//åè½¬å€ç‡
 		}
 		else 
 			if (ChassisMotor[i].Speed.SetSpeed>0)
-				ChassisMotor[i].Speed.SetSpeed*=ReverseError;//·´×ª±¶ÂÊ
+				ChassisMotor[i].Speed.SetSpeed*=ReverseError;//åè½¬å€ç‡
 	}
 	
-#if 1 //ÆôÓÃ¹Ø¿Ø±£»¤
+#if 1 //å¯ç”¨å…³æ§ä¿æŠ¤
 	if (!RemoteLostCount)
 	{
 		LL_TIM_OC_SetCompareCH1(TIM2,MIDDLE_PWM);
@@ -227,12 +227,12 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 		speed1=(s16)((ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		speed2=(s16)((ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		speed3=(s16)((ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		LL_TIM_OC_SetCompareCH1(TIM2,speed2);
-		LL_TIM_OC_SetCompareCH2(TIM2,speed3);
-		LL_TIM_OC_SetCompareCH3(TIM8,speed1);
-		LL_TIM_OC_SetCompareCH4(TIM8,speed0);
+		LL_TIM_OC_SetCompareCH1(TIM2,speed3);
+		LL_TIM_OC_SetCompareCH2(TIM2,speed2);
+		LL_TIM_OC_SetCompareCH3(TIM8,speed0);
+		LL_TIM_OC_SetCompareCH4(TIM8,speed1);
 	}
-	#else  //¹Ø±Õ¹Ø¿Ø±£»¤
+	#else  //å…³é—­å…³æ§ä¿æŠ¤
 		speed0=(u16)((ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		speed1=(u16)((ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		speed2=(u16)((ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);

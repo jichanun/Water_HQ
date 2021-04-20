@@ -108,6 +108,8 @@ typedef struct
 	float error_y;
 	u8 status;
 	u8 statusfinal;
+	float yaw_offset;
+	float rho_offset;
 	StatusCountStruct statuscount;
 }VisionDataStruct;
 extern GyroscopeStruct Gyroscope;

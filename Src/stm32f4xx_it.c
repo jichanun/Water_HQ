@@ -57,7 +57,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-char  TIM5CH1_CAPTURE_STA=0; // ‰»Î≤∂ªÒ◊¥Ã¨ 
+char  TIM5CH1_CAPTURE_STA=0; //ËæìÂÖ•ÊçïËé∑Áä∂ÊÄÅ 
 int   TIM5CH1_CAPTURE_VAL;
 /* USER CODE END PV */
 
@@ -82,7 +82,7 @@ extern CAN_HandleTypeDef hcan2;
 extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN EV */
-extern SemaphoreHandle_t xSemaphore;//wifiµƒ∂˛÷µ–≈∫≈
+extern SemaphoreHandle_t xSemaphore;//wifiÁöÑ‰∫åÂÄº‰ø°Âè∑
 u8 VisionReceiveFlag=0;
 
 /* USER CODE END EV */
@@ -210,7 +210,7 @@ void DMA1_Stream1_IRQHandler(void)
 void DMA1_Stream3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream3_IRQn 0 */
-	LL_DMA_ClearFlag_TC3(DMA1);                 //¥Æø⁄3∑¢ÀÕ
+	LL_DMA_ClearFlag_TC3(DMA1);                 //‰∏≤Âè£3ÂèëÈÄÅ
 	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_3);
 
   /* USER CODE END DMA1_Stream3_IRQn 0 */
@@ -226,7 +226,7 @@ void DMA1_Stream3_IRQHandler(void)
 void DMA1_Stream4_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream4_IRQn 0 */
-	LL_DMA_ClearFlag_TC4(DMA1);                 //¥Æø⁄3∑¢ÀÕ
+	LL_DMA_ClearFlag_TC4(DMA1);                 //‰∏≤Âè£3ÂèëÈÄÅ
 	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_4);
 
   /* USER CODE END DMA1_Stream4_IRQn 0 */
@@ -257,7 +257,7 @@ void DMA1_Stream5_IRQHandler(void)
 void DMA1_Stream6_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream6_IRQn 0 */
-	LL_DMA_ClearFlag_TC6(DMA1);                 //∑¢ÀÕ¥Æø⁄2
+	LL_DMA_ClearFlag_TC6(DMA1);                 //ÂèëÈÄÅ‰∏≤Âè£2
 	LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_6);
 
   /* USER CODE END DMA1_Stream6_IRQn 0 */
@@ -294,8 +294,8 @@ void USART1_IRQHandler(void)
 	if(((USART1->SR)&(1<<4))!=0)
 	{
 		LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_5);
-		(void)USART1->SR;				//«Â≥˝÷–∂œ
-		(void)USART1->DR;				//«Â≥˝ ˝æ›
+		(void)USART1->SR;				//Ê∏ÖÈô§‰∏≠Êñ≠
+		(void)USART1->DR;				//Ê∏ÖÈô§Êï∞ÊçÆ
 		LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_5);
 		LL_DMA_ClearFlag_TC5(DMA2);
 	}
@@ -311,8 +311,8 @@ void USART2_IRQHandler(void)
 if(((USART2->SR)&(1<<4))!=0)
 	{
 		LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_5);
-		(void)USART2->SR;				//«Â≥˝÷–∂œ
-		(void)USART2->DR;				//«Â≥˝ ˝æ›
+		(void)USART2->SR;				//Ê∏ÖÈô§‰∏≠Êñ≠
+		(void)USART2->DR;				//Ê∏ÖÈô§Êï∞ÊçÆ
 		LL_DMA_ClearFlag_TC5(DMA1);
 		LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_5);
 	}
@@ -332,8 +332,8 @@ static BaseType_t xHigherPriorityTaskWoken;
 if(((USART3->SR)&(1<<4))!=0)
 	{
 		LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_1);
-		(void)USART3->SR;				//«Â≥˝÷–∂œ
-		(void)USART3->DR;				//«Â≥˝ ˝æ›
+		(void)USART3->SR;				//Ê∏ÖÈô§‰∏≠Êñ≠
+		(void)USART3->DR;				//Ê∏ÖÈô§Êï∞ÊçÆ
 		LL_DMA_ClearFlag_TC1(DMA1);
 		LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_1);
 	}
@@ -436,8 +436,8 @@ void USART6_IRQHandler(void)
    if(((USART6->SR)&(1<<4))!=0)
 	{
 		LL_DMA_DisableStream(DMA2, LL_DMA_STREAM_1);
-		(void)USART6->SR;				//«Â≥˝÷–∂œ
-		(void)USART6->DR;				//«Â≥˝ ˝æ›
+		(void)USART6->SR;				//Ê∏ÖÈô§‰∏≠Êñ≠
+		(void)USART6->DR;				//Ê∏ÖÈô§Êï∞ÊçÆ
 		LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_1);
 		LL_DMA_ClearFlag_TC1(DMA2);
 	}

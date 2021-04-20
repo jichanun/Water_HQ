@@ -32,11 +32,11 @@
 
 #define LOW_POWER_MODE		0x1E
 
-#define MPU_FIFO_EN_REG			0X23	//FIFOÊ¹ÄÜ¼Ä´æÆ÷
+#define MPU_FIFO_EN_REG			0X23	//FIFOä½¿èƒ½å¯„å­˜å™¨
 
-#define MPU_INTBP_CFG_REG		0X37	//ÖĞ¶Ï/ÅÔÂ·ÉèÖÃ¼Ä´æÆ÷
-#define MPU_INT_EN_REG			0X38	//ÖĞ¶ÏÊ¹ÄÜ¼Ä´æÆ÷
-#define MPU_INT_STA_REG			0X3A	//ÖĞ¶Ï×´Ì¬¼Ä´æÆ÷
+#define MPU_INTBP_CFG_REG		0X37	//ä¸­æ–­/æ—è·¯è®¾ç½®å¯„å­˜å™¨
+#define MPU_INT_EN_REG			0X38	//ä¸­æ–­ä½¿èƒ½å¯„å­˜å™¨
+#define MPU_INT_STA_REG			0X3A	//ä¸­æ–­çŠ¶æ€å¯„å­˜å™¨
 
 #define ACCEL_XOUT_H      0x3B
 #define ACCEL_XOUT_L      0x3C
@@ -81,11 +81,11 @@ static uint8_t ICM20689_Read_Reg(uint8_t reg)
 
 void icm20689_reset()
 {
-	ICM20689_Write_Reg(PWR_MGMT_1,0X80);	//¸´Î»
+	ICM20689_Write_Reg(PWR_MGMT_1,0X80);	//å¤ä½
 	HAL_Delay(100);
-	ICM20689_Write_Reg(PWR_MGMT_1, 0x00);	//½â³ıĞİÃß×´Ì¬
+	ICM20689_Write_Reg(PWR_MGMT_1, 0x00);	//è§£é™¤ä¼‘çœ çŠ¶æ€
 }
-//²»ÓÃDMP³õÊ¼»¯°æ±¾
+//ä¸ç”¨DMPåˆå§‹åŒ–ç‰ˆæœ¬
 uint8_t Init_ICM20689(void)
 {	
 	if(ICM20689_Read_Reg(WHO_AM_I)==0x98)
@@ -96,27 +96,27 @@ uint8_t Init_ICM20689(void)
 		return 1;
 	}
 	
-	ICM20689_Write_Reg(PWR_MGMT_1,0X80);	//¸´Î»
+	ICM20689_Write_Reg(PWR_MGMT_1,0X80);	//å¤ä½
 	HAL_Delay(100);
-	ICM20689_Write_Reg(PWR_MGMT_1, 0x00);	//½â³ıĞİÃß×´Ì¬
+	ICM20689_Write_Reg(PWR_MGMT_1, 0x00);	//è§£é™¤ä¼‘çœ çŠ¶æ€
 	
-	ICM20689_Write_Reg(GYRO_CONFIG,3<<3);//ÉèÖÃÍÓÂİÒÇÂúÁ¿³Ì·¶Î§
-	ICM20689_Write_Reg(ACCEL_CONFIG,0<<3);//¼ÓËÙ¶È¼Æ¹¤×÷·¶Î§ 2G
-	ICM20689_Write_Reg(ACCEL_CONFIG_2, 0x08);//¼ÓËÙ¼Æ¸ßÍ¨ÂË²¨ÆµÂÊ µäĞÍÖµ £º0x08  £¨1.13kHz£©	
+	ICM20689_Write_Reg(GYRO_CONFIG,3<<3);//è®¾ç½®é™€èºä»ªæ»¡é‡ç¨‹èŒƒå›´
+	ICM20689_Write_Reg(ACCEL_CONFIG,0<<3);//åŠ é€Ÿåº¦è®¡å·¥ä½œèŒƒå›´ 2G
+	ICM20689_Write_Reg(ACCEL_CONFIG_2, 0x08);//åŠ é€Ÿè®¡é«˜é€šæ»¤æ³¢é¢‘ç‡ å…¸å‹å€¼ ï¼š0x08  ï¼ˆ1.13kHzï¼‰	
 	
 	ICM20689_Write_Reg(SMPLRT_DIV,19);
-	ICM20689_Write_Reg(CONFIG,4);					//µÍÍ¨ÂË²¨ÆµÂÊ£¬µäĞÍÖµ£º0x07(3600Hz)´Ë¼Ä´æÆ÷ÄÚ¾ö¶¨Internal_Sample_Rate==8K
+	ICM20689_Write_Reg(CONFIG,4);					//ä½é€šæ»¤æ³¢é¢‘ç‡ï¼Œå…¸å‹å€¼ï¼š0x07(3600Hz)æ­¤å¯„å­˜å™¨å†…å†³å®šInternal_Sample_Rate==8K
 	
-	ICM20689_Write_Reg(MPU_INT_EN_REG,0X00);	//¹Ø±ÕËùÓĞÖĞ¶Ï
-	ICM20689_Write_Reg(MPU_FIFO_EN_REG,0X00);	//¹Ø±ÕFIFO
+	ICM20689_Write_Reg(MPU_INT_EN_REG,0X00);	//å…³é—­æ‰€æœ‰ä¸­æ–­
+	ICM20689_Write_Reg(MPU_FIFO_EN_REG,0X00);	//å…³é—­FIFO
 	
-	ICM20689_Write_Reg(PWR_MGMT_1,0X01);	//ÉèÖÃCLKSEL,PLL XÖáÎª²Î¿¼
-	ICM20689_Write_Reg(PWR_MGMT_2,0X00);	//¼ÓËÙ¶ÈÓëÍÓÂİÒÇ¶¼¹¤×÷
+	ICM20689_Write_Reg(PWR_MGMT_1,0X01);	//è®¾ç½®CLKSEL,PLL Xè½´ä¸ºå‚è€ƒ
+	ICM20689_Write_Reg(PWR_MGMT_2,0X00);	//åŠ é€Ÿåº¦ä¸é™€èºä»ªéƒ½å·¥ä½œ
 	
 
 	return 0;
 }
-//×¢Òâµ¥Î»-----Ê¹ÓÃdmpÄ£Ê½Ê±¼ÓËÙ¶ÈÁ¿³ÌÒ»¶¨ÊÇ +/- 4g
+//æ³¨æ„å•ä½-----ä½¿ç”¨dmpæ¨¡å¼æ—¶åŠ é€Ÿåº¦é‡ç¨‹ä¸€å®šæ˜¯ +/- 4g
 unsigned char MPU_Get_Accelerometer(short *ax,short *ay,short *az)
 {
     unsigned char buf[6],res;  
@@ -129,7 +129,7 @@ unsigned char MPU_Get_Accelerometer(short *ax,short *ay,short *az)
 	} 	
     return res;
 }
-//×¢Òâµ¥Î»-----Ê¹ÓÃdmpÄ£Ê½Ê±ÍÓÂİÒÇÁ¿³ÌÒ»¶¨ÊÇ +/- 2000dps
+//æ³¨æ„å•ä½-----ä½¿ç”¨dmpæ¨¡å¼æ—¶é™€èºä»ªé‡ç¨‹ä¸€å®šæ˜¯ +/- 2000dps
 unsigned char MPU_Get_Gyroscope(short *gx,short *gy,short *gz)
 {
     unsigned char buf[6],res;  
@@ -181,14 +181,14 @@ static int idd_io_hal_write_reg(void * context, uint8_t reg, const uint8_t * wbu
 void dmp_setup(int (*read_reg)(void * context, uint8_t reg, uint8_t * buf, uint32_t len),int (*write_reg)(void * context, uint8_t reg, const uint8_t * buf, uint32_t len));
 float* icm20689_data_poll(void);
 
-//ÓÃDMP³õÊ¼»¯°æ±¾
+//ç”¨DMPåˆå§‹åŒ–ç‰ˆæœ¬
 void icm20689_dmp_setup()
 {
-	icm20689_reset();								//±ØĞëÏÈreset
+	icm20689_reset();								//å¿…é¡»å…ˆreset
 	dmp_setup(idd_io_hal_read_reg,idd_io_hal_write_reg);
 }
 int count=0;
-//¶ÁÈ¡  0±íÊ¾³É¹¦  1±íÊ¾Ê§°Ü
+//è¯»å–  0è¡¨ç¤ºæˆåŠŸ  1è¡¨ç¤ºå¤±è´¥
 char get_dmp_data(float* yaw,float* pitch, float* roll)
 {
 	float * point =icm20689_data_poll();
