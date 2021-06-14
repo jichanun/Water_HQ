@@ -308,8 +308,8 @@ void GimbalTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		//StraightLineMotorControl();//直线电机控制
-		GimbalControlTask();//Yaw和拨弹电机控制
+		//StraightLineMotorControl();
+		GimbalControlTask();
     osDelay(1);
   }
   /* USER CODE END GimbalTask */
@@ -331,7 +331,7 @@ void GraspTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		GraspControlTask();
+		//GraspControlTask();
     osDelay(LServo.time);
   }
   /* USER CODE END GraspTask */

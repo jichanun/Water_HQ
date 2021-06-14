@@ -462,26 +462,7 @@ RemoteDataPortStruct AutoModeProcessData1(RemoteDataProcessedStruct	RemoteDataRe
 	RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3+0.1;
 	if (RollSinkControl<-20)
 			RemoteDataPortTemp.ChassisSpeedY	=		RemoteDataReceive.Channel_3+0.2;
-	if (VisionData.statusfinal!='N')
-	{
-		ReceiveCount++;
-	}
-	if (ReceiveCount>100)
-	{
-		ReceiveCount++;
-		RemoteDataPortTemp.Friction=ENABLE;
-	}
-	if (ReceiveCount>500)
-	{
-		ReceiveCount++;
-		RemoteDataPortTemp.FeedMotor=ENABLE;
-	}
-	if (ReceiveCount>2000)
-	{
-		ReceiveCount=0;
-		RemoteDataPortTemp.Friction=DISABLE;
-		RemoteDataPortTemp.FeedMotor=DISABLE;
-	}
+
 //	switch(RemoteDataReceive.RightSwitch)
 //		
 //	{
@@ -567,6 +548,8 @@ void ChassisRampProcessed(RemoteDataPortStruct	*RemoteDataPortTemp)
 extern float YAWError;
 extern float PitchError;
 float VisionRho=0;
+extern PositionDataStruct PositionStruct;
+
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 {
 ////	if(Target_mode==0)//基地
@@ -589,11 +572,11 @@ void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 	YawSetLocationValueChange((RemoteDataPort.YawIncrement)/300);
 	PitchSetLocationValueChange(RemoteDataPort.PitchIncrement/1000);
 //	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError,PitchError);	//yaw轴测试用。需要注释
-	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX+VisionRho,RemoteDataPort.ChassisSpeedY,YAWError,PitchError);	
+	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX+PositionStruct.speedx,RemoteDataPort.ChassisSpeedY+PositionStruct.speedy,YAWError,0);	
 	#else //****如果不使用陀螺仪，右摇杆控制方向 
 	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY+VisionRho,RemoteDataPort.YawIncrement,0);//RemoteDataPort.PitchIncrement);	
 	#endif
-	CAN1Control(RemoteDataPort);
+	//CAN1Control(RemoteDataPort);
 
 
 }
@@ -624,21 +607,21 @@ extern LobotServoData LServo;
 int  PWMON=100;
 void CAN1Control(RemoteDataPortStruct RemoteDataPort)
 {
-	if (RemoteDataPort.Friction)
-	{
-		LL_TIM_OC_SetCompareCH2(TIM5,2550);//舵机开
-		if (RemoteDataPort.FeedMotor)
-			{
-				LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM+PWMON);//开
-			}
-			else 
-			{
-				LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM);//关
-			}		
-	}
-		else
-	{
-			LL_TIM_OC_SetCompareCH2(TIM5,2950);//舵机关
-			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM);//电机关
-	}
+//	if (RemoteDataPort.Friction)
+//	{
+//		LL_TIM_OC_SetCompareCH2(TIM5,2550);//舵机开
+//		if (RemoteDataPort.FeedMotor)
+//			{
+//				LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM+PWMON);//开
+//			}
+//			else 
+//			{
+//				LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM);//关
+//			}		
+//	}
+//		else
+//	{
+//			LL_TIM_OC_SetCompareCH2(TIM5,2950);//舵机关
+//			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM);//电机关
+//	}
 }

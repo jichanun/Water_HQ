@@ -117,6 +117,37 @@ void UART3Unpack(u8 *buff,u32 *num)
 		num[i]=x+(a-ONE1-TWO1*n)*x/TWO1;
 	}
 }
+void UART3Pack(u32 *num,u8 *txbuff)//a是那个十进制数x是返回的16进制数
+{
+	for (int j =0;j<4;j++)
+	{
+		int i=1,n=0;
+		while(num[j]>=(i<<1)){
+			n++;
+			i=i<<1;
+		 }
+		 int x=TWO1*n+ONE1+TWO1/i*(num[j]-i);
+		 txbuff[j*4+2]=x>>24;
+		 txbuff[j*4+3]=x>>16;
+		 txbuff[j*4+4]=x>>8;
+		 txbuff[j*4+5]=x&0xff;
+	 }
+	 
+}
+u8 UART3TXBUFF[20];
+u32 VisionTransmitData[4];
+void VisionTransmit(void)
+{
+	UART3TXBUFF[0]=UART3TXBUFF[1]=0XFF;
+	VisionTransmitData[0]=0;
+	VisionTransmitData[1]=0;//角度
+	VisionTransmitData[2]=0;//x
+	VisionTransmitData[3]=0;//y
+	UART3Pack(VisionTransmitData,UART3TXBUFF);
+	UART3TXBUFF[18]=0;//标志位
+	uart3WriteBuf(UART3TXBUFF,sizeof(UART3TXBUFF));
+	
+}
 float FilterK=0.05;
 int16_t TurnFlag=0;
 int down_error=30;
@@ -134,10 +165,10 @@ void VisionControl(void)
 		VisionData.rho=(float)VisionReceiveData[0]-330+VisionData.rho_offset;//偏离值
 		VisionData.angle=(float)atan(a)*57.3+VisionData.yaw_offset;//角度值
 		VisionData.angle=VisionData.angle*FilterK+VisionData.angle*(1-FilterK);
-		VisionData.error_x=(int)(-VisionReceiveData[2])+down_error;//深度
+		///////下面改成位置坐标的XY轴
+		VisionData.error_x=(int)(-VisionReceiveData[2]);//深度
 		VisionData.error_y=VisionReceiveData[3];
-		if (VisionData.error_x>20)
-			VisionData.error_x=20;
+
 	#if  0			////////////////使用滤波
 		VisionData.status=UART3BUFF[18];
 		switch (VisionData.status)
@@ -209,6 +240,8 @@ void VisionControl(void)
 //				(VisionData.change_rho>=-12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho<=-0.5f*VisionYawIncreasement.Kp))
 				VisionRho=VisionData.change_rho/Rho_Maximum;
 		}
+		
+		
 	}
 //	else 				RollMotor.RollSink=0;
 

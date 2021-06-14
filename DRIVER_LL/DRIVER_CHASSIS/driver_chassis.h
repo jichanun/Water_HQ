@@ -1,3 +1,4 @@
+void PositionCaculate(void);
 /****************************************************
 *			Title:		Chassis
 *			ChipType:	STM32F405RGT6
@@ -36,6 +37,16 @@ typedef struct
 	float SpeedError;
 }ChassisSpeedMessegePort;
 
+typedef struct 
+{
+	float actual_x;
+	float actual_y;
+	float expect_x;
+	float expect_y;
+	float yaw_error;
+	float speedx;
+	float speedy;
+}PositionDataStruct ;
 extern ChassisMotorStruct ChassisMotor[4];
 
 
@@ -47,6 +58,7 @@ void SetChassisFollowRef(float SetLocation);
 void ChassisFollowCalculate(ChassisSpeedMessegePort *ChassisSpeed);
 void ChassisShakeCalculate(ChassisSpeedMessegePort *ChassisSpeed);
 void ChassisChangeFollow(ChassisSpeedMessegePort *ChassisSpeed);
+void PositionCaculate(void);
 
 
 void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed);

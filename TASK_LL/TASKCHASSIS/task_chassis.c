@@ -54,8 +54,10 @@ void Chassis_Control(void)
 			LL_TIM_OC_SetCompareCH1(TIM12,PWMNum);
 		LL_TIM_OC_SetCompareCH2(TIM12,PWMNum);
 
-	#else 
+	#else
+	PositionCaculate();	
 	ChassisControl_PWM(ChassisSpeed);
+	
 	#endif
 
 }

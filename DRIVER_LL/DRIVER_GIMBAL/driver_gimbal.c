@@ -109,13 +109,13 @@
 	#define VISION_YAW_OFFSET (0)
 	#define VISION_RHO_OFFSET (0)
 #endif 
+
 #endif
 
 #define MAX_PWM  210
 GimbalMotorStruct	YawMotor,PitchMotor,RollMotor;
 extern  RemoteDataUnion RemoteData;
 extern VisionDataStruct VisionData;
-
 PID VisionRhoIncreasement , VisionYawIncreasement ;
 void GimbalInit(void)
 {
@@ -189,6 +189,8 @@ void GimbalInit(void)
 	
 	VisionData.yaw_offset = VISION_YAW_OFFSET;
 	VisionData.rho_offset	=	VISION_RHO_OFFSET;
+	
+
 	LL_TIM_CC_EnableChannel(TIM12,LL_TIM_CHANNEL_CH1);
 	LL_TIM_CC_EnableChannel(TIM12,LL_TIM_CHANNEL_CH2);	
 	LL_TIM_EnableCounter(TIM12);
@@ -367,7 +369,11 @@ float GetYawGyroValue()
 {
 	return	GyroDataSave.Yaw;
 }
-
+float GetYawLocation()
+{
+	return YawMotor.Location.Location;
+	
+}
 void GyroAndEncoderDataGet(void)					//陀螺仪值定时更新，1ms
 {
 //	float roll;
@@ -478,23 +484,27 @@ void GimbalControlCalculateAndSend(void)
 	{
 		LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM);
 		LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM);
+		LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM);
 	}	
 	else 
 	{
 		#if CONFIG_USE_GYROSCOPE
-			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM-RollMotor.RollError+RollMotor.RollSink);
-			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollError+RollMotor.RollSink);
+			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM-RollMotor.RollError+RollMotor.RollSink+PitchError/2);
+			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollError+RollMotor.RollSink+PitchError/2);
+			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM+RollMotor.RollSink-PitchError);
 		#else
 			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollMotor.RollSink);
 			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollSink);
+			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM+RollMotor.RollSink);
+
 		#endif
 	}
 	#else  //关闭关控保护
 		LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollError+RollSink);
 		LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM-RollError+RollSink);
-#endif
+	#endif
 	
-	#endif 
+#endif 
 	
 	
 	#if 0 //没有CAN发送所以注释 DEBUG_USE_GIMBALMOTOR_CANSEND
@@ -530,4 +540,13 @@ void GimbalDataInit()
 void PitchDataInit()
 {
 	PitchMotor.Location.SetLocation = PITCH_INIT_VALUE;
+}
+void uart3WriteBuf(uint8_t*SendBuf,int len)//串口3发送字符串
+{
+	while (len--) {
+    while(LL_USART_IsActiveFlag_TC(USART3)!=1);//等待发送完成
+    LL_USART_TransmitData8(USART3,(uint8_t)(*SendBuf & (uint16_t)0x1ff));//发送数据
+    SendBuf++;
+	}
+
 }

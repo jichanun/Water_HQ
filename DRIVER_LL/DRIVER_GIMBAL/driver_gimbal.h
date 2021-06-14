@@ -86,6 +86,7 @@ typedef struct
 
 float GetYawEncoderValue(void);
 float GetYawGyroValue(void);
+float GetYawLocation(void);
 void GimbalPIDClear(void);
 void GimbalDataInit(void);
 void PitchDataInit(void);
@@ -112,6 +113,7 @@ typedef struct
 	float rho_offset;
 	StatusCountStruct statuscount;
 }VisionDataStruct;
+
 extern GyroscopeStruct Gyroscope;
 
 void GimbalControlTask(void);
@@ -123,4 +125,5 @@ void GimbalControlCalculateAndSend(void);
 void GyroAndEncoderDataGet(void);					//陀螺仪值定时更新，1ms
 void GimbalSpeedDataUpdate(void);									//云台速度更新
 void VisionInit(void);
+void uart3WriteBuf(uint8_t*SendBuf,int len);//串口3发送字符串
 #endif
