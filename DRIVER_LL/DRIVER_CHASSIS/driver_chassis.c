@@ -10,8 +10,11 @@
 #include "bsp_can.h"
 #include "driver_gimbal.h"
 #include "math.h"
+#include "uwb.h" 
 
 ChassisMotorStruct ChassisMotor[4];
+
+#define AUTO_CALIBRATE 0//自动校准
 
 //电机参数宏定义
 #define	CHASSIS_MOTOR_KP	(0.8f)
@@ -30,19 +33,21 @@ ChassisMotorStruct ChassisMotor[4];
 #define PIE (3.1415926f)
 
 
-#define POSITION_X_KP (0)
+#define POSITION_X_KP (-1)
 #define POSITION_X_KI (0)
 #define POSITION_X_KD (0)
 //#define POSITION_X_AP (0)
 //#define POSITION_X_BP (0)
 //#define POSITION_X_CP (0)
 
-#define POSITION_Y_KP (0)
+#define POSITION_Y_KP (1)
 #define POSITION_Y_KI (0)
 #define POSITION_Y_KD (0)
 //#define POSITION_Y_AP (0)
 //#define POSITION_Y_BP (0)
 //#define POSITION_Y_CP (0)
+#define PX_MIN (0.5)
+#define PY_MIN (0.5)
 /*
 底盘运动控制规律
 电机摆放顺序;
@@ -67,6 +72,7 @@ spin				-		+		+		-
 
 PositionDataStruct PositionStruct;
 PID PositionPID[2];
+extern int RemoteLostCount;
 
 
 
@@ -104,8 +110,8 @@ void ChassisInit(void)
 		PositionPID[0].Kp	= POSITION_X_KP;
 	PositionPID[0].Ki	= POSITION_X_KI;
 	PositionPID[0].Kd	= POSITION_X_KD;
-	PositionPID[0].OutMax=1;
-	PositionPID[0].OutMin=-1;
+	PositionPID[0].OutMax=0.5;
+	PositionPID[0].OutMin=-0.5;
 	PositionPID[0].calc=&PidCalc;
 	PositionPID[0].clear=&PidClear;
 	PositionPID[0].clear(&PositionPID[0]);
@@ -113,8 +119,8 @@ void ChassisInit(void)
 	PositionPID[1].Kp	= POSITION_Y_KP;
 	PositionPID[1].Ki	= POSITION_Y_KI;
 	PositionPID[1].Kd	= POSITION_Y_KD;
-	PositionPID[1].OutMax=1;
-	PositionPID[1].OutMin=-1;
+	PositionPID[1].OutMax=0.5;
+	PositionPID[1].OutMin=-0.5;
 	PositionPID[1].calc=&PidCalc;
 	PositionPID[1].clear=&PidClear;
 	PositionPID[1].clear(&PositionPID[1]);
@@ -282,16 +288,81 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 	
 }
 
-extern float yaw_OFFSET;
+float yaw_Base = 0;
 extern VisionDataStruct VisionData;
+extern UWBStruct UWBData;
+extern  float yaw_OFFSET;
 
+u16 PositionCount=0;
+
+void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
+{
+	static float PX,PY,theta;
+	if(UWBData.status&&!UWBData.validp&&RemoteLostCount)//遥控器不丢数据，角度不准，定位准
+	{
+		PositionStruct.status=0;//发送未完成信号
+	#if !AUTO_CALIBRATE //自动校准
+		UWBData.validp=1;//强制校准完成，需要注释。
+	#endif 
+		/*一直向前运动*/
+		ChassisSpeed->SetSpeedY=0.2;
+		//ChassisSpeed->SetSpeedX=ChassisSpeed->SpeedError=ChassisSpeed->Spin=0;
+		PositionCount++;
+		if (PositionCount<50)
+		{
+			UWBData.init_x+=UWBData.x*0.02;
+			UWBData.init_y+=UWBData.y*0.02;
+		}
+		else if (PositionCount>3000&&PositionCount<3050)
+		{
+			UWBData.init_x-=UWBData.x*0.02;
+			UWBData.init_y-=UWBData.y*0.02;
+		}
+		else if (PositionCount>3050)
+		{
+			PX=UWBData.init_x;
+			PY=UWBData.init_y;
+			if (PX<PX_MIN&&PY<PY_MIN)
+			{
+				theta=atan(PX/PY)/6.28;
+				if (PY<0)theta+=3.14;
+				yaw_Base=yaw_OFFSET-theta;
+				UWBData.validp=1;
+				PositionCount=0;
+			}
+			else UWBData.init_x=UWBData.init_y=PositionCount=0;
+		}
+	}
+	else if (UWBData.status&&UWBData.validp)//状态正常
+		PositionCaculate();	
+	else if(RemoteLostCount) //遥控器丢数据
+	{
+		PositionCount=0;
+		PositionStruct.status=0;//发送未完成信号
+		//UWBData.validp=0;//重新开始校准
+	}
+	else //定位不准
+	{
+		PositionCount=0;
+		PositionStruct.status=0;//发送未完成信号
+		UWBData.validp=0;//重新开始校准
+		UWBData.init_x=UWBData.init_y=PositionCount=0;
+	}
+}
 void PositionCaculate(void)
 {
 		/*计算角度*/
-	PositionStruct.actual_x=0;
-	PositionStruct.actual_y=0;
-	PositionStruct.expect_x=VisionData.error_x;
-	PositionStruct.expect_y=VisionData.error_y;
+	if (VisionData.error_x)
+		PositionStruct.expect_x=VisionData.error_x;
+	else 
+		PositionStruct.expect_x=1.21;//=UWBData.x
+	if (VisionData.error_y)
+		PositionStruct.expect_y=VisionData.error_y;
+	else 
+		PositionStruct.expect_y=1.5;//=UWBData.y
+	
+	PositionStruct.actual_x=UWBData.x;
+	PositionStruct.actual_y=UWBData.y;
 		/*位置移动*/
 	PositionPID[0].Ref=PositionStruct.expect_x;
 	PositionPID[0].Fdb=PositionStruct.actual_x;//获得当前位置
@@ -302,9 +373,20 @@ void PositionCaculate(void)
 	PositionPID[1].Fdb=PositionStruct.actual_y;
 	PositionPID[1].calc(&PositionPID[1]);
 	
-	PositionStruct.yaw_error=(GetYawLocation()-yaw_OFFSET)*2*PIE;//偏离正北方向
-	PositionStruct.speedx=PositionPID[0].Out*sin(PositionStruct.yaw_error);//向右为正
-	PositionStruct.speedy=PositionPID[1].Out*cos(PositionStruct.yaw_error);//向左为正
+	PositionStruct.yaw_error=(GetYawLocation()-yaw_Base)*2*PIE;//偏离正北方向
+	PositionStruct.speedx=PositionPID[0].Out*cos(PositionStruct.yaw_error)-PositionPID[1].Out*sin(PositionStruct.yaw_error);//向右为正
+	PositionStruct.speedy=PositionPID[1].Out*cos(PositionStruct.yaw_error)+PositionPID[0].Out*sin(PositionStruct.yaw_error);//向左为正
 	
-
+}
+void Recalibrate(void)//遥控器左侧拨杆到中间再拨回，重新校准
+{
+#if AUTO_CALIBRATE //自动校准
+		PositionCount=0;
+		PositionStruct.status=0;//发送未完成信号
+		UWBData.validp=0;//重新开始校准
+		UWBData.init_x=UWBData.init_y=PositionCount=0;
+#else 
+	yaw_Base=GetYawLocation();
+	UWBData.validp=0;
+#endif
 }

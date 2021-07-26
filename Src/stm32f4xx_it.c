@@ -84,7 +84,7 @@ extern TIM_HandleTypeDef htim7;
 /* USER CODE BEGIN EV */
 extern SemaphoreHandle_t xSemaphore;//wifi的二值信号
 u8 VisionReceiveFlag=0;
-
+extern u8 UWB_Flag;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -244,6 +244,7 @@ void DMA1_Stream5_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
 	LL_DMA_ClearFlag_HT5(DMA1);
 	LL_DMA_ClearFlag_TC5(DMA1);
+	UWB_Flag=1;
   /* USER CODE END DMA1_Stream5_IRQn 0 */
   
   /* USER CODE BEGIN DMA1_Stream5_IRQn 1 */

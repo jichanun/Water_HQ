@@ -504,7 +504,7 @@ RemoteDataPortStruct RemoteDataCalculate(RemoteDataProcessedStruct	RemoteDataRec
 		case	AUTO_MODE:
 			RemoteDataPortTemp	=	AutoModeProcessData(RemoteDataReceive);
 			AutomaticAiming=1;
-		
+			Recalibrate();
 			break;
 	}
 	
@@ -552,33 +552,16 @@ extern PositionDataStruct PositionStruct;
 
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 {
-////	if(Target_mode==0)//基地
-////	{
-////		YawSetLocationValueChange(YAW_TARGET_MODE0);
-////	}
-////	if(Target_mode==1)//前哨战
-////	{
-////	  YawSetLocationValueChange(YAW_TARGET_MODE1);
-////	}
-//	if(RemoteData.RemoteDataProcessed.RCValue.Ch0>1024)
-//		RemoteDataPort.YawIncrement=1;
-//	if(RemoteData.RemoteDataProcessed.RCValue.Ch0<1024)
-//		RemoteDataPort.YawIncrement=-1;
-//	if(RemoteData.RemoteDataProcessed.RCValue.Ch0==1024)
-//		RemoteDataPort.YawIncrement=0;
-//	YawSetLocationValueChange(YawMotor.Location.SetLocation+(RemoteDataPort.YawIncrement)/800);
 	//**************下面的是工训代码
 	#if CONFIG_USE_GYROSCOPE //***如果使用陀螺仪，右摇杆控制位置增量
 	YawSetLocationValueChange((RemoteDataPort.YawIncrement)/300);
-	PitchSetLocationValueChange(RemoteDataPort.PitchIncrement/1000);
+	//PitchSetLocationValueChange(RemoteDataPort.PitchIncrement/1000);
 //	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError,PitchError);	//yaw轴测试用。需要注释
 	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX+PositionStruct.speedx,RemoteDataPort.ChassisSpeedY+PositionStruct.speedy,YAWError,0);	
 	#else //****如果不使用陀螺仪，右摇杆控制方向 
 	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY+VisionRho,RemoteDataPort.YawIncrement,0);//RemoteDataPort.PitchIncrement);	
 	#endif
 	//CAN1Control(RemoteDataPort);
-
-
 }
 void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort);
 

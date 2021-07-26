@@ -56,7 +56,7 @@
 #if 1 //使用ROLL PID
 	#define ROLL (0)
 
-	#define ROLL_LOCATION_KP (0.2f)					//0.5
+	#define ROLL_LOCATION_KP (0.0f)					//0.2
 	#define ROLL_LOCATION_KI (0)
 	#define ROLL_LOCATION_KD (0)
 	#define ROLL_LOCATION_KC (0)
@@ -128,8 +128,8 @@ void GimbalInit(void)
 	YawMotor.PIDLocation.clear=&PidClear;
 	YawMotor.PIDLocation.clear(&YawMotor.PIDLocation);
 	
-	YawMotor.PIDSpeed.OutMax=0.1;
-	YawMotor.PIDSpeed.OutMin=-0.1;
+	YawMotor.PIDSpeed.OutMax=0.5;
+	YawMotor.PIDSpeed.OutMin=-0.5;
 	YawMotor.PIDSpeed.calc=&PidCalc;
 	YawMotor.PIDSpeed.clear=&PidClear;
 	YawMotor.PIDSpeed.clear(&YawMotor.PIDSpeed);
@@ -140,14 +140,14 @@ void GimbalInit(void)
 	PitchMotor.PIDLocation.clear=&PidClear;
 	PitchMotor.PIDLocation.clear(&PitchMotor.PIDLocation);
 	
-	PitchMotor.PIDSpeed.OutMax=0.1;
-	PitchMotor.PIDSpeed.OutMin=-0.1;
+	PitchMotor.PIDSpeed.OutMax=0.5;
+	PitchMotor.PIDSpeed.OutMin=-0.5;
 	PitchMotor.PIDSpeed.calc=&PidCalc;
 	PitchMotor.PIDSpeed.clear=&PidClear;
 	PitchMotor.PIDSpeed.clear(&PitchMotor.PIDSpeed);
 	
-	RollMotor.PIDLocation.OutMax=0.1;
-	RollMotor.PIDLocation.OutMin=-0.1;
+	RollMotor.PIDLocation.OutMax=0.5;
+	RollMotor.PIDLocation.OutMin=-0.5;
 	RollMotor.PIDLocation.calc=&PidCalc;
 	RollMotor.PIDLocation.clear=&PidClear;
 	RollMotor.PIDLocation.clear(&RollMotor.PIDLocation);
@@ -471,12 +471,8 @@ void GimbalControlCalculateAndSend(void)
 	
 	RollMotor.RollError=RollMotor.PIDSpeed.Out*MAX_PWM;
 	
-	if (YawMotor.Location.SetLocation-yaw_OFFSET<-0.35&&AutomaticAiming)
-		RollSinkControl=VisionData.error_x*(-SinkPara);
-	else 
-		RollSinkControl=0;
 
-	RollMotor.RollSink=RemoteDataPort.PitchIncrement*MAX_PWM*GimbalSpeedK+RollSinkControl;//下沉不经过PID故使用K参数
+	RollMotor.RollSink=RemoteDataPort.PitchIncrement*MAX_PWM*GimbalSpeedK;//下沉不经过PID故使用K参数
 	
 	/************roll的发送放在这里**************/
 #if 1 //启用关控保护
@@ -491,7 +487,7 @@ void GimbalControlCalculateAndSend(void)
 		#if CONFIG_USE_GYROSCOPE
 			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM-RollMotor.RollError+RollMotor.RollSink+PitchError/2);
 			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollError+RollMotor.RollSink+PitchError/2);
-			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM+RollMotor.RollSink-PitchError);
+			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM-RollMotor.RollSink-PitchError);
 		#else
 			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollMotor.RollSink);
 			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollSink);

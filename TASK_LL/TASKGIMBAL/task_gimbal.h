@@ -11,4 +11,6 @@ void PitchSetLocationValueChange(float Pitch);
 void StraightLineMotorInit(void);
 void StraightLineMotorControl(void);
 void VisionControl(void);
+void VisionTransmit(void);
+
 #endif

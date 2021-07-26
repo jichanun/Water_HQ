@@ -4,9 +4,12 @@
 void USART6ConfigEnable(void);
 void USART3ConfigEnable(void);
 void USART1ConfigEnable(void);
+void USART2ConfigEnable(void);
+
 void ConfigUsart1DMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize);
 void ConfigUsart6DMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize);
 void ConfigUsart3DMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize);
+void ConfigUsart2DMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize);
 
 //WifiChange Begin
 void WIFI_USARTConfigEnable(void);

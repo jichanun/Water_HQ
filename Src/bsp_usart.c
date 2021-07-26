@@ -4,6 +4,8 @@
 
 u32 Usart1DMAMemoryBaseAddress,Usart1DMABufferSize;
 u32 Usart3DMAMemoryBaseAddress,Usart3DMABufferSize;
+u32 Usart2DMAMemoryBaseAddress,Usart2DMABufferSize;
+
 void ConfigUsart1DMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize)
 {
 	Usart1DMAMemoryBaseAddress=DMA_Memory0BaseAddr;
@@ -22,6 +24,26 @@ void USART1ConfigEnable(void)
   LL_USART_EnableDMAReq_RX(USART1);
 	LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_5);
 //	LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_5);
+}
+void ConfigUsart2DMA(u32 DMA_Memory0BaseAddr,u32 DMA_BufferSize)
+{
+	Usart2DMAMemoryBaseAddress=DMA_Memory0BaseAddr;
+	Usart2DMABufferSize=DMA_BufferSize;
+	
+	USART2ConfigEnable();
+}
+
+void USART2ConfigEnable(void)
+{
+	LL_DMA_SetMemoryAddress(DMA1,LL_DMA_STREAM_5,(u32)Usart2DMAMemoryBaseAddress);
+	LL_DMA_SetPeriphAddress(DMA1,LL_DMA_STREAM_5,(u32)&USART2->DR);
+	LL_DMA_SetDataLength(DMA1,LL_DMA_STREAM_5,Usart2DMABufferSize);	
+	LL_USART_EnableIT_IDLE(USART2);
+  LL_USART_EnableDMAReq_RX(USART2);
+//	LL_USART_EnableDMAReq_TX(USART2);
+	LL_DMA_EnableIT_TC(DMA1, LL_DMA_STREAM_5);
+//	LL_DMA_EnableIT_TC(DMA1, LL_DMA_STREAM_6);
+	LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_5);
 }
 
 u32 Usart6DMAMemoryBaseAddress,Usart6DMABufferSize;

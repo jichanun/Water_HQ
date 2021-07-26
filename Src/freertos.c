@@ -76,6 +76,8 @@
 #include "LobotSerialServo.h"
 #include "task_grasp.h"
 #include "driver_laser.h"
+#include "uwb.h" 
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -226,6 +228,9 @@ void LEDTask(void const * argument)
 * @param argument: Not used
 * @retval None
 */
+u8 UWB_Flag=0;
+extern u8 UART2BUFF[130];
+UWBStruct UWBData;
 /* USER CODE END Header_FeedMotorTask */
 void FeedMotorTask(void const * argument)
 {
@@ -234,9 +239,18 @@ void FeedMotorTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {		
+		if (UWB_Flag)
+		{
+			UWB_Flag=0;
+			Uwb_Get_Data(UART2BUFF,&UWBData.x,&UWBData.y,&UWBData.z,&UWBData.pitch
+			,&UWBData.yaw,&UWBData.roll,&UWBData.status);//接受函数
+			
+		}
+		VisionTransmit();
+
 		//TriggerControl();//扳机控制
     //FeedMotorControlLogic();//拉线电机控制
-    osDelay(4);
+    osDelay(8);
   }
   /* USER CODE END FeedMotorTask */
 }
