@@ -220,30 +220,10 @@ void VisionControl(void)
 		{
 //			if((VisionData.change_angle<=25.0f*VisionYawIncreasement.Kp&&VisionData.change_angle>=3.0f*VisionYawIncreasement.Kp)||
 //					(VisionData.change_angle>=-25.0f*VisionYawIncreasement.Kp&&VisionData.change_angle<=-3.0f*VisionYawIncreasement.Kp))
-			{
 				if(fabs(YawMotor.Location.SetLocation-YawMotor.Location.Location)<0.05)
 				{
-					//这些注释是用来弯道快速转弯
-//					if (VisionData.angle>50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20){
-//						YawSetLocationValueChange(-0.25);
-//						TurnFlag=60;
-//					}
-//					else if (VisionData.angle<-50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20)
-//					{
-//						YawSetLocationValueChange(-0.25);
-//						TurnFlag=60;
-//					}
-//					else 
-					{
 						YawSetLocationValueChange(-VisionData.change_angle);
-						if (TurnFlag>-10)
-						TurnFlag--;
-					}
 				}
-			}
-//		if((VisionData.change_rho<=12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho>=0.5f*VisionYawIncreasement.Kp)||
-//				(VisionData.change_rho>=-12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho<=-0.5f*VisionYawIncreasement.Kp))
-				VisionRho=VisionData.change_rho/Rho_Maximum;
 		}
 		
 		

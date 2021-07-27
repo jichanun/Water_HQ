@@ -301,7 +301,7 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 	if(UWBData.status&&!UWBData.validp&&RemoteLostCount)//遥控器不丢数据，角度不准，定位准
 	{
 		PositionStruct.status=0;//发送未完成信号
-	#if !AUTO_CALIBRATE //自动校准
+	#if !AUTO_CALIBRATE //手动校准
 		UWBData.validp=1;//强制校准完成，需要注释。
 	#endif 
 		/*一直向前运动*/
@@ -339,7 +339,7 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 	{
 		PositionCount=0;
 		PositionStruct.status=0;//发送未完成信号
-		//UWBData.validp=0;//重新开始校准
+		UWBData.validp=0;//重新开始校准
 	}
 	else //定位不准
 	{
