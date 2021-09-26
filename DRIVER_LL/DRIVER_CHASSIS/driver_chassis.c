@@ -305,7 +305,7 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 		UWBData.validp=1;//强制校准完成，需要注释。
 	#endif 
 		/*一直向前运动*/
-		ChassisSpeed->SetSpeedY=0.2;
+//		ChassisSpeed->SetSpeedY=0.2;
 		//ChassisSpeed->SetSpeedX=ChassisSpeed->SpeedError=ChassisSpeed->Spin=0;
 		PositionCount++;
 		if (PositionCount<50)
@@ -334,7 +334,10 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 		}
 	}
 	else if (UWBData.status&&UWBData.validp)//状态正常
+	{
 		PositionCaculate();	
+		PositionStruct.status=20;
+	}
 	else if(RemoteLostCount) //遥控器丢数据
 	{
 		PositionCount=0;
@@ -352,16 +355,16 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 void PositionCaculate(void)
 {
 		/*计算角度*/
-	if (VisionData.error_x)
-		PositionStruct.expect_x=VisionData.error_x;
-	else 
-		PositionStruct.expect_x=1.21;//=UWBData.x
-	if (VisionData.error_y)
-		PositionStruct.expect_y=VisionData.error_y;
-	else 
-		PositionStruct.expect_y=1.5;//=UWBData.y
+//	if (VisionData.error_x)
+//		PositionStruct.expect_x=VisionData.error_x;
+//	else 
+//		PositionStruct.expect_x=1.21;//=UWBData.x
+//	if (VisionData.error_y)
+//		PositionStruct.expect_y=VisionData.error_y;
+//	else 
+//		PositionStruct.expect_y=1.5;//=UWBData.y
 	
-	PositionStruct.actual_x=UWBData.x;
+	PositionStruct.actual_x=UWBData.x;	
 	PositionStruct.actual_y=UWBData.y;
 		/*位置移动*/
 	PositionPID[0].Ref=PositionStruct.expect_x;
