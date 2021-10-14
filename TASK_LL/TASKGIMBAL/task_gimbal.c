@@ -121,7 +121,7 @@ void UART3Unpack(u8 *buff,u32 *num)
 }
 void UART3Pack(u32 *num,u8 *txbuff)//a是那个十进制数x是返回的16进制数
 {
-	for (int j =0;j<4;j++)
+	for (int j =0;j<14;j++)
 	{
 //		int i=1,n=0;
 //		while(num[j]>=(i<<1)){
@@ -137,8 +137,8 @@ void UART3Pack(u32 *num,u8 *txbuff)//a是那个十进制数x是返回的16进制
 	 
 }
 
-u8 UART3TXBUFF[20];
-u32 VisionTransmitData[4];
+u8 UART3TXBUFF[53];
+u32 VisionTransmitData[14];
 extern PositionDataStruct PositionStruct;
 
 
@@ -147,8 +147,13 @@ void VisionTransmit(void)
 	//UART3TXBUFF[0]=UART3TXBUFF[1]=0XFF;
 	VisionTransmitData[0]=10000;
 	VisionTransmitData[1]=PositionStruct.yaw_error;//角度
-	VisionTransmitData[2]=PositionStruct.actual_x*1000;//x（m*1000）
-	VisionTransmitData[3]=PositionStruct.actual_y*1000;//y（m*1000）
+	for (int i =0;i<6;i++)
+		PositionStruct.Position[i].px=PositionStruct.Position[i].py=i*1.1;
+	for (int i=0;i<6;i++)//发送6个标签的坐标
+	{
+		VisionTransmitData[i*2+2]=PositionStruct.Position[i].px*1000;//x（m*1000）
+		VisionTransmitData[i*2+3]=PositionStruct.Position[i].py*1000;//y（m*1000）
+	}
 	
 ////	/*****测试****************/
 //	PositionStruct.actual_x=(VisionData.error_x-PositionStruct.actual_x)*0.1+PositionStruct.actual_x;
@@ -159,9 +164,9 @@ void VisionTransmit(void)
 //	VisionTransmitData[3]=PositionStruct.actual_y*1000;//y（m*1000）
 //	/*****测试****************/
 	UART3Pack(VisionTransmitData,UART3TXBUFF);
-	UART3TXBUFF[16]=PositionStruct.status;//标志位(为1 可用)
+	UART3TXBUFF[52]=PositionStruct.status;//标志位(不为0可用)
 //	UART3TXBUFF[16]=20;//标志位(为1 可用)
-	uart3WriteBuf(UART3TXBUFF,18);
+	uart3WriteBuf(UART3TXBUFF,53);
 	
 }
 
