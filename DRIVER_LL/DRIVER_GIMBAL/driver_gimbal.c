@@ -485,7 +485,7 @@ void GimbalControlCalculateAndSend(void)
 	else 
 	{
 		#if CONFIG_USE_GYROSCOPE
-			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM-RollMotor.RollError+RollMotor.RollSink+PitchError/2);
+			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollMotor.RollError-RollMotor.RollSink+PitchError/2);
 			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollError+RollMotor.RollSink+PitchError/2);
 			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM-RollMotor.RollSink-PitchError);
 		#else

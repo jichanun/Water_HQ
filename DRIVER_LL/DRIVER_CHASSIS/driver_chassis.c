@@ -266,10 +266,10 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 	}	
 	else 
 	{		
-		speed0=(s16)((ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed1=(s16)((ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed2=(s16)((ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed3=(s16)((ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		LL_TIM_OC_SetCompareCH1(TIM2,speed3);
 		LL_TIM_OC_SetCompareCH2(TIM2,speed2);
 		LL_TIM_OC_SetCompareCH3(TIM8,speed0);
@@ -301,11 +301,11 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 	if(UWBData.status&&!UWBData.validp&&RemoteLostCount)//遥控器不丢数据，角度不准，定位准
 	{
 		PositionStruct.status=0;//发送未完成信号
-	#if !AUTO_CALIBRATE //自动校准
+	#if !AUTO_CALIBRATE //手动校准
 		UWBData.validp=1;//强制校准完成，需要注释。
 	#endif 
 		/*一直向前运动*/
-		ChassisSpeed->SetSpeedY=0.2;
+//		ChassisSpeed->SetSpeedY=0.2;
 		//ChassisSpeed->SetSpeedX=ChassisSpeed->SpeedError=ChassisSpeed->Spin=0;
 		PositionCount++;
 		if (PositionCount<50)
@@ -334,12 +334,15 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 		}
 	}
 	else if (UWBData.status&&UWBData.validp)//状态正常
+	{
 		PositionCaculate();	
+		PositionStruct.status=SELF_ID;//TODO:改为自己的ID
+	}
 	else if(RemoteLostCount) //遥控器丢数据
 	{
 		PositionCount=0;
 		PositionStruct.status=0;//发送未完成信号
-		//UWBData.validp=0;//重新开始校准
+		UWBData.validp=0;//重新开始校准
 	}
 	else //定位不准
 	{
@@ -352,16 +355,16 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 void PositionCaculate(void)
 {
 		/*计算角度*/
-	if (VisionData.error_x)
-		PositionStruct.expect_x=VisionData.error_x;
-	else 
-		PositionStruct.expect_x=1.21;//=UWBData.x
-	if (VisionData.error_y)
-		PositionStruct.expect_y=VisionData.error_y;
-	else 
-		PositionStruct.expect_y=1.5;//=UWBData.y
+//	if (VisionData.error_x)
+//		PositionStruct.expect_x=VisionData.error_x;
+//	else 
+//		PositionStruct.expect_x=1.21;//=UWBData.x
+//	if (VisionData.error_y)
+//		PositionStruct.expect_y=VisionData.error_y;
+//	else 
+//		PositionStruct.expect_y=1.5;//=UWBData.y
 	
-	PositionStruct.actual_x=UWBData.x;
+	PositionStruct.actual_x=UWBData.x;	
 	PositionStruct.actual_y=UWBData.y;
 		/*位置移动*/
 	PositionPID[0].Ref=PositionStruct.expect_x;

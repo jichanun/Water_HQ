@@ -121,7 +121,7 @@ void UART3Unpack(u8 *buff,u32 *num)
 }
 void UART3Pack(u32 *num,u8 *txbuff)//a是那个十进制数x是返回的16进制数
 {
-	for (int j =0;j<4;j++)
+	for (int j =0;j<14;j++)
 	{
 //		int i=1,n=0;
 //		while(num[j]>=(i<<1)){
@@ -136,8 +136,9 @@ void UART3Pack(u32 *num,u8 *txbuff)//a是那个十进制数x是返回的16进制
 	 }
 	 
 }
-u8 UART3TXBUFF[20];
-u32 VisionTransmitData[4];
+
+u8 UART3TXBUFF[57];
+u32 VisionTransmitData[14];
 extern PositionDataStruct PositionStruct;
 
 
@@ -146,13 +147,34 @@ void VisionTransmit(void)
 	//UART3TXBUFF[0]=UART3TXBUFF[1]=0XFF;
 	VisionTransmitData[0]=10000;
 	VisionTransmitData[1]=PositionStruct.yaw_error;//角度
-	VisionTransmitData[2]=PositionStruct.actual_x*1000;//x（m*1000）
-	VisionTransmitData[3]=PositionStruct.actual_y*1000;//y（m*1000）
+	for (int i=0;i<6;i++)//发送6个标签的坐标
+	{
+		VisionTransmitData[i*2+2]=PositionStruct.Position[i].px*1000;//x（m*1000）
+		VisionTransmitData[i*2+3]=PositionStruct.Position[i].py*1000;//y（m*1000）
+	}
+	
+////	/*****测试****************/
+//	PositionStruct.actual_x=(VisionData.error_x-PositionStruct.actual_x)*0.1+PositionStruct.actual_x;
+//	PositionStruct.actual_y=((VisionData.error_y-PositionStruct.actual_y)*0.1+PositionStruct.actual_y);
+//	VisionTransmitData[0]=10000;
+//	VisionTransmitData[1]=0*10;//角度
+//	VisionTransmitData[2]=PositionStruct.actual_x*1000;//x（m*1000）
+//	VisionTransmitData[3]=PositionStruct.actual_y*1000;//y（m*1000）
+//	/*****测试****************/
 	UART3Pack(VisionTransmitData,UART3TXBUFF);
-	UART3TXBUFF[16]=PositionStruct.status;//标志位(为1 可用)
-	uart3WriteBuf(UART3TXBUFF,17);
+	UART3TXBUFF[56]=20;//PositionStruct.status;//标志位(不为0可用)
+//	UART3TXBUFF[16]=20;//标志位(为1 可用)
+	uart3WriteBuf(UART3TXBUFF,57);
 	
 }
+
+void VisionDataClear(void)
+{
+	for (int i=1;i<20;i++)
+		UART3BUFF[i]=0;
+	VisionData.angle=VisionData.rho=0;
+}
+
 float FilterK=0.05;
 int16_t TurnFlag=0;
 int down_error=30;
@@ -164,15 +186,15 @@ void VisionControl(void)
 	if (UART3BUFF[0]==0XFF&&UART3BUFF[1]==0XFF)
 	{
 		UART3Unpack(UART3BUFF,VisionReceiveData);
-		b=VisionReceiveData[1]-320;
-		float a =b;
-		a/=130;
+		b=VisionReceiveData[1];
+		float a =(float)b/10;
+		a-=180;
 		VisionData.rho=(float)VisionReceiveData[0]-330+VisionData.rho_offset;//偏离值
-		VisionData.angle=(float)atan(a)*57.3+VisionData.yaw_offset;//角度值
+		VisionData.angle=a+VisionData.yaw_offset;//角度值
 		VisionData.angle=VisionData.angle*FilterK+VisionData.angle*(1-FilterK);
 		///////下面改成位置坐标的XY轴
-		VisionData.error_x=(int)(-VisionReceiveData[2]);//深度
-		VisionData.error_y=VisionReceiveData[3];
+		VisionData.error_x=(float)(VisionReceiveData[2])/100.0;//深度
+		VisionData.error_y=(float)(VisionReceiveData[3])/100.0;
 
 	#if  0			////////////////使用滤波
 		VisionData.status=UART3BUFF[18];
@@ -213,41 +235,21 @@ void VisionControl(void)
 		//计算有问题
 		VisionYawIncreasement.Ref=VisionData.angle;
 		VisionYawIncreasement.calc(&VisionYawIncreasement);
-		VisionData.change_angle=VisionYawIncreasement.Out/500;
+		VisionData.change_angle=VisionYawIncreasement.Out/100;
 	#endif 
 		//视觉处理****************************************************
 			if(AutomaticAiming&&VisionData.rho!=-330)
 		{
 //			if((VisionData.change_angle<=25.0f*VisionYawIncreasement.Kp&&VisionData.change_angle>=3.0f*VisionYawIncreasement.Kp)||
 //					(VisionData.change_angle>=-25.0f*VisionYawIncreasement.Kp&&VisionData.change_angle<=-3.0f*VisionYawIncreasement.Kp))
-			{
 				if(fabs(YawMotor.Location.SetLocation-YawMotor.Location.Location)<0.05)
 				{
-					//这些注释是用来弯道快速转弯
-//					if (VisionData.angle>50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20){
-//						YawSetLocationValueChange(-0.25);
-//						TurnFlag=60;
-//					}
-//					else if (VisionData.angle<-50&&TurnFlag<0&&fabs(VisionData.angle-VisionData.angle_last)<20)
-//					{
-//						YawSetLocationValueChange(-0.25);
-//						TurnFlag=60;
-//					}
-//					else 
-					{
 						YawSetLocationValueChange(-VisionData.change_angle);
-						if (TurnFlag>-10)
-						TurnFlag--;
-					}
 				}
-			}
-//		if((VisionData.change_rho<=12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho>=0.5f*VisionYawIncreasement.Kp)||
-//				(VisionData.change_rho>=-12.5f*VisionYawIncreasement.Kp&&VisionData.change_rho<=-0.5f*VisionYawIncreasement.Kp))
-				VisionRho=VisionData.change_rho/Rho_Maximum;
 		}
 		
 		
 	}
 //	else 				RollMotor.RollSink=0;
-
+	//	VisionDataClear();
 }

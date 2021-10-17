@@ -250,7 +250,7 @@ void FeedMotorTask(void const * argument)
 
 		//TriggerControl();//扳机控制
     //FeedMotorControlLogic();//拉线电机控制
-    osDelay(8);
+    osDelay(50);
   }
   /* USER CODE END FeedMotorTask */
 }
