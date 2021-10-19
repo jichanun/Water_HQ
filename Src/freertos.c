@@ -241,13 +241,13 @@ void FeedMotorTask(void const * argument)
 		if (UWB_Flag)
 		{
 			UWB_Flag=0;
-			GetUwbData();
+			GetAnchorData();
 		}
 		VisionTransmit();
 
 		//TriggerControl();//扳机控制
     //FeedMotorControlLogic();//拉线电机控制
-    osDelay(50);
+    osDelay(200);
   }
   /* USER CODE END FeedMotorTask */
 }

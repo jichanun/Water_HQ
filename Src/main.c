@@ -140,6 +140,7 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN 0 */
 u8 UART3BUFF[20];
 u8 UART2BUFF[1000];
+extern u8 AnchorTransferData[1000];//????
 
 #define NUM 8
 #define LENTH (NUM*24+240)//后100个
@@ -208,7 +209,7 @@ int main(void)
 	//WifiInit("192.168.1.113",8888,"RoboMaster2","bufujiugan",USART3);
 	ConfigUsart3DMA((u32)UART3BUFF,19);
 	ConfigTIM3DMA((u32)data1,LENTH);
-	ConfigUsart2DMA((u32)UART2BUFF,sizeof(UART2BUFF));
+	ConfigUsart2DMA((u32)UART2BUFF,sizeof(UART2BUFF),(u32)AnchorTransferData);
 
   LostCounterInit();
   WatchDogInit();
