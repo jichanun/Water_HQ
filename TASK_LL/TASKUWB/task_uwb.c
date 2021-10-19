@@ -2,7 +2,7 @@
 #include "task_uwb.h" 
 
 API_Struct Position_LL;
-extern u8 UART2BUFF[130];
+extern u8 UART2BUFF[1000];
 u8 TagInfoData[128];
 void GetUwbData()
 {
