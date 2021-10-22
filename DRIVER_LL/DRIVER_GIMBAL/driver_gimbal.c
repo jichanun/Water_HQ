@@ -485,9 +485,15 @@ void GimbalControlCalculateAndSend(void)
 	else 
 	{
 		#if CONFIG_USE_GYROSCOPE
-			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollMotor.RollError-RollMotor.RollSink+PitchError/2);
-			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollError+RollMotor.RollSink+PitchError/2);
-			LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM-RollMotor.RollSink-PitchError);
+			#if SELF_ID==2
+				LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollMotor.RollError-RollMotor.RollSink+PitchError/2);
+				LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollError+RollMotor.RollSink+PitchError/2);
+				LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM-RollMotor.RollSink-PitchError);
+			#elif SELF_ID==3
+				LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollMotor.RollError-RollMotor.RollSink+PitchError/2);
+				LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollError-RollMotor.RollSink+PitchError/2);
+				LL_TIM_OC_SetCompareCH2(TIM4,MIDDLE_PWM-RollMotor.RollSink-PitchError);
+			#endif
 		#else
 			LL_TIM_OC_SetCompareCH1(TIM12,MIDDLE_PWM+RollMotor.RollSink);
 			LL_TIM_OC_SetCompareCH2(TIM12,MIDDLE_PWM+RollMotor.RollSink);

@@ -267,10 +267,17 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 	}	
 	else 
 	{		
-		speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		#if  (SELF_ID==3||SELF_ID==2)
+			speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		#elif  SELF_ID==0;
+			speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		#endif
 		LL_TIM_OC_SetCompareCH1(TIM2,speed3);
 		LL_TIM_OC_SetCompareCH2(TIM2,speed2);
 		LL_TIM_OC_SetCompareCH3(TIM8,speed0);
