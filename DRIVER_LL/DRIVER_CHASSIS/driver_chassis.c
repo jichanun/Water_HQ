@@ -366,12 +366,12 @@ void PositionCaculate(void)
 		/*计算角度*/
 	if (VisionData.error_x)
 		PositionStruct.expect_x=VisionData.error_x;
-	else 
-		PositionStruct.expect_x=1.21;//=UWBData.x
+//	else 
+//		PositionStruct.expect_x=1.21;//=UWBData.x
 	if (VisionData.error_y)
 		PositionStruct.expect_y=VisionData.error_y;
-	else 
-		PositionStruct.expect_y=1.5;//=UWBData.y
+//	else 
+//		PositionStruct.expect_y=1.5;//=UWBData.y
 	/**/
 	
 	PositionStruct.actual_x=Position_LL.x;	
