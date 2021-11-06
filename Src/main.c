@@ -139,7 +139,7 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 u8 UART3BUFF[20];
-u8 UART2BUFF[130];
+u8 UART2BUFF[1000];
 
 #define NUM 8
 #define LENTH (NUM*24+240)//后100个

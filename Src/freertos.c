@@ -77,7 +77,7 @@
 #include "task_grasp.h"
 #include "driver_laser.h"
 #include "uwb.h" 
-
+#include "task_uwb.h" 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -230,7 +230,6 @@ void LEDTask(void const * argument)
 */
 u8 UWB_Flag=0;
 extern u8 UART2BUFF[130];
-UWBStruct UWBData;
 /* USER CODE END Header_FeedMotorTask */
 void FeedMotorTask(void const * argument)
 {
@@ -242,9 +241,7 @@ void FeedMotorTask(void const * argument)
 		if (UWB_Flag)
 		{
 			UWB_Flag=0;
-			Uwb_Get_Data(UART2BUFF,&UWBData.x,&UWBData.y,&UWBData.z,&UWBData.pitch
-			,&UWBData.yaw,&UWBData.roll,&UWBData.status);//接受函数
-			
+			GetUwbData();
 		}
 		VisionTransmit();
 
@@ -345,8 +342,8 @@ void GraspTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		//GraspControlTask();
-    osDelay(LServo.time);
+		GraspControlTask();
+    osDelay(2000);
   }
   /* USER CODE END GraspTask */
 }

@@ -162,7 +162,7 @@ void VisionTransmit(void)
 //	VisionTransmitData[3]=PositionStruct.actual_y*1000;//y（m*1000）
 //	/*****测试****************/
 	UART3Pack(VisionTransmitData,UART3TXBUFF);
-	UART3TXBUFF[56]=20;//PositionStruct.status;//标志位(不为0可用)
+	UART3TXBUFF[56]=PositionStruct.status;//标志位(不为0可用)
 //	UART3TXBUFF[16]=20;//标志位(为1 可用)
 	uart3WriteBuf(UART3TXBUFF,57);
 	
@@ -193,7 +193,7 @@ void VisionControl(void)
 		VisionData.angle=a+VisionData.yaw_offset;//角度值
 		VisionData.angle=VisionData.angle*FilterK+VisionData.angle*(1-FilterK);
 		///////下面改成位置坐标的XY轴
-		VisionData.error_x=(float)(VisionReceiveData[2])/100.0;//深度
+		VisionData.error_x=(float)(VisionReceiveData[2])/100.0;
 		VisionData.error_y=(float)(VisionReceiveData[3])/100.0;
 
 	#if  0			////////////////使用滤波

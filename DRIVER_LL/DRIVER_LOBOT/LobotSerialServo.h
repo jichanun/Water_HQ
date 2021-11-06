@@ -58,6 +58,8 @@ void ReadTorque(u8 id);
 void ReadAngle(u8 id);
 void robstest(void);
 void ReadTemperature(u8 id);
+void uartWriteBuf(uint8_t*SendBuf,int len);//??1?????
+
 typedef struct
 {
 	u8 id ;

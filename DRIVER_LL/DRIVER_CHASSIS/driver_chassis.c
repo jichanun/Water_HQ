@@ -11,6 +11,7 @@
 #include "driver_gimbal.h"
 #include "math.h"
 #include "uwb.h" 
+#include "task_uwb.h" 
 
 ChassisMotorStruct ChassisMotor[4];
 
@@ -229,6 +230,7 @@ void ChassisControl(ChassisSpeedMessegePort ChassisSpeed)
 	CAN1_Send_Msg(CAN1SendMessegeBuffer,8);
 #endif
 }
+u8 SELF_ID = 255;
 extern int RemoteLostCount;
 float ChassisSpeedK=210;	
 u16 speed0=0,speed1=0,speed2=0,speed3=0;
@@ -266,10 +268,25 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 	}	
 	else 
 	{		
-		speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
-		speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		if (SELF_ID==3||SELF_ID==4){
+			speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		}
+		else if (  SELF_ID==5){
+			speed0=(s16)((ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed1=(s16)((ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed2=(s16)((ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed3=(s16)((ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+		}
+		else  //防止没收到数据
+		{
+			speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+			speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
+	}
 		LL_TIM_OC_SetCompareCH1(TIM2,speed3);
 		LL_TIM_OC_SetCompareCH2(TIM2,speed2);
 		LL_TIM_OC_SetCompareCH3(TIM8,speed0);
@@ -290,7 +307,8 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 
 float yaw_Base = 0;
 extern VisionDataStruct VisionData;
-extern UWBStruct UWBData;
+extern API_Struct Position_LL;
+
 extern  float yaw_OFFSET;
 
 u16 PositionCount=0;
@@ -298,11 +316,11 @@ u16 PositionCount=0;
 void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 {
 	static float PX,PY,theta;
-	if(UWBData.status&&!UWBData.validp&&RemoteLostCount)//遥控器不丢数据，角度不准，定位准
+	if(Position_LL.Validation&&!Position_LL.validp&&RemoteLostCount)//遥控器不丢数据，角度不准，定位准
 	{
-		PositionStruct.status=0;//发送未完成信号
+		//PositionStruct.status=0;//发送未完成信号
 	#if !AUTO_CALIBRATE //手动校准
-		UWBData.validp=1;//强制校准完成，需要注释。
+		Position_LL.validp=1;//强制校准完成，整个if就不用看了
 	#endif 
 		/*一直向前运动*/
 //		ChassisSpeed->SetSpeedY=0.2;
@@ -310,30 +328,30 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 		PositionCount++;
 		if (PositionCount<50)
 		{
-			UWBData.init_x+=UWBData.x*0.02;
-			UWBData.init_y+=UWBData.y*0.02;
+			Position_LL.init_x+=Position_LL.x*0.02;
+			Position_LL.init_y+=Position_LL.y*0.02;
 		}
 		else if (PositionCount>3000&&PositionCount<3050)
 		{
-			UWBData.init_x-=UWBData.x*0.02;
-			UWBData.init_y-=UWBData.y*0.02;
+			Position_LL.init_x-=Position_LL.x*0.02;
+			Position_LL.init_y-=Position_LL.y*0.02;
 		}
 		else if (PositionCount>3050)
 		{
-			PX=UWBData.init_x;
-			PY=UWBData.init_y;
+			PX=Position_LL.init_x;
+			PY=Position_LL.init_y;
 			if (PX<PX_MIN&&PY<PY_MIN)
 			{
 				theta=atan(PX/PY)/6.28;
 				if (PY<0)theta+=3.14;
 				yaw_Base=yaw_OFFSET-theta;
-				UWBData.validp=1;
+				Position_LL.validp=1;
 				PositionCount=0;
 			}
-			else UWBData.init_x=UWBData.init_y=PositionCount=0;
+			else Position_LL.init_x=Position_LL.init_y=PositionCount=0;
 		}
 	}
-	else if (UWBData.status&&UWBData.validp)//状态正常
+	else if (Position_LL.Validation&&Position_LL.validp)//状态正常
 	{
 		PositionCaculate();	
 		PositionStruct.status=SELF_ID;//TODO:改为自己的ID
@@ -341,31 +359,32 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 	else if(RemoteLostCount) //遥控器丢数据
 	{
 		PositionCount=0;
-		PositionStruct.status=0;//发送未完成信号
-		UWBData.validp=0;//重新开始校准
+		//PositionStruct.status=0;//发送未完成信号
+		Position_LL.validp=0;//重新开始校准
 	}
 	else //定位不准
 	{
 		PositionCount=0;
-		PositionStruct.status=0;//发送未完成信号
-		UWBData.validp=0;//重新开始校准
-		UWBData.init_x=UWBData.init_y=PositionCount=0;
+		//PositionStruct.status=0;//发送未完成信号
+		Position_LL.validp=0;//重新开始校准
+		Position_LL.init_x=Position_LL.init_y=PositionCount=0;
 	}
 }
 void PositionCaculate(void)
 {
 		/*计算角度*/
-//	if (VisionData.error_x)
-//		PositionStruct.expect_x=VisionData.error_x;
+	if (VisionData.error_x)
+		PositionStruct.expect_x=VisionData.error_x;
 //	else 
 //		PositionStruct.expect_x=1.21;//=UWBData.x
-//	if (VisionData.error_y)
-//		PositionStruct.expect_y=VisionData.error_y;
+	if (VisionData.error_y)
+		PositionStruct.expect_y=VisionData.error_y;
 //	else 
 //		PositionStruct.expect_y=1.5;//=UWBData.y
+	/**/
 	
-	PositionStruct.actual_x=UWBData.x;	
-	PositionStruct.actual_y=UWBData.y;
+	PositionStruct.actual_x=Position_LL.x;	
+	PositionStruct.actual_y=Position_LL.y;
 		/*位置移动*/
 	PositionPID[0].Ref=PositionStruct.expect_x;
 	PositionPID[0].Fdb=PositionStruct.actual_x;//获得当前位置
@@ -390,6 +409,6 @@ void Recalibrate(void)//遥控器左侧拨杆到中间再拨回，重新校准
 		UWBData.init_x=UWBData.init_y=PositionCount=0;
 #else 
 	yaw_Base=GetYawLocation();
-	UWBData.validp=0;
+	Position_LL.validp=0;
 #endif
 }
