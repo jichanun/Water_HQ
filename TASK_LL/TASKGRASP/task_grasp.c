@@ -19,13 +19,19 @@ void LServoInit()
 5号 	 机械臂roll
 
 *******************/
-u8 SendAncher[14];
+u8 SendAncher[18];
 ConsoleBufUnion ConsoleBuf;
 void ConsoleSend()
 {
-	ConsoleBuf.vars.id=0x10;
-	ConsoleBuf.vars.expectx=0;
-	ConsoleBuf.vars.expecty=0;
+	
+	ConsoleBuf.vars.start=0xcb;
+	ConsoleBuf.vars.mode=0xf0;
+	ConsoleBuf.vars.sender=0x10;
+	ConsoleBuf.vars.receiver=0x04;
+	ConsoleBuf.vars.x1=0.1;
+	ConsoleBuf.vars.x2=0.2;
+	ConsoleBuf.vars.expectx=0.3;
+	ConsoleBuf.vars.expecty=0.4;
 	ConsoleBuf.vars.status=5;
 	for (int i=0;i<sizeof(SendAncher);i++)
 		SendAncher[i]=ConsoleBuf.ConsoleSendBuf[i];
@@ -41,6 +47,5 @@ void GraspControlTask()
 //		LobotSerialServoMove(i,LServo.Servo[i].Posi,LServo.time);
 //		
 //	}
-	SendAncher[0]=1;
 	ConsoleSend();
 }

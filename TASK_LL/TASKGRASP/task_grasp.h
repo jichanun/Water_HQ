@@ -9,13 +9,19 @@
 *********************/
 typedef union 
 {
-		u8 ConsoleSendBuf[10];
+		u8 ConsoleSendBuf[18];
   struct
   {
-	  u8 id ;
+		u8 start;
+		u8 mode;
+		u8 sender;
+		u8 receiver;
+		float x1;
+		float x2;
 	  float expectx;
 	  float expecty;
 	  u8 status;
+		u8 end;
   }vars;
 
 }ConsoleBufUnion;

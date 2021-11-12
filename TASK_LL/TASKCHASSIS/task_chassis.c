@@ -44,6 +44,8 @@ void Chassis_Init(void)
 
 }
 //420-630-840
+extern u8 AutomaticAiming;
+
 void Chassis_Control(void)
 {
 	#if  0  ///*********************调试接口
@@ -55,7 +57,8 @@ void Chassis_Control(void)
 		LL_TIM_OC_SetCompareCH2(TIM12,PWMNum);
 
 	#else
-	Position_Init(&ChassisSpeed);
+	if(AutomaticAiming)
+		Position_Init(&ChassisSpeed);
 	ChassisControl_PWM(ChassisSpeed);
 	
 	#endif
