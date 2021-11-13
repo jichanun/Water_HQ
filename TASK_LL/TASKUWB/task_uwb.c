@@ -21,8 +21,11 @@ void TagUnpack(void)
 		if (ConsoleBufRx.vars.mode==0xf0)
 		{
 			a=2;
-			if (ConsoleBufRx.vars.receiver==0x04)
-				a=3;
+			if(Position_LL.Info_Sender==0x10){
+				a=5;
+				if (ConsoleBufRx.vars.receiver==0x04)
+					a=3;
+			}
 		}
 	}
 }
@@ -55,7 +58,7 @@ void GetUwbData()
 		}break;
 		case 3:
 		{
-			for (int i =0; i<18;i++)
+			for (int i =0; i<22;i++)
 				ConsoleBufRx.ConsoleSendBuf[i]=TagInfoData[i];
 			TagUnpack();
 		}

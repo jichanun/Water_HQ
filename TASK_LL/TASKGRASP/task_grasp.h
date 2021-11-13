@@ -9,7 +9,7 @@
 *********************/
 typedef union 
 {
-		u8 ConsoleSendBuf[18];
+		u8 ConsoleSendBuf[22];
   struct
   {
 		u8 start;

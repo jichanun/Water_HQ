@@ -19,7 +19,7 @@ void LServoInit()
 5号 	 机械臂roll
 
 *******************/
-u8 SendAncher[18];
+u8 SendAncher[22];
 ConsoleBufUnion ConsoleBuf;
 void ConsoleSend()
 {
