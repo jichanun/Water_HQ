@@ -343,7 +343,8 @@ void GraspTask(void const * argument)
   for(;;)
   {
 		//GraspControlTask();
-    osDelay(LServo.time);
+		//AnchorSendBuff();
+    osDelay(2000);
   }
   /* USER CODE END GraspTask */
 }

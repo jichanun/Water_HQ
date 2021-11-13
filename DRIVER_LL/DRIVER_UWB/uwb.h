@@ -302,17 +302,22 @@ typedef struct
 {
 	uint8_t Present_Nodes ;
 	Position_Nodes Tag[TagNumber] ;
+	Position_Nodes TagLast[TagNumber] ;
 } API_Position ;
 #pragma pack()
 
 
-uint8_t Uwb_Get_Data(uint8_t* data, API_Position* TagsPosition,
+uint8_t Uwb_Get_Data(uint8_t* data, API_Position* TagsPosition, uint8_t* ID,
 								float* Pos_X,float* Pos_Y,float* Pos_Z,uint8_t* Validation,
 								uint8_t* Info_Data, uint16_t* Info_Length, uint8_t* Info_Sender ) ;	
 //返回值：1表示当前标签坐标更新，2表示全体标签坐标更新，3表示当前标签通讯内容更新
-uint8_t Uwb_BroadCast(uint8_t* data, uint8_t* TransData, uint16_t* Length);
+//uint8_t Uwb_BroadCast(uint8_t* data, uint8_t* TransData, uint16_t* Length);
+uint8_t Uwb_BroadCast(uint8_t* data, uint8_t* TransData, uint16_t* Length, //For Transfering
+										API_Position* TagsPosition,  //For Positioning
+										uint8_t* Info_Data, uint16_t* Info_Length, uint8_t* Info_Sender); //For Info
 	//需要主函数定义一个接收的字符型变量,trnasdata还需要设计一个区分位分开定位信息与用户信息
-//返回0，数据解算无效，禁止转发数据；返回1，定位数据广播；返回2，通讯数据广播
+//返回0，数据解算无效，禁止转发数据与读取数据；返回1，定位数据广播,定位数据输出；
+//返回2，通讯数据广播，通讯数据输出；返回3，基站指令广播
 
 #ifdef __cplusplus  //C艹兼容
 }

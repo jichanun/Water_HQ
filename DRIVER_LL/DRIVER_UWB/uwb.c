@@ -202,9 +202,9 @@ nlt_anchorframe0_t nlt_anchorframe0_ = {.fixed_part_size = 896,
 */
 					
 info_data_t Info_DATA ;
-uint8_t Uwb_Get_Data(uint8_t* data, API_Position* TagsPosition,
+uint8_t Uwb_Get_Data(uint8_t* data, API_Position* TagsPosition, uint8_t* ID,
 								float* Pos_X,float* Pos_Y,float* Pos_Z,uint8_t* Validation,
-								uint8_t* Info_Data, uint16_t* Info_Length, uint8_t* Info_Sender )												
+								uint8_t* Info_Data, uint16_t* Info_Length, uint8_t* Info_Sender)												
 {
 	size_t data_length;
 	
@@ -216,6 +216,7 @@ uint8_t Uwb_Get_Data(uint8_t* data, API_Position* TagsPosition,
 		{
 			nlt_tagframe0_result_t *result = &g_nlt_tagframe0.result;
 			
+			*ID = result->id ;
 			*Pos_X = result->pos_3d[0] ;
 			*Pos_Y = result->pos_3d[1] ;
 			*Pos_Z = result->pos_3d[2] ;
@@ -256,8 +257,10 @@ uint8_t Uwb_Get_Data(uint8_t* data, API_Position* TagsPosition,
 
 
 trans_data_t Trans_Data ;
-API_Position Position_Data ; //虽然是API接口结构体，但是只在内部使用,便于做内存转移
-uint8_t Uwb_BroadCast(uint8_t* data, uint8_t* TransData, uint16_t* Length)
+//API_Position Position_Data ; //虽然是API接口结构体，但是只在内部使用,便于做内存转移
+uint8_t Uwb_BroadCast(uint8_t* data, uint8_t* TransData, uint16_t* Length, //For Transfering
+										API_Position* TagsPosition,  //For Positioning
+										uint8_t* Info_Data, uint16_t* Info_Length, uint8_t* Info_Sender) //For Info
 {
 	size_t data_length;
 	
@@ -267,32 +270,33 @@ uint8_t Uwb_BroadCast(uint8_t* data, uint8_t* TransData, uint16_t* Length)
 		if (nlt_anchorframe0_.UnpackData(data, data_length))
 		{
 			nlt_anchorframe0_result_t *result = &nlt_anchorframe0_.result;
-			Position_Data.Present_Nodes = result->valid_node_count ;
-			for(uint8_t i=0; i<Position_Data.Present_Nodes; i++) //有效节点
+			TagsPosition->Present_Nodes = result->valid_node_count ;
+			for(uint8_t i=0; i<TagsPosition->Present_Nodes; i++) //有效节点
 			{
-				Position_Data.Tag[i].ID = result->nodes[i]->id ;
-				Position_Data.Tag[i].Pos_X = result->nodes[i]->pos_3d[0] ;
-				Position_Data.Tag[i].Pos_Y = result->nodes[i]->pos_3d[1] ;
-				Position_Data.Tag[i].Pos_Z = result->nodes[i]->pos_3d[2] ;
-				Position_Data.Tag[i].Validation = 0x01 ;
+				TagsPosition->Tag[i].ID = result->nodes[i]->id ;
+				TagsPosition->Tag[i].Pos_X = result->nodes[i]->pos_3d[0] ;
+				TagsPosition->Tag[i].Pos_Y = result->nodes[i]->pos_3d[1] ;
+				TagsPosition->Tag[i].Pos_Z = result->nodes[i]->pos_3d[2] ;
+				TagsPosition->Tag[i].Validation = 0x01 ;
 			}
-			for(uint8_t i=Position_Data.Present_Nodes; i<TagNumber; i++) //无效节点
+			for(uint8_t i=TagsPosition->Present_Nodes; i<TagNumber; i++) //无效节点
 			{
-				Position_Data.Tag[i].Validation = 0x00 ;
+				TagsPosition->Tag[i].Validation = 0x00 ;
 			}
 			Trans_Data.Data = TransData ;
 			Trans_Data.Data_length = 2+14*TagNumber ;
 			*Trans_Data.Data = 0x02 ; //表明信息来源于定位广播信息
-			memcpy(Trans_Data.Data+1, &Position_Data, Trans_Data.Data_length-1) ;
+			memcpy(Trans_Data.Data+1, TagsPosition, Trans_Data.Data_length-1) ;
 			*Length = Trans_Data.Data_length ;
+			
+			return 1 ;
 		}
 		else //发生解包错误
 		{
 			for(uint8_t i=0; i<TagNumber; i++)
 			{
-				Position_Data.Tag[i].Validation = 0x00 ;
+				TagsPosition->Tag[i].Validation = 0x00 ;
 			}
-			return 0 ;
 		}
 		
 		break ; }
@@ -301,25 +305,41 @@ uint8_t Uwb_BroadCast(uint8_t* data, uint8_t* TransData, uint16_t* Length)
 
 		if(NLINK_VerifyCheckSum(data, data_length))
 		{
-			Trans_Data.Sender = data[12] ;//基站接收到的数据发送者一定是ID对应的标签
+			Trans_Data.Sender = data[12] ; //基站接收到的数据发送者一定是ID对应的标签
 			Trans_Data.Receiver = NULL ;
 			Trans_Data.Data_length = (data[13] | data[14]<<8) +2;
-			Trans_Data.Data = TransData ;
+			Trans_Data.Data = TransData ; //指针定向
 			*Trans_Data.Data = 0x01 ; //表明信息来源于用户信息
 			*(Trans_Data.Data+1) = Trans_Data.Sender ;
 			memcpy(Trans_Data.Data+2, data+15, Trans_Data.Data_length-2) ;
 			Trans_Data.Node_Frame0_Nodes = data[10] ;
 			*Length = Trans_Data.Data_length ;
+			
+			*Info_Sender = Trans_Data.Sender ;
+			*Info_Length = Trans_Data.Data_length-2 ;
+			memcpy(Info_Data, data+15, Trans_Data.Data_length-2) ;
+			
+			return 2 ;
 		}
 		else  //出现解包错误
 		{
-			return 0 ;
 		}
 		break ; }
-	default:
-		return 0 ;
+	case 3:{  //Analysis for Anchor Command
+		data_length = data[0] ;
+		
+		*TransData = 0x01 ; //共享用户信息解算途径
+		TransData[1] = 0x10 ; //基站统一ID
+		memcpy(TransData+2, data+2, data_length) ;
+		*Length = data_length+2 ;
+		
+		return 3 ;
+//		break ;}
 	}
-		return 1 ;
+	default:
+		break ;
+	}
+		return 0 ;
 }
 
 
