@@ -5,7 +5,8 @@
 #include "math.h"
 #include "driver_laser.h"
 #include "driver_chassis.h"
-
+#include "usbd_cdc_if.h"
+#include "uwb.h"
 
 //遥控器灵敏度
 #define YAW_REMOTE_SENSITIVE (0.0005f)
@@ -62,7 +63,6 @@ void GimbalControlTask()
 		GimbalSetLocationDataTemp.YawSetLocation	=	yaw_OFFSET;//使用陀螺仪则取消注释
 		//此时向前运动
 	}
-	if (VisionReceiveFlag)
 		VisionControl();
 	//VisionReceiveDataClear(&VisionData);//接收重置
 
@@ -140,19 +140,20 @@ void UART3Pack(u32 *num,u8 *txbuff)//a是那个十进制数x是返回的16进制
 u8 UART3TXBUFF[57];
 u32 VisionTransmitData[14];
 extern PositionDataStruct PositionStruct;
+extern API_Position TagsPosition;
 
-
+ToRosUnion ToRosData;
 void VisionTransmit(void)
 {
 	//UART3TXBUFF[0]=UART3TXBUFF[1]=0XFF;
-	VisionTransmitData[0]=10000;
-	VisionTransmitData[1]=PositionStruct.yaw_error;//角度
+	ToRosData.vars.data0=10000;
+	ToRosData.vars.data1=0;
 	for (int i=0;i<6;i++)//发送6个标签的坐标
 	{
-		VisionTransmitData[i*2+2]=PositionStruct.Position[i].px*1000;//x（m*1000）
-		VisionTransmitData[i*2+3]=PositionStruct.Position[i].py*1000;//y（m*1000）
+		ToRosData.vars.px[i]=PositionStruct.Position[i].px*1000;//x（m*1000）
+		ToRosData.vars.py[i]=PositionStruct.Position[i].py*1000;//y（m*1000）
 	}
-	
+	ToRosData.vars.status=20;
 ////	/*****测试****************/
 //	PositionStruct.actual_x=(VisionData.error_x-PositionStruct.actual_x)*0.1+PositionStruct.actual_x;
 //	PositionStruct.actual_y=((VisionData.error_y-PositionStruct.actual_y)*0.1+PositionStruct.actual_y);
@@ -161,10 +162,11 @@ void VisionTransmit(void)
 //	VisionTransmitData[2]=PositionStruct.actual_x*1000;//x（m*1000）
 //	VisionTransmitData[3]=PositionStruct.actual_y*1000;//y（m*1000）
 //	/*****测试****************/
-	UART3Pack(VisionTransmitData,UART3TXBUFF);
-	UART3TXBUFF[56]=20;//PositionStruct.status;//标志位(不为0可用)
+//	UART3Pack(VisionTransmitData,UART3TXBUFF);
+	for (int i = 0 ;i < 57 ;i++)
+		UART3TXBUFF[i]=ToRosData.buf[i];
 //	UART3TXBUFF[16]=20;//标志位(为1 可用)
-	uart3WriteBuf(UART3TXBUFF,57);
+	CDC_Transmit_FS(UART3TXBUFF,57);
 	
 }
 

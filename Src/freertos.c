@@ -321,7 +321,7 @@ void GimbalTask(void const * argument)
   {
 		//StraightLineMotorControl();
 		GimbalControlTask();
-    osDelay(1);
+    osDelay(100);
   }
   /* USER CODE END GimbalTask */
 }
@@ -343,8 +343,8 @@ void GraspTask(void const * argument)
   for(;;)
   {
 		//GraspControlTask();
-		//AnchorSendBuff();
-    osDelay(2000);
+		AnchorSendBuff();
+    osDelay(200);
   }
   /* USER CODE END GraspTask */
 }

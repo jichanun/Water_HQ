@@ -85,6 +85,7 @@ extern TIM_HandleTypeDef htim7;
 extern SemaphoreHandle_t xSemaphore;//wifi的二值信号
 u8 VisionReceiveFlag=0;
 extern u8 UWB_Flag;
+u8 RosReceiveFlag=0;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -401,6 +402,7 @@ void OTG_FS_IRQHandler(void)
 
   /* USER CODE END OTG_FS_IRQn 0 */
   HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
+	RosReceiveFlag=1;
   /* USER CODE BEGIN OTG_FS_IRQn 1 */
 
   /* USER CODE END OTG_FS_IRQn 1 */

@@ -127,7 +127,7 @@ uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
-uint8_t UsbRxBuf[30];
+uint8_t UsbRxBuf[60];
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -295,7 +295,7 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 	
 	memcpy(UsbRxBuf,Buf,*Len);										//接收的数据放在UsbRxBuf中
-	CDC_Transmit_FS(UsbRxBuf,sizeof(UsbRxBuf));		//发送
+	//CDC_Transmit_FS(UsbRxBuf,57);		//发送
 
   return (USBD_OK);
   /* USER CODE END 6 */

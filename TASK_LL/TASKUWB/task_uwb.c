@@ -1,6 +1,6 @@
 #include "uwb.h" 
 #include "task_uwb.h" 
-
+#include "task_gimbal.h"
 API_Struct Position_LL;
 extern u8 UART2BUFF[1000];
 u8 TagInfoData[128];
@@ -37,14 +37,25 @@ void GetAnchorData()
 	}
 	
 }
-u8 AnchorSend[10];
-
+u8 AnchorSend[60];
+extern uint8_t UsbRxBuf[60];
+extern u8 RosReceiveFlag;
+ToRosUnion ToAncherData;
 void AnchorSendBuff(void)
 {
-	AnchorSend[0]=8;
-	AnchorSend[1]=3;
-	for (int i =2;i<10;i++)
-		AnchorSend[i]=0xff;
-	bsp_usart2_send(AnchorSend,sizeof(AnchorSend));
+	if (RosReceiveFlag)
+	{
+		for (int i =0;i<57;i++)
+			ToAncherData.buf[i]=UsbRxBuf[i];
+		
+		AnchorSend[0]=57;//长度
+		AnchorSend[1]=3;//功能勿动
+		for (int i =2;i<59;i++)
+			AnchorSend[i]=ToAncherData.buf[i-2];
+		
+		Uwb_BroadCast(AnchorSend,AnchorTransferData,&Trans_Length,&TagsPosition
+				, Anchor_Info_Data,&Anchor_Info_Length,&Anchor_Info_Sender);
+	}
+	RosReceiveFlag=0;
 }
 
