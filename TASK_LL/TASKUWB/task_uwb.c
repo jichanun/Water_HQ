@@ -61,9 +61,8 @@ void GetUwbData()
 		case 3:
 		{
 			for (int i =0; i<22;i++)
-				//ConsoleBufRx.ConsoleSendBuf[i]=TagInfoData[i];
 				ROSData.buf[i]=TagInfoData[i];
-			TagUnpack();
+			//TagUnpack();//no need for this ,in driver.c 's test module.
 		}
 			break;
 		default:break;

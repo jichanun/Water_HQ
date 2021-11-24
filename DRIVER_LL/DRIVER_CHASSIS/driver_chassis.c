@@ -12,7 +12,7 @@
 #include "math.h"
 #include "uwb.h" 
 #include "task_uwb.h" 
-
+#include "task_grasp.h"
 ChassisMotorStruct ChassisMotor[4];
 
 #define AUTO_CALIBRATE 0//自动校准
@@ -370,9 +370,11 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 		Position_LL.init_x=Position_LL.init_y=PositionCount=0;
 	}
 }
+extern ToRosUnion ROSData;
+
 void PositionCaculate(void)
 {
-	#if 0 //使用树莓派数据
+	#if 1 //使用树莓派数据
 		/*计算角度*/
 	if (VisionData.error_x)
 		PositionStruct.expect_x=VisionData.error_x;
@@ -383,6 +385,22 @@ void PositionCaculate(void)
 //	else 
 //		PositionStruct.expect_y=1.5;//=UWBData.y
 	/**/
+	#endif
+	
+	#if 1 //测试代码
+	//这里是判断数据的来源到底是树莓还是ROS。并且树莓派数据的优先级更高。
+	//但是如果有错误数据输入进来，则会影响整个系统的稳定并需要重启，所以仅为测试代码，后期毕设时可以直接删除
+			/*计算角度*/
+		if (VisionData.error_x&&VisionData.error_y)
+		{
+			PositionStruct.expect_x=VisionData.error_x;
+			PositionStruct.expect_y=VisionData.error_y;
+		}
+		else if (ROSData.vars.px[SELF_ID]&&ROSData.vars.py[SELF_ID])
+		{
+			PositionStruct.expect_x=ROSData.vars.px[SELF_ID];
+			PositionStruct.expect_y=ROSData.vars.py[SELF_ID];
+		}
 	#endif
 	PositionStruct.actual_x=Position_LL.x;	
 	PositionStruct.actual_y=Position_LL.y;
