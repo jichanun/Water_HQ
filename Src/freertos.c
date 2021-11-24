@@ -344,7 +344,7 @@ void GraspTask(void const * argument)
   {
 		//GraspControlTask();
 		AnchorSendBuff();
-    osDelay(200);
+    osDelay(50);
   }
   /* USER CODE END GraspTask */
 }

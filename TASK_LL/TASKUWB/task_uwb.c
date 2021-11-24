@@ -1,6 +1,7 @@
 #include "uwb.h" 
 #include "task_uwb.h" 
 #include "task_gimbal.h"
+#include "driver_chassis.h"
 API_Struct Position_LL;
 extern u8 UART2BUFF[1000];
 u8 TagInfoData[128];
@@ -11,6 +12,8 @@ API_Position TagsPosition;
 u8 Anchor_Info_Data[128];
 u16 Anchor_Info_Length;
 u8 Anchor_Info_Sender;
+extern PositionDataStruct PositionStruct;
+
 uint8_t bsp_usart2_send(uint8_t *data,uint32_t len)
 {
 	while (LL_USART_IsActiveFlag_TC(USART2) == 0){
@@ -27,13 +30,36 @@ void GetUwbData()
 //	,&Position_LL.z,&Position_LL.Validation,TagInfoData,&Position_LL.Info_Length,
 //	&Position_LL.Info_Sender);
 }
+float PFilterK=0.1;
 
 void GetAnchorData()
 {
-	if (Uwb_BroadCast(UART2BUFF,AnchorTransferData,&Trans_Length,&TagsPosition
+	switch (Uwb_BroadCast(UART2BUFF,AnchorTransferData,&Trans_Length,&TagsPosition
 		, Anchor_Info_Data,&Anchor_Info_Length,&Anchor_Info_Sender))
 	{
-		bsp_usart2_send(AnchorTransferData,Trans_Length);
+		case 1 :
+		{
+			for (int i =0;i<TagsPosition.Present_Nodes;i++)
+			{
+				if (TagsPosition.Tag[i].Validation)
+				{
+					#if 1  //Filter
+						TagsPosition.Tag[i].Pos_X=TagsPosition.Tag[i].Pos_X*PFilterK+TagsPosition.TagLast[i].Pos_X*(1-PFilterK);
+						TagsPosition.Tag[i].Pos_Y=TagsPosition.Tag[i].Pos_Y*PFilterK+TagsPosition.TagLast[i].Pos_Y*(1-PFilterK);
+						TagsPosition.TagLast[i].Pos_X=TagsPosition.Tag[i].Pos_X;
+						TagsPosition.TagLast[i].Pos_Y=TagsPosition.Tag[i].Pos_Y;
+					#endif
+					PositionStruct.Position[TagsPosition.Tag[i].ID].px=TagsPosition.Tag[i].Pos_X;
+					PositionStruct.Position[TagsPosition.Tag[i].ID].py=TagsPosition.Tag[i].Pos_Y;
+					TagsPosition.Tag[i].Validation=0;
+				}
+			}
+		}
+		case 2 :
+		case 3 :
+			bsp_usart2_send(AnchorTransferData,Trans_Length);
+		break;
+		default: break;
 	}
 	
 }
