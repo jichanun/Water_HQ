@@ -342,8 +342,8 @@ void GraspTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		GraspControlTask();
-    osDelay(2000);
+		//GraspControlTask();
+    osDelay(20);
   }
   /* USER CODE END GraspTask */
 }

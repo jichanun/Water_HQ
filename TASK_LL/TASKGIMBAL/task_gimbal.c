@@ -244,7 +244,7 @@ void VisionControl(void)
 //					(VisionData.change_angle>=-25.0f*VisionYawIncreasement.Kp&&VisionData.change_angle<=-3.0f*VisionYawIncreasement.Kp))
 				if(fabs(YawMotor.Location.SetLocation-YawMotor.Location.Location)<0.05)
 				{
-						YawSetLocationValueChange(-VisionData.change_angle);
+//						YawSetLocationValueChange(-VisionData.change_angle);
 				}
 		}
 		

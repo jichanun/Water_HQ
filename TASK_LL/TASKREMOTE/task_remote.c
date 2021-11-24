@@ -495,13 +495,13 @@ RemoteDataPortStruct RemoteDataCalculate(RemoteDataProcessedStruct	RemoteDataRec
 	{
 		case	REMOTE_MODE:
 			RemoteDataPortTemp	=	RemoteModeProcessData(RemoteDataReceive);
-				AutomaticAiming=0;
-			break;
-		case	KEYBOARD_MODE:
-			RemoteDataPortTemp	=	AutoModeProcessData1(RemoteDataReceive);
 				AutomaticAiming=1;
 			break;
 		case	AUTO_MODE:
+			RemoteDataPortTemp	=	AutoModeProcessData(RemoteDataReceive);
+				AutomaticAiming=0;
+			break;
+		case	KEYBOARD_MODE:
 			RemoteDataPortTemp	=	AutoModeProcessData(RemoteDataReceive);
 			AutomaticAiming=1;
 			Recalibrate();
@@ -557,7 +557,10 @@ void RemoteDataPortProcessed(RemoteDataPortStruct	RemoteDataPort)
 	YawSetLocationValueChange((RemoteDataPort.YawIncrement)/300);
 	//PitchSetLocationValueChange(RemoteDataPort.PitchIncrement/1000);
 //	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError,PitchError);	//yaw轴测试用。需要注释
+	if (AutomaticAiming)
 	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX+PositionStruct.speedx,RemoteDataPort.ChassisSpeedY+PositionStruct.speedy,YAWError,0);	
+	else 
+	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY,YAWError,0);	
 	#else //****如果不使用陀螺仪，右摇杆控制方向 
 	ChassisSetSpeed(RemoteDataPort.ChassisSpeedX,RemoteDataPort.ChassisSpeedY+VisionRho,RemoteDataPort.YawIncrement,0);//RemoteDataPort.PitchIncrement);	
 	#endif
