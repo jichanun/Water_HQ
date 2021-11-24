@@ -372,6 +372,7 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 }
 void PositionCaculate(void)
 {
+	#if 0 //使用树莓派数据
 		/*计算角度*/
 	if (VisionData.error_x)
 		PositionStruct.expect_x=VisionData.error_x;
@@ -382,7 +383,7 @@ void PositionCaculate(void)
 //	else 
 //		PositionStruct.expect_y=1.5;//=UWBData.y
 	/**/
-	
+	#endif
 	PositionStruct.actual_x=Position_LL.x;	
 	PositionStruct.actual_y=Position_LL.y;
 		/*位置移动*/

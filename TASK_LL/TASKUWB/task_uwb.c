@@ -10,11 +10,13 @@ extern u8 SELF_ID;
 float PFilterK=0.1;
 
 ConsoleBufUnion ConsoleBufRx;
-
+ToRosUnion ROSData;
 void TagUnpack(void)
 {
 	
 	int a =0;
+	PositionStruct.expect_x=ROSData.vars.px[SELF_ID];
+	PositionStruct.expect_y=ROSData.vars.py[SELF_ID];
 	if (ConsoleBufRx.vars.start==0xcb)
 	{
 		a=1;
@@ -59,7 +61,8 @@ void GetUwbData()
 		case 3:
 		{
 			for (int i =0; i<22;i++)
-				ConsoleBufRx.ConsoleSendBuf[i]=TagInfoData[i];
+				//ConsoleBufRx.ConsoleSendBuf[i]=TagInfoData[i];
+				ROSData.buf[i]=TagInfoData[i];
 			TagUnpack();
 		}
 			break;

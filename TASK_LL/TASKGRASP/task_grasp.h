@@ -26,6 +26,17 @@ typedef union
 
 }ConsoleBufUnion;
 
+typedef union
+{
+	u8 buf[57];
+	struct{
+		float data0;
+		float data1;
+		float px[6];
+		float py[6];
+		u8 status;
+	}vars;
+}ToRosUnion;
 
 
 
