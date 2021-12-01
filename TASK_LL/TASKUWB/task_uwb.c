@@ -81,6 +81,7 @@ void AnchorSendBuff(void)
 		
 		Uwb_BroadCast(AnchorSend,AnchorTransferData,&Trans_Length,&TagsPosition
 				, Anchor_Info_Data,&Anchor_Info_Length,&Anchor_Info_Sender);
+		bsp_usart2_send(AnchorTransferData,Trans_Length);
 	}
 	RosReceiveFlag=0;
 }
