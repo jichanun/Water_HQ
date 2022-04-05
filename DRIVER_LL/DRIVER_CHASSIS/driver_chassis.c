@@ -268,13 +268,13 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 	}	
 	else 
 	{		
-		if (SELF_ID==3||SELF_ID==4){
+		if (SELF_ID==3){
 			speed0=(s16)(-(ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 			speed1=(s16)(-(ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 			speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 			speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 		}
-		else if (  SELF_ID==5){
+		else if ( SELF_ID==4||SELF_ID==5){
 			speed0=(s16)((ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 			speed1=(s16)((ChassisMotor[1].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 			speed2=(s16)((ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
