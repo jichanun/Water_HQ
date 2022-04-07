@@ -23,6 +23,7 @@ enum
 
 u8 FlagGimbalLock=0;
 u8 SomeThing[1];
+u8 AutoBackFlag=0;
 RemoteDataPortStruct RemoteModeProcessData(RemoteDataProcessedStruct	RemoteDataReceive)
 {
 	RemoteDataPortStruct	RemoteDataPortTemp={0};
@@ -38,13 +39,15 @@ RemoteDataPortStruct RemoteModeProcessData(RemoteDataProcessedStruct	RemoteDataR
 	{
 		case 1:RemoteDataPortTemp.Friction=DISABLE;
 					RemoteDataPortTemp.FeedMotor=DISABLE;
+		AutoBackFlag=0;
 			break;
 		case 2:RemoteDataPortTemp.Friction=ENABLE;
 					RemoteDataPortTemp.FeedMotor=ENABLE;
+		AutoBackFlag=0;
 			break;
 		case 3:RemoteDataPortTemp.Friction=ENABLE;
 					RemoteDataPortTemp.FeedMotor=DISABLE;
-					
+					AutoBackFlag=1;
 			break;
 		default:
 			break;
@@ -503,7 +506,7 @@ RemoteDataPortStruct RemoteDataCalculate(RemoteDataProcessedStruct	RemoteDataRec
 			break;
 		case	KEYBOARD_MODE:
 			RemoteDataPortTemp	=	AutoModeProcessData(RemoteDataReceive);
-			AutomaticAiming=1;
+			AutomaticAiming=0;
 			Recalibrate();
 			break;
 	}

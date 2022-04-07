@@ -371,6 +371,7 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed)
 	}
 }
 extern ToRosUnion ROSData;
+extern u8 AutoBackFlag;
 
 void PositionCaculate(void)
 {
@@ -402,6 +403,62 @@ void PositionCaculate(void)
 			PositionStruct.expect_y=ROSData.vars.py[SELF_ID];
 		}
 	#endif
+	
+	if (AutoBackFlag)//机器人自动回位
+	{
+		switch (SELF_ID)
+		{
+			case 2:
+				if (ROSData.vars.status==1)//一字围捕
+				{
+					PositionStruct.expect_x=0;
+					PositionStruct.expect_y=0;
+				}
+				else if(ROSData.vars.status==2)//菱形围捕
+				{
+					PositionStruct.expect_x=4.5;
+					PositionStruct.expect_y=2;
+				}
+			break;
+			case 3:
+				if (ROSData.vars.status==1)//一字围捕
+				{
+					PositionStruct.expect_x=3;
+					PositionStruct.expect_y=0;
+				}
+				else if(ROSData.vars.status==2)//菱形围捕
+				{
+					PositionStruct.expect_x=3;
+					PositionStruct.expect_y=1;
+				}
+			break;
+			case 4:
+				if (ROSData.vars.status==1)//一字围捕
+				{
+					PositionStruct.expect_x=6;
+					PositionStruct.expect_y=0;
+				}
+				else if(ROSData.vars.status==2)//菱形围捕
+				{
+					PositionStruct.expect_x=6;
+					PositionStruct.expect_y=1;
+				}
+			break;
+			case 5:
+				if (ROSData.vars.status==1)//一字围捕
+				{
+					PositionStruct.expect_x=9;
+					PositionStruct.expect_y=0;
+				}
+				else if(ROSData.vars.status==2)//菱形围捕
+				{
+					PositionStruct.expect_x=9;
+					PositionStruct.expect_y=1;
+				}
+			break;
+		}
+	}
+		
 	PositionStruct.actual_x=Position_LL.x;	
 	PositionStruct.actual_y=Position_LL.y;
 		/*位置移动*/
