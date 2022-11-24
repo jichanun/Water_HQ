@@ -28,12 +28,12 @@ typedef union
 
 typedef union
 {
-	u8 buf[57];
+	u8 buf[64];
 	struct{
 		float data0;
 		float data1;
-		float px[6];
-		float py[6];
+		float px[7];
+		float py[7];
 		u8 status;
 	}vars;
 }ToRosUnion;

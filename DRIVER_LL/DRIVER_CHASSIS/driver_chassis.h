@@ -53,7 +53,7 @@ typedef struct
 	float speedx;
 	float speedy;
 	u8 status;
-	OPositionStruct Position[6];//0 Target 1-5 Friends 5 
+	OPositionStruct Position[7];//0 Target 1-5 Friends 5 
 }PositionDataStruct ;
 extern ChassisMotorStruct ChassisMotor[4];
 

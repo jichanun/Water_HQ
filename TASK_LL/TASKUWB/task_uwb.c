@@ -60,7 +60,7 @@ void GetUwbData()
 		}break;
 		case 3:
 		{
-			for (int i =0; i<57;i++)
+			for (int i =0; i<65;i++)
 				ROSData.buf[i]=TagInfoData[i];
 			//TagUnpack();//no need for this ,in driver.c 's test module.
 		}
