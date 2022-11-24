@@ -63,20 +63,20 @@ void GetAnchorData()
 	}
 	
 }
-u8 AnchorSend[60];
-extern uint8_t UsbRxBuf[60];
+u8 AnchorSend[68];
+extern uint8_t UsbRxBuf[68];
 extern u8 RosReceiveFlag;
 ToRosUnion ToAncherData;
 void AnchorSendBuff(void)
 {
 	if (RosReceiveFlag)
 	{
-		for (int i =0;i<57;i++)
+		for (int i =0;i<65;i++)
 			ToAncherData.buf[i]=UsbRxBuf[i];
 		
-		AnchorSend[0]=57;//长度
+		AnchorSend[0]=65;//长度
 		AnchorSend[1]=3;//功能勿动
-		for (int i =2;i<59;i++)
+		for (int i =2;i<67;i++)
 			AnchorSend[i]=ToAncherData.buf[i-2];
 		
 		Uwb_BroadCast(AnchorSend,AnchorTransferData,&Trans_Length,&TagsPosition

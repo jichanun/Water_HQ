@@ -137,7 +137,7 @@ void UART3Pack(u32 *num,u8 *txbuff)//a是那个十进制数x是返回的16进制
 	 
 }
 
-u8 UART3TXBUFF[57];
+u8 UART3TXBUFF[65];
 u32 VisionTransmitData[14];
 extern PositionDataStruct PositionStruct;
 extern API_Position TagsPosition;
@@ -148,7 +148,7 @@ void VisionTransmit(void)
 	//UART3TXBUFF[0]=UART3TXBUFF[1]=0XFF;
 	ToRosData.vars.data0=10000;
 	ToRosData.vars.data1=0;
-	for (int i=0;i<6;i++)//发送6个标签的坐标
+	for (int i=0;i<7;i++)//发送6个标签的坐标
 	{
 		ToRosData.vars.px[i]=PositionStruct.Position[i].px*1000;//x（m*1000）
 		ToRosData.vars.py[i]=PositionStruct.Position[i].py*1000;//y（m*1000）
@@ -163,10 +163,10 @@ void VisionTransmit(void)
 //	VisionTransmitData[3]=PositionStruct.actual_y*1000;//y（m*1000）
 //	/*****测试****************/
 //	UART3Pack(VisionTransmitData,UART3TXBUFF);
-	for (int i = 0 ;i < 57 ;i++)
+	for (int i = 0 ;i < 65 ;i++)
 		UART3TXBUFF[i]=ToRosData.buf[i];
 //	UART3TXBUFF[16]=20;//标志位(为1 可用)
-	CDC_Transmit_FS(UART3TXBUFF,57);
+	CDC_Transmit_FS(UART3TXBUFF,65);
 	
 }
 

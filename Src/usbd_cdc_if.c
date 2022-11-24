@@ -127,7 +127,7 @@ uint8_t UserRxBufferFS[APP_RX_DATA_SIZE];
 uint8_t UserTxBufferFS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
-uint8_t UsbRxBuf[60];
+uint8_t UsbRxBuf[68];
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
