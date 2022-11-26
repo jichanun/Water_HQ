@@ -317,6 +317,17 @@ uint8_t Uwb_BroadCast(uint8_t* data, uint8_t* TransData, uint16_t* Length)
 			return 0 ;
 		}
 		break ; }
+	
+	case 3:{  //Analysis for Anchor Command
+	data_length = data[0] ;
+	
+	*TransData = 0x01 ; //共享用户信息解算途径
+	TransData[1] = 1 ; //用户统一ID
+	memcpy(TransData+2, data+2, data_length) ;
+	*Length = data_length+2 ;
+	
+	return 3 ;
+	}
 	default:
 		return 0 ;
 	}

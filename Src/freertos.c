@@ -82,6 +82,10 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+#include "mapinit.h"
+#include "planner.h"
+#include "lqr.h"
+#include "model.h"
 
 /* USER CODE END PTD */
 
@@ -338,12 +342,35 @@ extern LobotServoData LServo;
 void GraspTask(void const * argument)
 {
   /* USER CODE BEGIN GraspTask */
-	LServoInit();
+	float Ur[7] = {0};
+	Map_Init();
+	BSRRTStar();
+	setPath();
   /* Infinite loop */
   for(;;)
   {
-		//GraspControlTask();
-    osDelay(20);
+		/*更新X*/
+	X[0] = ReturnX();
+	X[1] = 0;
+	X[2] = ReturnY();
+	X[3] = 0;
+	X[4] = ReturnZ();
+	X[5] = 0;
+	X[6] = GetPitchLocation();
+	X[7] = ReturnGX();
+	X[8] = GetRollLocation();
+	X[9] = ReturnGY();
+	X[10] = ReturnYawErr();
+	X[11] = ReturnGZ();
+		/*end*/
+		setXr();
+		
+		
+		
+		getU(Xr,Ur);
+			
+
+    osDelay(100);
   }
   /* USER CODE END GraspTask */
 }

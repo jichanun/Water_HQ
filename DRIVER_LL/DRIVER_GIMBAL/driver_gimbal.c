@@ -372,7 +372,20 @@ float GetYawGyroValue()
 float GetYawLocation()
 {
 	return YawMotor.Location.Location;
-	
+}
+float GetPitchLocation()
+{
+	return PitchMotor.Location.Location;
+}
+float GetRollLocation()
+{
+	return RollMotor.Location.Location;
+}
+void GetVxyz(void)
+{
+	Gyroscope.vx+=Gyroscope.ax*0.098/1000;//m/s
+	Gyroscope.vy+=Gyroscope.ay*0.098/1000;//m/s
+	Gyroscope.vz+=(Gyroscope.az+100)*0.098/1000;//m/s
 }
 void GyroAndEncoderDataGet(void)					//陀螺仪值定时更新，1ms
 {
@@ -383,11 +396,26 @@ void GyroAndEncoderDataGet(void)					//陀螺仪值定时更新，1ms
 //	}
 	HI229_Get_Gyroscope_Location(&Gyroscope.yaw,&Gyroscope.pitch,&Gyroscope.roll);
 	HI229_Get_Gyroscope_Speed(&Gyroscope.speed_x,&Gyroscope.speed_y,&Gyroscope.speed_z);
-
+	HI229_Get_Gyroscope_Acceleration(&Gyroscope.ax,&Gyroscope.ay,&Gyroscope.az);//0.01G=0.098m/s2
+	GetVxyz();
 	//EncoderDataSave	=	YawPitchEncoderDataUpdate();
 	GyroDataSave = YawPitchGyroDataUpdate( Gyroscope.yaw,Gyroscope.roll,Gyroscope.pitch);
 
 }
+float ReturnGX(void)
+{
+	return Gyroscope.speed_x;
+}
+float ReturnGY(void)
+{
+	return Gyroscope.speed_y;
+}
+float ReturnGZ(void)
+{
+	return Gyroscope.speed_z;
+}
+
+
 void YawSetLocationValueChange(float Yaw);
 void PitchSetLocationValueChange(float Pitch);
 void GimbalDataInput(GimbalSetLocationStruct GimbalData)

@@ -57,9 +57,11 @@ void Chassis_Control(void)
 		LL_TIM_OC_SetCompareCH2(TIM12,PWMNum);
 
 	#else
-	if(AutomaticAiming)
-		Position_Init(&ChassisSpeed);
-	ChassisControl_PWM(ChassisSpeed);
+//	if(AutomaticAiming)
+//		Position_Init(&ChassisSpeed);
+	
+	if(!AutomaticAiming)
+		ChassisControl_PWM(ChassisSpeed);
 	
 	#endif
 

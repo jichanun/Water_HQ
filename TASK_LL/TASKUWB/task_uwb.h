@@ -24,7 +24,9 @@ typedef struct
 
 
 void GetUwbData(void);
-
+float ReturnX(void);
+float ReturnY(void);
+float ReturnZ(void);
 
 
 

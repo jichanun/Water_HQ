@@ -71,6 +71,7 @@ void Position_Init(ChassisSpeedMessegePort *ChassisSpeed);
 
 void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed);
 void Recalibrate(void);
+float ReturnYawErr(void);
 #endif
 
 #endif

@@ -500,6 +500,8 @@ RemoteDataPortStruct RemoteDataCalculate(RemoteDataProcessedStruct	RemoteDataRec
 		case	AUTO_MODE:
 			RemoteDataPortTemp	=	AutoModeProcessData(RemoteDataReceive);
 				AutomaticAiming=0;
+					Recalibrate();
+
 			break;
 		case	KEYBOARD_MODE:
 			RemoteDataPortTemp	=	AutoModeProcessData(RemoteDataReceive);

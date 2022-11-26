@@ -431,3 +431,8 @@ void Recalibrate(void)//遥控器左侧拨杆到中间再拨回，重新校准
 	Position_LL.validp=0;
 #endif
 }
+float ReturnYawErr(void)
+{
+	return (GetYawLocation()-yaw_Base)*2*PIE;
+	
+}

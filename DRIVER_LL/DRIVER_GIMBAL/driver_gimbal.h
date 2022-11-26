@@ -82,11 +82,23 @@ typedef struct
 	float speed_x;
 	float speed_y;
 	float speed_z;
+	float ax;
+	float ay;
+	float az;
+	float vx;
+	float vy;
+	float vz;
 }GyroscopeStruct;
 
 float GetYawEncoderValue(void);
 float GetYawGyroValue(void);
 float GetYawLocation(void);
+float GetPitchLocation(void);
+float GetRollLocation(void);
+float ReturnGX(void);
+float ReturnGY(void);
+float ReturnGZ(void);
+
 void GimbalPIDClear(void);
 void GimbalDataInit(void);
 void PitchDataInit(void);
