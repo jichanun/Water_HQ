@@ -79,7 +79,6 @@ void GetUwbData()
 							bsp_usart2_send(AnchorTransferData,Trans_Length);
 
 					#endif
-			break;
 		}
 		case 2:{
 		SELF_ID=Position_LL.id;
