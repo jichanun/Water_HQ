@@ -16,12 +16,13 @@ void VisionTransmit(void);
 
 typedef union
 {
-	u8 buf[65];
+	u8 buf[69];
 	struct{
 		float data0;
 		float data1;
 		float px[7];
 		float py[7];
+		u32 time;
 		u8 status;
 	}vars;
 }ToRosUnion;

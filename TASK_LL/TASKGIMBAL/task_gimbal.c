@@ -137,23 +137,28 @@ void UART3Pack(u32 *num,u8 *txbuff)//a是那个十进制数x是返回的16进制
 	 
 }
 
-u8 UART3TXBUFF[65];
+u8 UART3TXBUFF[69];
 u32 VisionTransmitData[14];
 extern PositionDataStruct PositionStruct;
 extern API_Position TagsPosition;
+extern u8  Rec[69];//从机器人收到的
 
 ToRosUnion ToRosData;
 void VisionTransmit(void)
 {
 	//UART3TXBUFF[0]=UART3TXBUFF[1]=0XFF;
-	ToRosData.vars.data0=10000;
-	ToRosData.vars.data1=0;
+	ToRosData.vars.data0=(s16)((Rec[4]<<8)|Rec[5])/1000.0f;//x
+	ToRosData.vars.data1=(s16)((Rec[6]<<8)|Rec[7])/1000.0f;//y
 	for (int i=0;i<7;i++)//发送6个标签的坐标
 	{
 		ToRosData.vars.px[i]=PositionStruct.Position[i].px*1000;//x（m*1000）
 		ToRosData.vars.py[i]=PositionStruct.Position[i].py*1000;//y（m*1000）
 	}
 	ToRosData.vars.status=20;
+	for(int j=65;j<69;j++)
+	ToRosData.vars.time=
+	(u32)Rec[3]|Rec[2]<<8|Rec[1]<<16|Rec[0]<<24;
+	
 ////	/*****测试****************/
 //	PositionStruct.actual_x=(VisionData.error_x-PositionStruct.actual_x)*0.1+PositionStruct.actual_x;
 //	PositionStruct.actual_y=((VisionData.error_y-PositionStruct.actual_y)*0.1+PositionStruct.actual_y);
@@ -163,10 +168,10 @@ void VisionTransmit(void)
 //	VisionTransmitData[3]=PositionStruct.actual_y*1000;//y（m*1000）
 //	/*****测试****************/
 //	UART3Pack(VisionTransmitData,UART3TXBUFF);
-	for (int i = 0 ;i < 65 ;i++)
+	for (int i = 0 ;i < 69 ;i++)
 		UART3TXBUFF[i]=ToRosData.buf[i];
 //	UART3TXBUFF[16]=20;//标志位(为1 可用)
-	CDC_Transmit_FS(UART3TXBUFF,65);
+	CDC_Transmit_FS(UART3TXBUFF,69);
 	
 }
 
