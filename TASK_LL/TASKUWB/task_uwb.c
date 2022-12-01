@@ -58,9 +58,8 @@ void GetAnchorData()
 		case 2 :
 			for (int i=0;i< Anchor_Info_Length;i++)
 			Rec[i]=Anchor_Info_Data[i+2];
-		break;
 		case 3 :
-			//bsp_usart2_send(AnchorTransferData,Trans_Length);
+			bsp_usart2_send(AnchorTransferData,Trans_Length);
 		break;
 		default: break;
 	}
@@ -72,16 +71,10 @@ extern u8 RosReceiveFlag;
 ToRosUnion ToAncherData;
 void AnchorSendBuff(void)
 {
-//	if (RosReceiveFlag)
-//	
-	for (int i =0;i<7;i++)
+	if (RosReceiveFlag)
 	{
-		ToAncherData.vars.px[i] = PositionStruct.Position[i].px;
-		ToAncherData.vars.py[i] = PositionStruct.Position[i].px;
-		
-	}
-//		for (int i =0;i<65;i++)
-//			ToAncherData.buf[i]=UsbRxBuf[i];
+		for (int i =0;i<65;i++)
+			ToAncherData.buf[i]=UsbRxBuf[i];
 		
 		AnchorSend[0]=65;//长度
 		AnchorSend[1]=3;//功能勿动
@@ -91,7 +84,7 @@ void AnchorSendBuff(void)
 		Uwb_BroadCast(AnchorSend,AnchorTransferData,&Trans_Length,&TagsPosition
 				, Anchor_Info_Data,&Anchor_Info_Length,&Anchor_Info_Sender);
 		bsp_usart2_send(AnchorTransferData,Trans_Length);
-//	}
+	}
 	RosReceiveFlag=0;
 }
 
