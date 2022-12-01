@@ -287,10 +287,20 @@ void ChassisControl_PWM(ChassisSpeedMessegePort ChassisSpeed)
 			speed2=(s16)(-(ChassisMotor[2].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 			speed3=(s16)(-(ChassisMotor[3].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
 	}
-		LL_TIM_OC_SetCompareCH1(TIM2,speed3);
-		LL_TIM_OC_SetCompareCH2(TIM2,speed2);
-		LL_TIM_OC_SetCompareCH3(TIM8,speed0);
-		LL_TIM_OC_SetCompareCH4(TIM8,speed1);
+		if(SELF_ID == 1)
+		{
+			LL_TIM_OC_SetCompareCH1(TIM2,speed3);
+			LL_TIM_OC_SetCompareCH2(TIM4,speed2);
+			LL_TIM_OC_SetCompareCH3(TIM8,speed0);
+			LL_TIM_OC_SetCompareCH4(TIM8,speed1);
+		}
+		else 
+		{
+			LL_TIM_OC_SetCompareCH1(TIM2,speed3);
+			LL_TIM_OC_SetCompareCH2(TIM2,speed2);
+			LL_TIM_OC_SetCompareCH3(TIM8,speed0);
+			LL_TIM_OC_SetCompareCH4(TIM8,speed1);
+		}
 	}
 	#else  //关闭关控保护
 		speed0=(u16)((ChassisMotor[0].Speed.SetSpeed*ChassisSpeedK)+MIDDLE_PWM);
