@@ -25,6 +25,7 @@ extern double Qq;
 extern double Qdq;
 extern double Rr;
 extern double Rdr;
+extern double Mw;
 
 extern double Xn;
 extern double Up;

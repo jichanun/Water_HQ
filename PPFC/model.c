@@ -55,6 +55,7 @@ void getAr(float* Xr, float* Ur){
 	
 	Ar[8][9] = 1;
 	
+	Ar[9][5] = Mw/(Iyy-Qdq);
 	Ar[9][7] = Xr[11]*(Izz-Ixx)/(Iyy-Qdq);
 	Ar[9][9] = Qq/(Iyy-Qdq);
 	Ar[9][11] = Xr[7]*(Izz-Ixx)/(Iyy-Qdq);

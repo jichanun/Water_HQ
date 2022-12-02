@@ -2,7 +2,7 @@
 #define _FC_INIT
 #include "fcinit.h"
 
-double m = 16.59;
+double m = 7.25;
 
 double Ixx = 0.8102;
 double Iyy = 1.5717;
@@ -14,18 +14,19 @@ double lvx = 0.107;
 double lmx = 0.267;
 double lh = 0.220;
 
-double Xu = 0.002;
-double Xdu = 0.022;
-double Yv = -0.034;
-double Ydv = -0.034;
-double Zw = -0.036;
-double Zdw = -0.036;
-double Pp = -0.025;
-double Pdp = 0.024;
-double Qq = -0.0066;
-double Qdq = 0.0056;
-double Rr = -0.0063;
-double Rdr = -0.0058;
+double Xu = -60.2293;
+double Xdu = -3.5497;
+double Yv = -36.441;
+double Ydv = -11.9743;
+double Zw = -1.9422;
+double Zdw = -40.9319;
+double Pp = -3.0678;
+double Pdp = -0.7553;
+double Qq = -5.3090;
+double Qdq = -5.1596;
+double Rr = -2.0282;
+double Rdr = -6.6105;
+double Mw = 17.0878;
 
 double Xn = 12;
 double Up = 7;
